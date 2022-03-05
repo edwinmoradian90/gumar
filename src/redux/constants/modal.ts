@@ -1,0 +1,2 @@
+export const MODAL_VISIBLE = 'MODAL_VISIBLE';
+export const MODAL_NOT_VISIBLE = 'MODAL_NOT_VISIBLE';

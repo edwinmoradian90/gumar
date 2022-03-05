@@ -1,0 +1,8 @@
+- add filters and/or filter page like airbnb for overview page: date, time, name, amount, time period, payment type (card, cash, subscription)
+- finish view for export, possible move export functionality to home page as button on header or somewhere else.
+- finish functionality for export, can only export out, no editing, deleting, etc. Give user choice form and choice between row or columns in spread sheet.
+- add totals in overview with filter functionality for specific categories, cards subscription, cash, total, etc. 
+- add animations and work on ui/ux touchs
+- maybe add tests
+- refactor views to be dumb components and handle logic else where
+- push to android store

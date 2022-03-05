@@ -1,0 +1,108 @@
+import {AnyAction} from 'redux';
+import {ThunkAction} from 'redux-thunk';
+import config from '../../settings/config';
+import {Transaction} from '../../types/app';
+import {
+  SPREAD_SHEET,
+  SPREAD_SHEET_FAILURE,
+  SPREAD_SHEET_SUCCESS,
+} from '../constants/spreadSheets';
+import {Separator, SpreadSheetProps} from '../types/spreadSheets';
+import {RootState} from '../types/store';
+
+async function setSheetValues(
+  accessToken: string,
+  spreadSheetId: string,
+  transactions: Transaction[],
+) {
+  const batchUpdateUrl = `${config.sheets.url}/${spreadSheetId}/values:batchUpdate`;
+  const range = `A1:C${transactions.length + 1}`;
+  const categories = ['Name', 'Amount', 'Date'];
+  const transactionValues = transactions.map((transaction: Transaction) => [
+    transaction.name,
+    transaction.amount,
+    transaction.date,
+  ]);
+  const values = [categories, ...transactionValues];
+  const body = {
+    data: [
+      {
+        range,
+        values,
+      },
+    ],
+    valueInputOption: 'RAW',
+    includeValuesInResponse: true,
+  };
+  const data = await fetch(batchUpdateUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  const result = await data.json();
+
+  console.log({result});
+}
+
+export function create(
+  accessToken: string,
+  spreadSheet: Omit<SpreadSheetProps, 'id'>,
+  transactions: Transaction[],
+): ThunkAction<void, RootState, unknown, AnyAction> {
+  return async (dispatch, getState) => {
+    const {sheets: currentSheets} = getState().spreadSheets;
+    const URL = 'https://sheets.googleapis.com/v4/spreadsheets';
+    console.log({spreadSheet});
+    try {
+      dispatch({type: SPREAD_SHEET});
+      const body = {
+        properties: {
+          title: spreadSheet.title,
+        },
+      };
+      console.log('TRY');
+      const data = await fetch(URL, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+      const {spreadsheetId: id} = await data.json();
+      const newSpreadSheetWithId = {...spreadSheet, id};
+      const sheets = [...currentSheets, newSpreadSheetWithId];
+
+      await setSheetValues(accessToken, id, transactions);
+
+      dispatch({
+        type: SPREAD_SHEET_SUCCESS,
+        sheets,
+      });
+    } catch (error) {
+      console.error(error);
+      dispatch({type: SPREAD_SHEET_FAILURE});
+    }
+  };
+}
+
+// add removal in google sheets as well
+export function clear(): ThunkAction<void, RootState, unknown, AnyAction> {
+  return async dispatch => {
+    try {
+      dispatch({type: SPREAD_SHEET});
+      // code for removing from google drive
+      dispatch({type: SPREAD_SHEET_SUCCESS, sheets: []});
+      console.log('CLEARED SHEETS');
+    } catch (error) {
+      console.error(error);
+      dispatch({type: SPREAD_SHEET_FAILURE});
+    }
+  };
+}
