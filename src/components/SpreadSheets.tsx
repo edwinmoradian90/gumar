@@ -1,7 +1,6 @@
 import {Picker} from '@react-native-picker/picker';
 import React, {useRef} from 'react';
-import {Pressable, Text, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
+import {Pressable, Text, View, TextInput} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {clear, create} from '../redux/actions/spreadSheets';
 import {Separator, SpreadSheetProps} from '../redux/types/spreadSheets';

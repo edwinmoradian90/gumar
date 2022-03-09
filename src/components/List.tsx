@@ -6,7 +6,6 @@ import {
   TouchableHighlight,
   ScrollView,
 } from 'react-native';
-import Animated, {SlideInUp, SlideOutUp} from 'react-native-reanimated';
 import uuid from 'react-native-uuid';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/types/store';
@@ -109,13 +108,11 @@ export default function List({
     const key = uuid.v4() as string;
     if (hide && hide.length > 0 && hide.includes(item.id)) return null;
     return (
-      <Animated.View key={key} entering={SlideInUp}>
-        <Item
-          item={item}
-          onPress={() => onPress(item)}
-          onLongPress={() => onLongPress(item)}
-        />
-      </Animated.View>
+      <Item
+        item={item}
+        onPress={() => onPress(item)}
+        onLongPress={() => onLongPress(item)}
+      />
     );
   };
 
