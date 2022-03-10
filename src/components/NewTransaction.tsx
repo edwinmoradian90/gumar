@@ -1,39 +1,41 @@
 import React, {useState} from 'react';
-import {View, Pressable, Text, TextInput} from 'react-native';
-import uuid from 'react-native-uuid';
-import {appendTransaction} from '../redux/actions/transaction';
-import {Transaction} from '../types/app';
 import ReactNativeModal from 'react-native-modal';
-import {useDispatch, useSelector} from 'react-redux';
-import {setModalNotVisible} from '../redux/actions/modal';
-import newTransactionStyles from '../styles/newTransaction';
+import uuid from 'react-native-uuid';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {RootState} from '../redux/types/store';
-import {ModalVisible} from '../redux/types/modal';
-import {splitDate} from '../utils/helpers';
+import {View, Pressable, Text, TextInput} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
+import {useDispatch, useSelector} from 'react-redux';
+import {actions} from '../redux';
+import {style} from '../styles';
+import {modalTypes, storeTypes, transactionTypes} from '../types';
 
 export default function NewTransaction() {
   const dispatch = useDispatch();
-  const {modalVisible} = useSelector((state: RootState) => state.modal);
+  const {modalVisible} = useSelector(
+    (state: storeTypes.RootState) => state.modal,
+  );
 
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] =
+    useState<transactionTypes.PaymentMethod>(
+      transactionTypes.PaymentMethod.CASH,
+    );
 
   function onSubmit() {
     try {
       const id = uuid.v4() as string;
       const date = new Date();
-      const splitDateValues = splitDate(date);
-      const newTransaction: Transaction = {
+      const newTransaction: transactionTypes.Transaction = {
         id,
         name,
         amount,
         date,
-        ...splitDateValues,
+        paymentMethod,
       };
 
-      dispatch(appendTransaction(newTransaction));
-      dispatch(setModalNotVisible());
+      dispatch(actions.transaction.append(newTransaction));
+      dispatch(actions.modal.setNotVisible());
 
       setName('');
       setAmount('');
@@ -44,36 +46,53 @@ export default function NewTransaction() {
 
   return (
     <ReactNativeModal
-      style={newTransactionStyles.modalContainer}
-      isVisible={modalVisible === ModalVisible.ADD}
+      style={style.newTransaction.modalContainer}
+      isVisible={modalVisible === modalTypes.ModalVisible.ADD}
       swipeDirection={['down']}
-      onBackdropPress={() => dispatch(setModalNotVisible())}
-      onSwipeComplete={() => dispatch(setModalNotVisible())}>
-      <View style={newTransactionStyles.modalView}>
-        <View style={newTransactionStyles.container}>
-          <View style={newTransactionStyles.header}>
-            <Text style={newTransactionStyles.headerTitle}>
+      onBackdropPress={() => dispatch(actions.modal.setNotVisible())}
+      onSwipeComplete={() => dispatch(actions.modal.setNotVisible())}>
+      <View style={style.newTransaction.modalView}>
+        <View style={style.newTransaction.container}>
+          <View style={style.newTransaction.header}>
+            <Text style={style.newTransaction.headerTitle}>
               New Transaction
             </Text>
             <Pressable
-              style={newTransactionStyles.closeButton}
-              onPress={() => dispatch(setModalNotVisible())}>
+              style={style.newTransaction.closeButton}
+              onPress={() => dispatch(actions.modal.setNotVisible())}>
               <AntDesign name="close" size={18} />
             </Pressable>
           </View>
-          <TextInput onChangeText={name => setName(name)} placeholder="Name" />
+          <Text>Transaction name</Text>
           <TextInput
+            style={style.newTransaction.input}
+            onChangeText={name => setName(name)}
+            placeholder="Name"
+          />
+          <Text>Transaction amount</Text>
+          <TextInput
+            style={style.newTransaction.input}
             onChangeText={amount => setAmount(amount)}
             placeholder="Amount"
             keyboardType="numeric"
           />
+          <Text>Payment type</Text>
+          <Picker
+            style={style.newTransaction.input}
+            selectedValue={paymentMethod}
+            onValueChange={(itemValue: number) => setPaymentMethod(itemValue)}>
+            <Picker.Item label="Cash" value={0} />
+            <Picker.Item label="Credit" value={1} />
+            <Picker.Item label="Debit" value={2} />
+            <Picker.Item label="Other" value={3} />
+          </Picker>
           <Pressable
             style={[
-              newTransactionStyles.button,
-              newTransactionStyles.buttonSubmit,
+              style.newTransaction.button,
+              style.newTransaction.buttonSubmit,
             ]}
             onPress={onSubmit}>
-            <Text style={newTransactionStyles.textStyle}>Submit</Text>
+            <Text style={style.newTransaction.textStyle}>Submit</Text>
           </Pressable>
         </View>
       </View>

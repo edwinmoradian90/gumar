@@ -1,6 +1,6 @@
 import React from 'react';
 import {Switch, View, StyleSheet} from 'react-native';
-import {gray, muted, primary} from '../utils/colors';
+import {colors} from '../utils';
 
 export default function Toggle({
   isEnabled = false,
@@ -12,8 +12,8 @@ export default function Toggle({
   return (
     <View style={styles.container}>
       <Switch
-        trackColor={{false: muted, true: primary}}
-        thumbColor={gray}
+        trackColor={{false: colors.muted, true: colors.secondary}}
+        thumbColor={colors.gray}
         ios_backgroundColor="#3e3e3e"
         onValueChange={toggleSwitch}
         value={isEnabled}

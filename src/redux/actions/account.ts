@@ -5,14 +5,19 @@ import {
 import {Alert} from 'react-native';
 import {AnyAction} from 'redux';
 import {ThunkAction} from 'redux-thunk';
+import {storeTypes} from '../../types';
 import {
   GOOGLE_AUTH,
   GOOGLE_AUTH_FAILURE,
   GOOGLE_AUTH_SUCCESS,
 } from '../constants/account';
-import {RootState} from '../types/store';
 
-export function login(): ThunkAction<void, RootState, any, AnyAction> {
+export function login(): ThunkAction<
+  void,
+  storeTypes.RootState,
+  any,
+  AnyAction
+> {
   return async (dispatch, getState) => {
     const {isLoggedIn} = getState().account;
     try {
@@ -48,7 +53,12 @@ export function login(): ThunkAction<void, RootState, any, AnyAction> {
   };
 }
 
-export function logout(): ThunkAction<void, RootState, any, AnyAction> {
+export function logout(): ThunkAction<
+  void,
+  storeTypes.RootState,
+  any,
+  AnyAction
+> {
   return async (dispatch, getState) => {
     try {
       dispatch({type: GOOGLE_AUTH});

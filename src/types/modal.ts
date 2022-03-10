@@ -6,6 +6,6 @@ export enum ModalVisible {
   'NONE',
 }
 
-export interface ModalProps {
+export interface Props {
   modalVisible: ModalVisible;
 }

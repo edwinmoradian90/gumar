@@ -1,8 +1,8 @@
 import {MODAL_NOT_VISIBLE, MODAL_VISIBLE} from '../constants/modal';
-import {ModalProps, ModalVisible} from '../types/modal';
+import {modalTypes} from '../../types';
 
-const initialState: ModalProps = {
-  modalVisible: ModalVisible.NONE,
+const initialState: modalTypes.Props = {
+  modalVisible: modalTypes.ModalVisible.NONE,
 };
 
 export default function modalReducer(state = initialState, action: any) {
@@ -16,7 +16,7 @@ export default function modalReducer(state = initialState, action: any) {
     case MODAL_NOT_VISIBLE:
       return {
         ...state,
-        modalVisible: ModalVisible.NONE,
+        modalVisible: modalTypes.ModalVisible.NONE,
       };
     default:
       return state;

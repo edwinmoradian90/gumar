@@ -1,12 +1,12 @@
+import {settingTypes} from '../../types';
 import {
   SELECT_CURRENCY,
   SELECT_SETTING,
   SET_PASSWORD,
   SET_PASSWORD_STATE,
 } from '../constants/settings';
-import {Selected} from '../types/settings';
 
-export function selectSetting(selected: Selected) {
+export function selectSetting(selected: settingTypes.Selected) {
   return {type: SELECT_SETTING, selected};
 }
 

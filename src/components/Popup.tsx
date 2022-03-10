@@ -1,10 +1,8 @@
 import React from 'react';
-import {Modal, StyleSheet, View} from 'react-native';
+import {Modal, View} from 'react-native';
 import {useSelector} from 'react-redux';
-import {RootState} from '../redux/types/store';
-import fromBottomPopupStyles from '../styles/popup/fromBottom';
-import fullScreenPopupStyles from '../styles/popup/fullScreen';
-import popupStyles from '../styles/popup/main';
+import {storeTypes} from '../types';
+import {style} from '../styles';
 
 // TODO move to types, add gestures to popup, fill in any types
 type AnimationType = 'none' | 'slide' | 'fade' | undefined;
@@ -17,7 +15,7 @@ export default function Popup({
   onRequestClose,
   presentation = 'center',
   children,
-  styles = popupStyles,
+  styles = style.popup.main,
 }: {
   animationType?: AnimationType;
   transparent?: boolean;
@@ -27,12 +25,15 @@ export default function Popup({
   children?: React.ReactNode;
   styles?: any;
 }) {
-  const {modalVisible} = useSelector((state: RootState) => state.modal);
+  const {modalVisible} = useSelector(
+    (state: storeTypes.RootState) => state.modal,
+  );
   const presentationMap: {[index: string]: any} = {
-    full: fullScreenPopupStyles,
-    center: popupStyles,
-    bottom: fromBottomPopupStyles,
+    full: style.popup.fullScreen,
+    center: style.popup.main,
+    bottom: style.popup.fromBottom,
   };
+
   const presentationStyle = presentationMap[presentation];
 
   return (

@@ -1,35 +1,28 @@
-import Slider from '@react-native-community/slider';
 import React, {useState} from 'react';
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  Text,
-  Platform,
-  TextInput,
-} from 'react-native';
 import ReactNativeModal from 'react-native-modal';
-import {useDispatch, useSelector} from 'react-redux';
-import {setModalNotVisible} from '../redux/actions/modal';
-import {ModalVisible} from '../redux/types/modal';
-import {RootState} from '../redux/types/store';
-import {white} from '../utils/colors';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
-import Header from './Header';
+import {ScrollView, View, StyleSheet, Text, TextInput} from 'react-native';
+import {Header} from '.';
+import {useDispatch, useSelector} from 'react-redux';
+import {actions} from '../redux';
 import {Picker} from '@react-native-picker/picker';
+import {modalTypes, storeTypes} from '../types';
+import {colors} from '../utils';
 
 export default function Filter(data?: any) {
   const dispatch = useDispatch();
-  const {modalVisible} = useSelector((state: RootState) => state.modal);
+  const {modalVisible} = useSelector(
+    (state: storeTypes.RootState) => state.modal,
+  );
   const [range, setRange] = useState({from: 0, to: 100});
 
   return (
     <ReactNativeModal
       style={styles.modalContainer}
-      isVisible={modalVisible === ModalVisible.FILTER}
+      isVisible={modalVisible === modalTypes.ModalVisible.FILTER}
       swipeDirection={['down']}
-      onBackdropPress={() => dispatch(setModalNotVisible())}
-      onSwipeComplete={() => dispatch(setModalNotVisible())}>
+      onBackdropPress={() => dispatch(actions.modal.setNotVisible())}
+      onSwipeComplete={() => dispatch(actions.modal.setNotVisible())}>
       <ScrollView style={styles.modalView}>
         <Header title="Filter" left={['title']} right={['close']} />
         <View style={styles.contentContainer}>
@@ -98,7 +91,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   modalView: {
-    backgroundColor: white,
+    backgroundColor: colors.primary,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     flex: 1,

@@ -1,3 +1,4 @@
+import {settingTypes} from '../../types';
 import {
   SELECT_CURRENCY,
   SELECT_SETTING,
@@ -5,14 +6,7 @@ import {
   SET_PASSWORD_STATE,
 } from '../constants/settings';
 
-type SettingState = {
-  selected: {[index: string]: string} | null;
-  currency: string | null;
-  isUsingPassword: boolean;
-  password: string;
-};
-
-const initialState: SettingState = {
+const initialState: settingTypes.InitialState = {
   selected: null,
   currency: 'usd',
   isUsingPassword: false,

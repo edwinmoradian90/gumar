@@ -47,6 +47,11 @@ const newTransactionStyles = StyleSheet.create({
     right: 30,
     width: 70,
   },
+  input: {
+    borderBottomColor: secondary,
+    borderBottomWidth: 1,
+    marginBottom: 16,
+  },
   textStyle: {
     color: 'white',
     fontWeight: 'bold',

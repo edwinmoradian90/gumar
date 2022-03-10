@@ -1,19 +1,15 @@
 import React from 'react';
-import {Text, View} from 'react-native';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
-import List from '../../components/List';
-import {gray, muted, primary, secondary} from '../../utils/colors';
-import settingsListStyles from '../../styles/list/settings';
-import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
+import settingsListStyles from '../../styles/list/settings';
+import {Header, List} from '../../components';
 import {selectSetting} from '../../redux/actions/settings';
-import {Selected} from '../../redux/types/settings';
-import {NavigationProps} from '../../types/app';
-import Header from '../../components/Header';
+import {appTypes, settingTypes} from '../../types';
+import {colors} from '../../utils';
 
 export default function Settings() {
-  const navigation = useNavigation<NavigationProps>();
+  const navigation = useNavigation<appTypes.Navigation>();
   const dispatch = useDispatch();
   const settingsData = [
     {
@@ -34,7 +30,7 @@ export default function Settings() {
     },
   ];
 
-  function onPress(selected: Selected) {
+  function onPress(selected: settingTypes.Selected) {
     dispatch(selectSetting(selected));
     navigation.navigate('SettingScreen');
   }
@@ -47,7 +43,11 @@ export default function Settings() {
         exclude={['id']}
         styles={settingsListStyles}
         onPress={onPress}>
-        <EntypoIcon name="chevron-thin-right" size={14} color={secondary} />
+        <EntypoIcon
+          name="chevron-thin-right"
+          size={14}
+          color={colors.secondary}
+        />
       </List>
     </>
   );

@@ -1,9 +1,9 @@
-import {Status} from '../../utils/ds';
+import {appTypes} from '../../types';
 
 const appInitialState = {
   sheets: [],
   transactions: [],
-  status: Status.SUCCESS,
+  status: appTypes.Status.SUCCESS,
 };
 
 export default function appReducer(state = appInitialState, action: any) {

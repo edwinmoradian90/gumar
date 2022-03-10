@@ -1,16 +1,10 @@
-import {useNavigation} from '@react-navigation/native';
-import React, {useLayoutEffect} from 'react';
+import React from 'react';
+import uuid from 'react-native-uuid';
 import {Dimensions, Text, View} from 'react-native';
 import useHeaderActions from '../hooks/useHeaderActions';
-import {setModalVisible} from '../redux/actions/modal';
-import {removeTransaction} from '../redux/actions/transaction';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/types/store';
-import headerStyles from '../styles/header/main';
-import * as Buttons from './Buttons';
-import {capitalize} from '../utils/helpers';
-import uuid from 'react-native-uuid';
-import {ModalVisible} from '../redux/types/modal';
+import {Buttons} from '.';
+import {helpers} from '../utils';
+import {style} from '../styles';
 
 export default function Header({
   title,
@@ -18,7 +12,7 @@ export default function Header({
   right = [],
   center = [],
   actions = {},
-  styles = headerStyles,
+  styles = style.header.main,
 }: {
   title?: string;
   left?: string[];
@@ -27,23 +21,7 @@ export default function Header({
   actions?: {[index: string]: (...args: any) => void};
   styles?: any;
 }) {
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
   const headerActions = useHeaderActions();
-  const {selected} = useSelector((state: RootState) => state.transaction);
-
-  function handleRemoveTransaction() {
-    dispatch(removeTransaction(selected.id));
-    navigation.goBack();
-  }
-
-  function handleNewTransaction() {
-    dispatch(setModalVisible(ModalVisible.ADD));
-  }
-
-  function handleGoBack() {
-    if (navigation.canGoBack()) navigation.goBack();
-  }
 
   function calculateSectionWidth() {
     let n = 0;
@@ -59,7 +37,7 @@ export default function Header({
   function createHeaderSection(section: string[]) {
     return section.map((name: string) => {
       const key = uuid.v4().toString();
-      const capitalizedName = capitalize(name);
+      const capitalizedName = helpers.capitalize(name);
       if (name === 'title') {
         return (
           <View key={key} style={styles.title}>
@@ -78,10 +56,6 @@ export default function Header({
       return null;
     });
   }
-
-  useLayoutEffect(() => {}, []);
-
-  const sectionWidth = calculateSectionWidth();
 
   return (
     <View style={styles.container}>

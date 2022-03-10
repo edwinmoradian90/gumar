@@ -1,28 +1,24 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {TextInput} from 'react-native-paper';
-import {useDispatch, useSelector} from 'react-redux';
-import Header from '../../components/Header';
-import List from '../../components/List';
-import Popup from '../../components/Popup';
-import Toggle from '../../components/Toggle';
-import {options} from '../../data/privacySecurity';
-import {setModalNotVisible, setModalVisible} from '../../redux/actions/modal';
-import {setPassword, setPasswordUse} from '../../redux/actions/settings';
-import {RootState} from '../../redux/types/store';
-import privacySecurityListStyles from '../../styles/list/privacySecurity';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import {gray, muted, primary, white} from '../../utils/colors';
 import ReactNativeModal from 'react-native-modal';
-import {ModalVisible} from '../../redux/types/modal';
+import {useDispatch, useSelector} from 'react-redux';
+import {Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
+import {Header, List, Toggle} from '../../components';
+import {options} from '../../data/privacySecurity';
+import {actions} from '../../redux';
+import privacySecurityListStyles from '../../styles/list/privacySecurity';
+import {modalTypes, storeTypes} from '../../types';
+import {colors} from '../../utils';
 
 export default function PrivacySecurity() {
   const dispatch = useDispatch();
   const {isUsingPassword, password} = useSelector(
-    (state: RootState) => state.settings,
+    (state: storeTypes.RootState) => state.settings,
   );
-  const {modalVisible} = useSelector((state: RootState) => state.modal);
+  const {modalVisible} = useSelector(
+    (state: storeTypes.RootState) => state.modal,
+  );
   const [showPassword, setShowPassword] = useState(false);
   const data = useRef('');
 
@@ -33,12 +29,12 @@ export default function PrivacySecurity() {
   }
 
   function toggleSwitch() {
-    dispatch(setPasswordUse(!isUsingPassword));
+    dispatch(actions.setting.setPasswordUse(!isUsingPassword));
   }
 
   function onPress(item: any) {
     if (item.id !== 'update-password') return null;
-    dispatch(setModalVisible(ModalVisible.ADD));
+    dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD));
   }
 
   function ToggleButton({item}: {item?: any}) {
@@ -49,26 +45,29 @@ export default function PrivacySecurity() {
 
   function ChangePasswordIcon({item}: {item?: any}) {
     if (item.id !== 'update-password') return null;
-    return <FontAwesome5Icon name="chevron-right" size={16} color={primary} />;
+    return (
+      <FontAwesome5Icon name="chevron-right" size={16} color={colors.primary} />
+    );
   }
 
   function handlePasswordModalClose() {
-    if (!password) dispatch(setPasswordUse(false));
-    dispatch(setModalNotVisible());
+    if (!password) dispatch(actions.setting.setPasswordUse(false));
+    dispatch(actions.modal.setNotVisible());
     setData('');
   }
 
   function onEndEditing() {
     const newPassword = data.current || password;
 
-    dispatch(setPassword(newPassword));
-    dispatch(setModalNotVisible());
+    dispatch(actions.setting.setPassword(newPassword));
+    dispatch(actions.modal.setNotVisible());
     setData('');
   }
 
   useEffect(() => {
     if (isUsingPassword) {
-      if (!password) dispatch(setModalVisible(ModalVisible.PASSWORD));
+      if (!password)
+        dispatch(actions.modal.setVisible(modalTypes.ModalVisible.PASSWORD));
     }
   }, [isUsingPassword]);
 
@@ -90,7 +89,7 @@ export default function PrivacySecurity() {
       {/* <Popup animationType="slide" presentation="full" transparent={false}> */}
       <ReactNativeModal
         style={styles.modalContainer}
-        isVisible={modalVisible === ModalVisible.PASSWORD}
+        isVisible={modalVisible === modalTypes.ModalVisible.PASSWORD}
         swipeDirection={['down']}
         onBackdropPress={handlePasswordModalClose}
         onSwipeComplete={handlePasswordModalClose}>
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   modalView: {
-    backgroundColor: white,
+    backgroundColor: colors.primary,
     padding: 30,
   },
   headingText: {

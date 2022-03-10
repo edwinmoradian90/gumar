@@ -7,19 +7,6 @@ export enum Status {
   DEFAULT = 'DEFAULT',
 }
 
-export type Transaction = {
-  [index: string]: string | Date;
-  id: string;
-  name: string;
-  amount: string;
-  year: string;
-  month: string;
-  week: string;
-  day: string;
-  time: string;
-  date: Date;
-};
-
 type RootStackParamList = {
   HomeScreen: undefined;
   EditScreen: undefined;
@@ -27,4 +14,4 @@ type RootStackParamList = {
   SettingScreen: undefined;
 };
 
-export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
+export type Navigation = NativeStackNavigationProp<RootStackParamList>;

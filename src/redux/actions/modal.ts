@@ -1,10 +1,10 @@
+import {modalTypes} from '../../types';
 import {MODAL_NOT_VISIBLE, MODAL_VISIBLE} from '../constants/modal';
-import {ModalVisible} from '../types/modal';
 
-export function setModalVisible(modalVisible: ModalVisible) {
+export function setVisible(modalVisible: modalTypes.ModalVisible) {
   return {type: MODAL_VISIBLE, modalVisible};
 }
 
-export function setModalNotVisible() {
+export function setNotVisible() {
   return {type: MODAL_NOT_VISIBLE};
 }

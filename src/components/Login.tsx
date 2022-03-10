@@ -1,31 +1,31 @@
 import React, {useEffect} from 'react';
+import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {actions} from '../redux';
 import {
   GoogleSignin,
   GoogleSigninButton,
 } from '@react-native-google-signin/google-signin';
-import {Button, Pressable, StyleSheet, Text, View} from 'react-native';
-import {login, logout} from '../redux/actions/account';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/types/store';
-import {primary, secondary, white} from '../utils/colors';
 import api from '../settings/config';
+import {storeTypes} from '../types';
+import {colors} from '../utils';
 
 export default function Login() {
   const dispatch = useDispatch();
   const {isLoggedIn, accessToken} = useSelector(
-    (state: RootState) => state.account,
+    (state: storeTypes.RootState) => state.account,
   );
   function handleLogin() {
-    dispatch(login());
+    dispatch(actions.account.login());
   }
 
   function handleLogout() {
-    dispatch(logout());
+    dispatch(actions.account.logout());
   }
 
   function handleUseAnotherAccount() {
-    if (isLoggedIn) dispatch(logout());
-    dispatch(login());
+    if (isLoggedIn) dispatch(actions.account.logout());
+    dispatch(actions.account.login());
   }
 
   console.log({accessToken});
@@ -71,14 +71,14 @@ const styles = StyleSheet.create({
     width: 192,
   },
   button: {
-    backgroundColor: secondary,
+    backgroundColor: colors.secondary,
     borderRadius: 5,
     padding: 10,
     marginBottom: 20,
     width: 100,
   },
   buttonText: {
-    color: white,
+    color: colors.white,
     textAlign: 'center',
   },
 });

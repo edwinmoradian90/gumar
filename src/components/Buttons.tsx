@@ -1,10 +1,9 @@
 import React from 'react';
-import {Pressable} from 'react-native';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {primary, secondary, white} from '../utils/colors';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
+import {Pressable} from 'react-native';
+import {colors} from '../utils';
 
 export function Trash({onPress, styles}: {onPress?: () => void; styles?: any}) {
   return (
@@ -24,7 +23,7 @@ export function Add({onPress, styles}: {onPress?: () => void; styles?: any}) {
       <AntDesign
         name="plus"
         size={22}
-        color={styles?.addButton?.color || secondary || 'black'}
+        color={styles?.addButton?.color || colors.secondary || 'black'}
       />
     </Pressable>
   );
@@ -54,7 +53,7 @@ export function Filter({
       <IonIcon
         name="ios-filter-outline"
         size={22}
-        color={styles?.filterButton?.color || white}
+        color={styles?.filterButton?.color || colors.primary}
       />
     </Pressable>
   );
@@ -72,7 +71,7 @@ export function Export({
       <AntDesign
         name="export"
         size={20}
-        color={styles?.exportButton?.color || white}
+        color={styles?.exportButton?.color || colors.primary}
       />
     </Pressable>
   );
@@ -84,7 +83,7 @@ export function Close({onPress, styles}: {onPress?: () => void; styles?: any}) {
       <AntDesign
         name="close"
         size={20}
-        color={styles?.closeButton?.color || secondary}
+        color={styles?.closeButton?.color || colors.secondary}
       />
     </Pressable>
   );

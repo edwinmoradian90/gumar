@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Text, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {primary, secondary} from '../utils/colors';
+import {colors} from '../utils';
 
 export default function Splash() {
   return (
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    color: secondary,
+    color: colors.secondary,
     fontSize: 32,
     fontWeight: 'bold',
   },

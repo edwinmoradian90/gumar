@@ -1,17 +1,9 @@
 import React, {Key} from 'react';
-import {
-  FlatList,
-  Text,
-  View,
-  TouchableHighlight,
-  ScrollView,
-} from 'react-native';
 import uuid from 'react-native-uuid';
+import {FlatList, Text, View, TouchableHighlight} from 'react-native';
 import {useSelector} from 'react-redux';
-import {RootState} from '../redux/types/store';
-import listStyles from '../styles/list/main';
-import {Transaction} from '../types/app';
-import {Status} from '../types/app';
+import {appTypes, storeTypes, transactionTypes} from '../types';
+import {style} from '../styles';
 
 export default function List({
   data,
@@ -19,7 +11,7 @@ export default function List({
   onLongPress = () => {},
   exclude,
   include,
-  styles = listStyles,
+  styles = style.list.main,
   reverse = false,
   scrollable = true,
   before,
@@ -29,8 +21,8 @@ export default function List({
 }: {
   // update type
   data: any;
-  onPress?: (item: Transaction) => void;
-  onLongPress?: (item: Transaction) => void;
+  onPress?: (item: transactionTypes.Transaction) => void;
+  onLongPress?: (item: transactionTypes.Transaction) => void;
   exclude?: string[];
   include?: string[];
   styles?: any;
@@ -41,7 +33,9 @@ export default function List({
   hide?: string[] | null;
   children?: React.ReactNode;
 }) {
-  const {status} = useSelector((state: RootState) => state.transaction);
+  const {status} = useSelector(
+    (state: storeTypes.RootState) => state.transaction,
+  );
 
   const {
     listItemContainer,
@@ -59,7 +53,7 @@ export default function List({
     onPress,
     onLongPress,
   }: {
-    item: Transaction;
+    item: transactionTypes.Transaction;
     onPress: () => void;
     onLongPress: () => void;
   }) => {
@@ -108,17 +102,21 @@ export default function List({
     const key = uuid.v4() as string;
     if (hide && hide.length > 0 && hide.includes(item.id)) return null;
     return (
-      <Item
-        item={item}
-        onPress={() => onPress(item)}
-        onLongPress={() => onLongPress(item)}
-      />
+      <View key={key}>
+        <Item
+          item={item}
+          onPress={() => onPress(item)}
+          onLongPress={() => onLongPress(item)}
+        />
+      </View>
     );
   };
 
+  console.log({data});
+
   return (
     <View style={listContainer}>
-      {status === Status.SUCCESS &&
+      {status === appTypes.Status.SUCCESS &&
         data &&
         data.length > 0 &&
         (scrollable ? (

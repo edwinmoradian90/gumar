@@ -1,15 +1,13 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import {View, Text, StyleSheet} from 'react-native';
 import {useSelector} from 'react-redux';
-import Header from '../../components/Header';
-import Login from '../../components/Login';
-import {RootState} from '../../redux/types/store';
-import {primary, white} from '../../utils/colors';
+import {Header, Login} from '../../components';
+import {storeTypes} from '../../types';
+import {colors} from '../../utils';
 
 export default function Account() {
   const {isLoggedIn, email, givenName} = useSelector(
-    (state: RootState) => state.account,
+    (state: storeTypes.RootState) => state.account,
   );
 
   return (
@@ -33,7 +31,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: primary,
+    backgroundColor: colors.primary,
   },
   buttonContainer: {
     alignItems: 'center',
@@ -43,14 +41,14 @@ const styles = StyleSheet.create({
   },
   loginStatusText: {},
   authButton: {
-    backgroundColor: primary,
+    backgroundColor: colors.primary,
     borderRadius: 5,
     padding: 10,
     marginRight: 20,
     width: 100,
   },
   authButtonText: {
-    color: white,
+    color: colors.white,
     textAlign: 'center',
   },
 });

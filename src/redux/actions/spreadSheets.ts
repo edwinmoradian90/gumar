@@ -1,28 +1,28 @@
 import {AnyAction} from 'redux';
 import {ThunkAction} from 'redux-thunk';
 import config from '../../settings/config';
-import {Transaction} from '../../types/app';
+import {spreadSheetTypes, storeTypes, transactionTypes} from '../../types';
 import {
   SPREAD_SHEET,
   SPREAD_SHEET_FAILURE,
   SPREAD_SHEET_SUCCESS,
 } from '../constants/spreadSheets';
-import {Separator, SpreadSheetProps} from '../types/spreadSheets';
-import {RootState} from '../types/store';
 
 async function setSheetValues(
   accessToken: string,
   spreadSheetId: string,
-  transactions: Transaction[],
+  transactions: transactionTypes.Transaction[],
 ) {
   const batchUpdateUrl = `${config.sheets.url}/${spreadSheetId}/values:batchUpdate`;
   const range = `A1:C${transactions.length + 1}`;
   const categories = ['Name', 'Amount', 'Date'];
-  const transactionValues = transactions.map((transaction: Transaction) => [
-    transaction.name,
-    transaction.amount,
-    transaction.date,
-  ]);
+  const transactionValues = transactions.map(
+    (transaction: transactionTypes.Transaction) => [
+      transaction.name,
+      transaction.amount,
+      transaction.date,
+    ],
+  );
   const values = [categories, ...transactionValues];
   const body = {
     data: [
@@ -51,9 +51,9 @@ async function setSheetValues(
 
 export function create(
   accessToken: string,
-  spreadSheet: Omit<SpreadSheetProps, 'id'>,
-  transactions: Transaction[],
-): ThunkAction<void, RootState, unknown, AnyAction> {
+  spreadSheet: Omit<spreadSheetTypes.SpreadSheet, 'id'>,
+  transactions: transactionTypes.Transaction[],
+): ThunkAction<void, storeTypes.RootState, unknown, AnyAction> {
   return async (dispatch, getState) => {
     const {sheets: currentSheets} = getState().spreadSheets;
     const URL = 'https://sheets.googleapis.com/v4/spreadsheets';
@@ -93,7 +93,12 @@ export function create(
 }
 
 // add removal in google sheets as well
-export function clear(): ThunkAction<void, RootState, unknown, AnyAction> {
+export function clear(): ThunkAction<
+  void,
+  storeTypes.RootState,
+  unknown,
+  AnyAction
+> {
   return async dispatch => {
     try {
       dispatch({type: SPREAD_SHEET});

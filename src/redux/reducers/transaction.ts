@@ -1,14 +1,13 @@
-import {TransactionState} from '../types/transaction';
-import {Status} from '../../types/app';
 import {
   ACTION_TRANSACTION_FAILURE,
   ACTION_TRANSACTION_SUCCESS,
   ACTION_TRANSACTION,
   SELECT_TRANSACTION,
 } from '../constants/transaction';
+import {appTypes, transactionTypes} from '../../types';
 
-const initialState: TransactionState = {
-  status: Status.SUCCESS,
+const initialState: transactionTypes.InitialState = {
+  status: appTypes.Status.SUCCESS,
   transactions: [],
   selected: null,
   error: null,
@@ -26,19 +25,19 @@ export default function transactionReducer(state = initialState, action: any) {
     case ACTION_TRANSACTION:
       return {
         ...state,
-        status: Status.LOADING,
+        status: appTypes.Status.LOADING,
       };
     case ACTION_TRANSACTION_SUCCESS:
       return {
         ...state,
         transactions,
-        status: Status.SUCCESS,
+        status: appTypes.Status.SUCCESS,
       };
     case ACTION_TRANSACTION_FAILURE:
       return {
         ...state,
         error,
-        status: Status.ERROR,
+        status: appTypes.Status.ERROR,
       };
     default:
       return state;

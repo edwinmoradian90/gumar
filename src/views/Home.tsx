@@ -1,30 +1,26 @@
+import moment from 'moment';
+import React, {useCallback, useMemo} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import React, {useMemo} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch, useSelector} from 'react-redux';
-import Header from '../components/Header';
-import List from '../components/List';
-import NewTransaction from '../components/NewTransaction';
+import * as Component from '../components';
+import {actions} from '../redux';
 import {currencies} from '../data/currency';
-import {selectTransaction} from '../redux/actions/transaction';
-import {RootState} from '../redux/types/store';
 import homeStyles from '../styles/home';
 import listStyles from '../styles/list/main';
-import {NavigationProps, Transaction} from '../types/app';
-import {secondary} from '../utils/colors';
-import {Status} from '../types/app';
-import Filter from '../components/Filter';
-import Export from '../components/Export';
-import {months} from '../utils/helpers';
+import {appTypes, transactionTypes, storeTypes} from '../types';
+import {colors, helpers} from '../utils';
 
 export default function Home() {
-  const navigation = useNavigation<NavigationProps>();
+  const navigation = useNavigation<appTypes.Navigation>();
   const dispatch = useDispatch();
   const {transactions, status} = useSelector(
-    (state: RootState) => state.transaction,
+    (state: storeTypes.RootState) => state.transaction,
   );
-  const {currency} = useSelector((state: RootState) => state.settings);
+  const {currency} = useSelector(
+    (state: storeTypes.RootState) => state.settings,
+  );
   const currencySymbol: any = useMemo(() => {
     let symbol;
     currencies.forEach((c: {[index: string]: string}) =>
@@ -37,14 +33,15 @@ export default function Home() {
     console.log('LONG');
   }
 
-  function onPress(transaction: Transaction) {
-    dispatch(selectTransaction(transaction));
+  function onPress(transaction: transactionTypes.Transaction) {
+    console.log(transaction);
+    dispatch(actions.transaction.select(transaction));
     navigation.navigate('EditScreen');
   }
 
   function createDateMap(unit: string) {
     const dateMap: any = {};
-    transactions.forEach((transaction: Transaction) => {
+    transactions.forEach((transaction: transactionTypes.Transaction) => {
       if (!dateMap[transaction[unit] as any]) {
         return (dateMap[transaction[unit] as any] = [transaction]);
       }
@@ -56,13 +53,13 @@ export default function Home() {
   }
 
   function separateByMonth(dateMap: {[index: string]: string}) {
-    return months
+    return helpers.months
       .filter((month: string) => dateMap[month])
       .map((month: string) => {
         return (
-          <View key={month} style={{flex: 1}}>
+          <View style={{flex: 1}} key={month}>
             <Text style={{textAlign: 'center'}}>{month}</Text>
-            <List
+            <Component.List
               scrollable={false}
               data={dateMap[month]}
               onPress={onPress}
@@ -81,16 +78,33 @@ export default function Home() {
     if (unitOfTime === 'month') return separateByMonth(dateMap);
   }
 
+  const dateSeparatedList = useCallback(
+    () => createDateSeparatedLists('month'),
+    [transactions],
+  );
+
+  const settings = {
+    hide: {
+      beforeDate: '2022-05-25',
+    },
+  };
+
+  function filter(item: transactionTypes.Transaction): boolean {
+    if (!settings.hide.beforeDate) return true;
+
+    return moment(item.date).isBefore(settings.hide.beforeDate);
+  }
+
   // clean up modals
   return (
-    <ScrollView>
-      <Header
+    <ScrollView style={{flex: 1, backgroundColor: colors.primary}}>
+      <Component.Header
         title="Overview"
         left={['title']}
         right={['export', 'filter', 'add']}
       />
-      <View style={homeStyles.container}>
-        {status === Status.SUCCESS &&
+      <View>
+        {status === appTypes.Status.SUCCESS &&
         transactions &&
         transactions.length === 0 ? (
           <View style={homeStyles.container}>
@@ -99,15 +113,17 @@ export default function Home() {
             </Text>
             <Text style={homeStyles.p}>Go buy something!</Text>
             <View style={homeStyles.bagIcon}>
-              <Icon name="shopping-bag" size={50} color={secondary} />
+              <Icon name="shopping-bag" size={50} color={colors.secondary} />
             </View>
           </View>
         ) : (
-          createDateSeparatedLists('month')
+          <Component.IList data={transactions} filter={filter}>
+            <Component.ListItem currency={currencySymbol} onPress={onPress} />
+          </Component.IList>
         )}
-        <NewTransaction />
-        <Filter />
-        <Export />
+        <Component.NewTransaction />
+        <Component.Filter />
+        <Component.Export />
       </View>
     </ScrollView>
   );

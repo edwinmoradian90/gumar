@@ -1,19 +1,12 @@
 import React, {useState, useLayoutEffect} from 'react';
-import Home from './src/views/Home';
-import Splash from './src/views/Splash';
-import {NavigationContainer} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AntDesignIcon from 'react-native-vector-icons/AntDesign';
+import {NavigationContainer} from '@react-navigation/native';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {muted, primary, secondary, white} from './src/utils/colors';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Edit from './src/views/Edit';
-import Layout from './src/views/Layout';
-import Settings from './src/views/settings/Settings';
-import Setting from './src/views/settings/Setting';
-import Export from './src/components/Export';
+import {Edit, Home, Layout, Settings, Splash} from './src/views';
+import {Export} from './src/components';
+import {colors} from './src/utils';
 
 let count = 0;
 
@@ -54,9 +47,9 @@ export default function App() {
 
   const EditScreen = createScreen(Edit);
 
-  const SettingsScreen = createScreen(Settings);
+  const SettingsScreen = createScreen(Settings.Settings);
 
-  const SettingScreen = createScreen(Setting);
+  const SettingScreen = createScreen(Settings.Setting);
 
   const ExportScreen = createScreen(Export);
 
@@ -94,10 +87,10 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        activeColor={secondary}
-        inactiveColor={muted}
+        activeColor={colors.secondary}
+        inactiveColor={colors.muted}
         barStyle={{
-          backgroundColor: primary,
+          backgroundColor: colors.primary,
           elevation: 0,
           shadowColor: 'transparent',
         }}>

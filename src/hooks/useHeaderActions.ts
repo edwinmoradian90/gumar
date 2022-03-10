@@ -1,23 +1,22 @@
-import React from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
-import {setModalNotVisible, setModalVisible} from '../redux/actions/modal';
-import {removeTransaction} from '../redux/actions/transaction';
-import {RootState} from '../redux/types/store';
-import {ModalVisible} from '../redux/types/modal';
+import {actions} from '../redux';
+import {modalTypes, storeTypes} from '../types';
 
 export default function useHeaderActions(overrideActions?: any) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const {selected} = useSelector((state: RootState) => state.transaction);
+  const {selected} = useSelector(
+    (state: storeTypes.RootState) => state.transaction,
+  );
 
   function handleRemoveTransaction() {
-    dispatch(removeTransaction(selected.id));
+    dispatch(actions.transaction.remove(selected.id));
     navigation.goBack();
   }
 
   function handleNewTransaction() {
-    dispatch(setModalVisible(ModalVisible.ADD));
+    dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD));
   }
 
   function handleGoBack() {
@@ -25,16 +24,16 @@ export default function useHeaderActions(overrideActions?: any) {
   }
 
   function handleFilter() {
-    dispatch(setModalVisible(ModalVisible.FILTER));
+    dispatch(actions.modal.setVisible(modalTypes.ModalVisible.FILTER));
   }
 
   function handleExport() {
     console.log('EXPORT');
-    dispatch(setModalVisible(ModalVisible.EXPORT));
+    dispatch(actions.modal.setVisible(modalTypes.ModalVisible.EXPORT));
   }
 
   function handleClose() {
-    dispatch(setModalNotVisible());
+    dispatch(actions.modal.setNotVisible());
   }
 
   const defaultActions = {

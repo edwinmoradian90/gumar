@@ -1,6 +1,6 @@
 import React from 'react';
 import {Pressable, StyleSheet} from 'react-native';
-import {white} from '../utils/colors';
+import {colors} from '../utils';
 
 export default function Card({
   children,
@@ -21,7 +21,7 @@ export default function Card({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: white,
+    backgroundColor: colors.primary,
     borderRadius: 5,
     margin: 10,
     padding: 20,

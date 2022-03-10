@@ -1,33 +1,27 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AnyAction, Dispatch} from 'redux';
-import {
-  ACTION_TRANSACTION,
-  ACTION_TRANSACTION_SUCCESS,
-  ACTION_TRANSACTION_FAILURE,
-  SELECT_TRANSACTION,
-} from '../constants/transaction';
-import {STORE, TRANSACTIONS} from '../../constants/shared';
-import {Transaction} from '../../types/app';
+import {AnyAction} from 'redux';
+import {STORE} from '../../constants/shared';
 import {ThunkAction} from 'redux-thunk';
-import {RootState} from '../types/store';
 import {Alert} from 'react-native';
-import {setModalVisible} from './modal';
-import {ModalVisible} from '../types/modal';
+import {modalTypes, storeTypes, transactionTypes} from '../../types';
+import {actions, constants} from '..';
 
-function parseTransactions(transaction: string | null): Transaction[] | [] {
+function parseTransactions(
+  transaction: string | null,
+): transactionTypes.Transaction[] | [] {
   return typeof transaction === 'string' ? JSON.parse(transaction) : [];
 }
 
-export function getTransactions(): ThunkAction<
+export function get(): ThunkAction<
   void,
-  RootState,
+  storeTypes.RootState,
   unknown,
   AnyAction
 > {
   return async dispatch => {
     try {
-      dispatch({type: ACTION_TRANSACTION});
-      const store: RootState = JSON.parse(
+      dispatch({type: constants.transaction.ACTION_TRANSACTION});
+      const store: storeTypes.RootState = JSON.parse(
         (await AsyncStorage.getItem(STORE)) || '',
       );
 
@@ -35,29 +29,33 @@ export function getTransactions(): ThunkAction<
         store.transaction.transactions !== null
           ? store.transaction.transactions
           : [];
-      dispatch({type: ACTION_TRANSACTION_SUCCESS, transactions});
+      dispatch({
+        type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
+        transactions,
+      });
     } catch (error) {
       console.error(error);
-      dispatch({type: ACTION_TRANSACTION_FAILURE, error});
+      dispatch({type: constants.transaction.ACTION_TRANSACTION_FAILURE, error});
     }
   };
 }
 
-export function appendTransaction(
-  newTransaction: Transaction,
-): ThunkAction<void, RootState, unknown, AnyAction> {
+export function append(
+  newTransaction: transactionTypes.Transaction,
+): ThunkAction<void, storeTypes.RootState, unknown, AnyAction> {
   return (dispatch, getState) => {
     try {
-      dispatch({type: ACTION_TRANSACTION});
+      dispatch({type: constants.transaction.ACTION_TRANSACTION});
       const {transactions} = getState().transaction;
       dispatch({
-        type: ACTION_TRANSACTION_SUCCESS,
+        type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
         transactions: [...transactions, newTransaction],
       });
       Alert.alert('Transaction created.', '', [
         {
           text: 'Add another',
-          onPress: () => dispatch(setModalVisible(ModalVisible.ADD)),
+          onPress: () =>
+            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD)),
         },
         {
           text: 'Close',
@@ -65,20 +63,20 @@ export function appendTransaction(
       ]);
     } catch (error) {
       console.error(error);
-      dispatch({type: ACTION_TRANSACTION_FAILURE, error});
+      dispatch({type: constants.transaction.ACTION_TRANSACTION_FAILURE, error});
     }
   };
 }
-export function updateTransaction(
+export function update(
   id: string,
-  updatedTransaction: Transaction,
-): ThunkAction<void, RootState, unknown, AnyAction> {
+  updatedTransaction: transactionTypes.Transaction,
+): ThunkAction<void, storeTypes.RootState, unknown, AnyAction> {
   return (dispatch, getState) => {
     const {transactions} = getState().transaction;
     try {
-      dispatch({type: ACTION_TRANSACTION});
+      dispatch({type: constants.transaction.ACTION_TRANSACTION});
       const updatedTransactions = transactions.map(
-        (transaction: Transaction) => {
+        (transaction: transactionTypes.Transaction) => {
           if (transaction.id === id) {
             return {...transaction, ...updatedTransaction};
           }
@@ -88,37 +86,58 @@ export function updateTransaction(
       );
 
       dispatch({
-        type: ACTION_TRANSACTION_SUCCESS,
+        type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
         transactions: updatedTransactions,
       });
     } catch (error) {
       console.error(error);
-      dispatch({type: ACTION_TRANSACTION_FAILURE, error});
+      dispatch({type: constants.transaction.ACTION_TRANSACTION_FAILURE, error});
     }
   };
 }
 
-export function removeTransaction(
+export function remove(
   selectedId: string,
-): ThunkAction<void, RootState, unknown, AnyAction> {
+): ThunkAction<void, storeTypes.RootState, unknown, AnyAction> {
   return (dispatch, getState) => {
     try {
-      dispatch({type: ACTION_TRANSACTION});
+      dispatch({type: constants.transaction.ACTION_TRANSACTION});
       const {transactions} = getState().transaction;
       const newTransactions = transactions.filter(
-        (transaction: Transaction) => transaction.id !== selectedId,
+        (transaction: transactionTypes.Transaction) =>
+          transaction.id !== selectedId,
       );
       dispatch({
-        type: ACTION_TRANSACTION_SUCCESS,
+        type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
         transactions: newTransactions,
       });
     } catch (error) {
       console.error(error);
-      dispatch({type: ACTION_TRANSACTION_FAILURE, error});
+      dispatch({type: constants.transaction.ACTION_TRANSACTION_FAILURE, error});
     }
   };
 }
 
-export function selectTransaction(selected: Transaction) {
-  return {type: SELECT_TRANSACTION, selected};
+export function removeAll(): ThunkAction<
+  void,
+  storeTypes.RootState,
+  unknown,
+  AnyAction
+> {
+  return dispatch => {
+    try {
+      dispatch({type: constants.transaction.ACTION_TRANSACTION});
+      dispatch({
+        type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
+        transaction: [],
+      });
+    } catch (error) {
+      console.error(error);
+      dispatch({type: constants.transaction.ACTION_TRANSACTION_FAILURE, error});
+    }
+  };
+}
+
+export function select(selected: transactionTypes.Transaction) {
+  return {type: constants.transaction.SELECT_TRANSACTION, selected};
 }

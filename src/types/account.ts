@@ -1,4 +1,4 @@
-export interface AccountInitialState {
+export interface InitialState {
   id: string;
   givenName: string;
   email: string;

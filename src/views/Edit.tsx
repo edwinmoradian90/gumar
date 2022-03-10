@@ -1,26 +1,23 @@
 import React, {useState, useRef} from 'react';
 import {ScrollView, Text, TextInput, View} from 'react-native';
-import Card from '../components/Card';
+import {Header, Card} from '../components';
 import {secondary} from '../utils/colors';
 import {Status} from '../types/app';
 import DatePicker from 'react-native-date-picker';
-import editStyles from '../styles/edit';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/types/store';
-import {
-  selectTransaction,
-  updateTransaction,
-} from '../redux/actions/transaction';
-import Header from '../components/Header';
 import editHeaderStyles from '../styles/header/edit';
 import {capitalize, humanReadableDate, splitDate} from '../utils/helpers';
+import {storeTypes, transactionTypes} from '../types';
+import {actions} from '../redux';
+import {style} from '../styles';
+import {Picker} from '@react-native-picker/picker';
 
 function Edit() {
-  const includedKeys = ['name', 'amount', 'date'];
+  const includedKeys = ['name', 'amount', 'paymentMethod', 'date'];
   const dispatch = useDispatch();
   const {selected, status} = useSelector(
-    (state: RootState) => state.transaction,
+    (state: storeTypes.RootState) => state.transaction,
   );
 
   const content: any = useRef('');
@@ -28,6 +25,9 @@ function Edit() {
   const [editMode, setEditMode] = useState(false);
   const [selectedAttribute, setSelectedAttribute] = useState(
     initialAttributeState,
+  );
+  const [paymentMethod, setPaymentMethod] = useState(
+    transactionTypes.PaymentMethod.CASH,
   );
 
   type SelectedAttribute = {
@@ -65,8 +65,8 @@ function Edit() {
         ? {...selected, [key]: content.current, ...splitDate(content.current)}
         : {...selected, [key]: content.current};
 
-    dispatch(updateTransaction(selected.id, updatedTransaction));
-    dispatch(selectTransaction(updatedTransaction));
+    dispatch(actions.transaction.update(selected.id, updatedTransaction));
+    dispatch(actions.transaction.select(updatedTransaction));
   }
 
   function onEndEditing(dataKey: string) {
@@ -74,9 +74,45 @@ function Edit() {
     saveEdit(dataKey);
   }
 
-  const Section = ({data, dataKey: key}: {data: string; dataKey: string}) => {
-    if (key === 'id') return null;
+  const DateSection = () => {
+    const dateObj = new Date(selected.date);
+    const key = 'date';
+    return (
+      <React.Fragment>
+        <View style={style.edit.heading}>
+          <Text style={style.edit.headingTitle}>Date</Text>
+        </View>
+        <Text style={style.edit.sectionText}>{humanReadableDate(dateObj)}</Text>
+        <DatePicker
+          modal
+          open={editMode}
+          date={dateObj}
+          onConfirm={(date: Date) => {
+            setContent(date);
+            onEndEditing(key);
+          }}
+          onCancel={() => setEditMode(false)}
+        />
+      </React.Fragment>
+    );
+  };
 
+  const PaymentMethodSection = () => {
+    return (
+      <React.Fragment>
+        <View style={style.edit.heading}>
+          <Text style={style.edit.headingTitle}>Payment Method</Text>
+        </View>
+        <Picker
+          selectedValue={paymentMethod}
+          onValueChange={(newValue: number) => setPaymentMethod(newValue)}>
+          <Picker.Item value={0} label="Cash" />
+        </Picker>
+      </React.Fragment>
+    );
+  };
+
+  const Section = ({data, dataKey: key}: {data: string; dataKey: string}) => {
     const isMatch = selectedAttribute.key === key;
     const keyboardType = isNaN(selected[key]) ? 'default' : 'numeric';
     const dateObj = new Date(selected['date']);
@@ -103,25 +139,25 @@ function Edit() {
     const Icon = icons[key];
 
     return (
-      <Card style={editStyles.card} onPress={() => onSelect(data, key)}>
-        <View style={editStyles.icon}>{Icon && Icon}</View>
+      <Card style={style.edit.card} onPress={() => onSelect(data, key)}>
+        <View style={style.edit.icon}>{Icon && Icon}</View>
         <View>
-          <View style={editStyles.heading}>
-            <Text style={editStyles.headingTitle}>{capitalize(key)}</Text>
+          <View style={style.edit.heading}>
+            <Text style={style.edit.headingTitle}>{capitalize(key)}</Text>
           </View>
-          {editMode && isMatch ? (
+          {editMode && isMatch && key !== 'paymentMethod' ? (
             key !== 'date' ? (
               <TextInput
                 autoFocus
-                style={editStyles.sectionText}
+                style={style.edit.sectionText}
                 defaultValue={content.current}
                 keyboardType={keyboardType}
                 onEndEditing={() => onEndEditing(key)}
                 onChangeText={content => setContent(content)}
               />
             ) : (
-              <>
-                <Text style={editStyles.sectionText}>
+              <React.Fragment>
+                <Text style={style.edit.sectionText}>
                   {humanReadableDate(dateObj)}
                 </Text>
                 <DatePicker
@@ -134,12 +170,26 @@ function Edit() {
                   }}
                   onCancel={() => setEditMode(false)}
                 />
-              </>
+              </React.Fragment>
             )
           ) : (
-            <Text style={editStyles.sectionText}>
-              {key === 'date' ? humanReadableDate(dateObj) : data}
-            </Text>
+            <React.Fragment>
+              {key === 'paymentMethod' ? (
+                <React.Fragment>
+                  <Text style={style.edit.headingTitle}>Payment Method</Text>
+                  <Picker>
+                    <Picker.Item
+                      value={transactionTypes.PaymentMethod.CASH}
+                      label="Cash"
+                    />
+                  </Picker>
+                </React.Fragment>
+              ) : (
+                <Text style={style.edit.sectionText}>
+                  {key === 'date' ? humanReadableDate(dateObj) : data}
+                </Text>
+              )}
+            </React.Fragment>
           )}
         </View>
       </Card>
@@ -147,14 +197,14 @@ function Edit() {
   };
 
   return (
-    <>
+    <React.Fragment>
       <Header left={['back']} right={['trash']} styles={editHeaderStyles} />
-      <ScrollView style={editStyles.container}>
+      <ScrollView style={style.edit.container}>
         {selected && (
-          <View style={editStyles.snapshotContainer}>
-            <Text style={editStyles.snapshotAmount}>${selected.amount}</Text>
-            <Text style={editStyles.snapshotName}>{selected.name}</Text>
-            <Text style={editStyles.snapshotDate}>
+          <View style={style.edit.snapshotContainer}>
+            <Text style={style.edit.snapshotAmount}>${selected.amount}</Text>
+            <Text style={style.edit.snapshotName}>{selected.name}</Text>
+            <Text style={style.edit.snapshotDate}>
               {humanReadableDate(selected.date.toString())}
             </Text>
           </View>
@@ -170,7 +220,7 @@ function Edit() {
               return <Section key={`data__${key}`} dataKey={key} data={data} />;
             })}
       </ScrollView>
-    </>
+    </React.Fragment>
   );
 }
 

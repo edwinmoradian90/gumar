@@ -1,31 +1,33 @@
 import React from 'react';
-import {View, Text, ScrollView, StyleSheet} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import Header from './Header';
-import SpreadSheets from './SpreadSheets';
-import {RootState} from '../redux/types/store';
 import ReactNativeModal from 'react-native-modal';
-import {setModalNotVisible} from '../redux/actions/modal';
-import {ModalVisible} from '../redux/types/modal';
-import {white} from '../utils/colors';
+import {Text, ScrollView, StyleSheet} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {actions} from '../redux';
+import {Header, SpreadSheet} from '.';
+import {modalTypes, storeTypes} from '../types';
+import {colors} from '../utils';
 
 export default function Export() {
   const dispatch = useDispatch();
-  const {isLoggedIn} = useSelector((state: RootState) => state.account);
-  const {modalVisible} = useSelector((state: RootState) => state.modal);
+  const {isLoggedIn} = useSelector(
+    (state: storeTypes.RootState) => state.account,
+  );
+  const {modalVisible} = useSelector(
+    (state: storeTypes.RootState) => state.modal,
+  );
   return (
     <ReactNativeModal
       style={styles.modalContainer}
-      isVisible={modalVisible === ModalVisible.EXPORT}
+      isVisible={modalVisible === modalTypes.ModalVisible.EXPORT}
       swipeDirection={['down']}
-      onBackdropPress={() => dispatch(setModalNotVisible())}
-      onSwipeComplete={() => dispatch(setModalNotVisible())}>
+      onBackdropPress={() => dispatch(actions.modal.setNotVisible())}
+      onSwipeComplete={() => dispatch(actions.modal.setNotVisible())}>
       <ScrollView style={styles.modalView}>
         <Header title="Export" left={['title']} right={['close']} />
         {isLoggedIn ? (
           <>
             <Text>Spread Sheet</Text>
-            <SpreadSheets />
+            <SpreadSheet />
           </>
         ) : (
           <>
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   modalView: {
-    backgroundColor: white,
+    backgroundColor: colors.primary,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     flex: 1,

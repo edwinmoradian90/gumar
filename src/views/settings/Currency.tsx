@@ -1,22 +1,23 @@
 import React from 'react';
-import {Pressable, Text, View} from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import {Pressable, Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import Header from '../../components/Header';
-import List from '../../components/List';
+import {Header, List} from '../../components';
 import {currencies} from '../../data/currency';
-import {selectCurrency} from '../../redux/actions/settings';
-import {RootState} from '../../redux/types/store';
+import {actions} from '../../redux';
 import settingsListStyles from '../../styles/list/settings';
 import settingsStyles from '../../styles/settings';
-import {primary} from '../../utils/colors';
+import {storeTypes} from '../../types';
+import {colors} from '../../utils';
 
 export default function Currency() {
-  const {currency} = useSelector((state: RootState) => state.settings);
+  const {currency} = useSelector(
+    (state: storeTypes.RootState) => state.settings,
+  );
   const dispatch = useDispatch();
 
   function onPress(item: any) {
-    dispatch(selectCurrency(item.id));
+    dispatch(actions.setting.selectCurrency(item.id));
   }
 
   // update type for item
@@ -24,7 +25,7 @@ export default function Currency() {
     if (item.id !== currency) return null;
     return (
       <Pressable>
-        <FontAwesome5Icon name="check" size={16} color={primary} />
+        <FontAwesome5Icon name="check" size={16} color={colors.primary} />
       </Pressable>
     );
   };

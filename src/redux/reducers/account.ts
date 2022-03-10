@@ -3,10 +3,9 @@ import {
   GOOGLE_AUTH_FAILURE,
   GOOGLE_AUTH_SUCCESS,
 } from '../constants/account';
-import {Status} from '../../types/app';
-import {AccountInitialState} from '../types/account';
+import {accountTypes, appTypes} from '../../types';
 
-const accountInitialState: AccountInitialState = {
+const accountInitialState: accountTypes.InitialState = {
   id: '',
   givenName: '',
   email: '',
@@ -15,7 +14,7 @@ const accountInitialState: AccountInitialState = {
   photo: '',
   error: null,
   isLoggedIn: false,
-  status: Status.SUCCESS,
+  status: appTypes.Status.SUCCESS,
 };
 
 export default function accountReducer(
@@ -37,7 +36,7 @@ export default function accountReducer(
     case GOOGLE_AUTH:
       return {
         ...state,
-        status: Status.LOADING,
+        status: appTypes.Status.LOADING,
       };
     case GOOGLE_AUTH_SUCCESS:
       console.log('ACCESS ', accessToken);
@@ -50,14 +49,14 @@ export default function accountReducer(
         email: email || state.email,
         photo: photo || state.photo,
         isLoggedIn,
-        status: Status.SUCCESS,
+        status: appTypes.Status.SUCCESS,
       };
     case GOOGLE_AUTH_FAILURE:
       return {
         ...state,
         error: error || state.error,
         isLoggedIn,
-        status: Status.ERROR,
+        status: appTypes.Status.ERROR,
       };
     default:
       return state;

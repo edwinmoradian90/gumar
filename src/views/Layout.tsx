@@ -1,6 +1,6 @@
 import React from 'react';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
-import {primary, secondary} from '../utils/colors';
+import {colors} from '../utils';
 
 export default function Layout({
   children,
@@ -9,7 +9,7 @@ export default function Layout({
 }) {
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={primary} barStyle="dark-content" />
+      <StatusBar backgroundColor={colors.primary} barStyle="dark-content" />
       {children}
     </SafeAreaView>
   );
