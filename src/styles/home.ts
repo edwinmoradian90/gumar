@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import {colors} from '../utils';
 import {muted, primary, secondary, white} from '../utils/colors';
 
 const homeStyles = StyleSheet.create({
@@ -32,6 +33,27 @@ const homeStyles = StyleSheet.create({
     fontSize: 18,
     padding: 10,
     textAlign: 'center',
+  },
+  dnameSort: {
+    color: colors.secondary,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 20,
+  },
+  anameSort: {
+    color: colors.secondary,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 20,
+  },
+  sortOptions: {
+    color: colors.secondary,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 20,
   },
 });
 

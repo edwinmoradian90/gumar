@@ -2,6 +2,7 @@ export enum ModalVisible {
   'EXPORT',
   'ADD',
   'FILTER',
+  'SORT_OPTIONS',
   'PASSWORD',
   'NONE',
 }

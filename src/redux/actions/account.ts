@@ -64,7 +64,6 @@ export function logout(): ThunkAction<
       dispatch({type: GOOGLE_AUTH});
 
       const result = await GoogleSignin.signOut();
-      console.log(result);
       dispatch({type: GOOGLE_AUTH_SUCCESS, isLoggedIn: false, accessToken: ''});
       Alert.alert('Successfully logged out.');
     } catch (error: any) {

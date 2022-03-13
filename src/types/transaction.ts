@@ -1,25 +1,26 @@
 export enum PaymentMethod {
-  'CASH',
-  'CREDIT',
-  'DEBIT',
-  'OTHER',
+  'CASH' = 'cash',
+  'CREDIT' = 'credit',
+  'DEBIT' = 'debit',
+  'CHECK' = 'check',
+  'OTHER' = 'other',
 }
 
 export enum PaymentInterval {
-  'NONE',
-  'DAILY',
-  'WEEKLY',
-  'BIWEEKLY',
-  'MONTHLY',
-  'SEMIANNUALLY',
-  'ANNUALLY',
-  'OTHER',
+  'DAILY' = 'daily',
+  'WEEKLY' = 'weekly',
+  'BIWEEKLY' = 'biweekly',
+  'MONTHLY' = 'monthly',
+  'SEMI_ANNUALLY' = 'semiAnnually',
+  'ANNUALLY' = 'annually',
+  'OTHER' = 'other',
+  'NONE' = 'none',
 }
 
-export enum InstallmentType {
-  'SINGLE',
-  'RECURRING',
-  'OTHER',
+export enum Installment {
+  'SINGLE' = 'single',
+  'RECURRING' = 'recurring',
+  'OTHER' = 'other',
 }
 
 export interface InitialState {

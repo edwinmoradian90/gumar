@@ -39,7 +39,6 @@ export default function accountReducer(
         status: appTypes.Status.LOADING,
       };
     case GOOGLE_AUTH_SUCCESS:
-      console.log('ACCESS ', accessToken);
       return {
         ...state,
         id: id || state.id,

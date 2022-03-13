@@ -1,21 +1,39 @@
+import {constants} from '..';
 import {filterTypes, transactionTypes} from '../../types';
 
-const initialState: filterTypes.InitialState = {
+export const initialState: filterTypes.InitialState = {
   isUsingFilter: false,
   isDescending: false,
-  transactionName: '',
-  paymentMethod: transactionTypes.PaymentMethod.CASH,
-  installmentType: transactionTypes.InstallmentType.SINGLE,
-  paymentInterval: transactionTypes.PaymentInterval.NONE,
-  rangeFrom: 0,
-  rangeTo: 0,
-  dateFrom: null,
-  dateTo: null,
+  name: '',
+  paymentMethods: [],
+  installments: [],
+  paymentIntervals: [],
+  amountRangeFrom: '',
+  amountRangeTo: '',
+  dateRangeFrom: null,
+  dateRangeTo: null,
 };
 
 export default function filterReducer(state = initialState, action: any) {
-  const {type} = action || {};
+  const {filter, isUsingFilter, type} = action || {};
   switch (type) {
+    case constants.filter.TOGGLE_FILTER:
+      return {
+        ...state,
+        isUsingFilter,
+      };
+    case constants.filter.CREATE:
+      return {
+        ...state,
+        ...filter,
+      };
+    case constants.filter.UPDATE:
+      return {
+        ...state,
+        ...filter,
+      };
+    case constants.filter.CLEAR:
+      return initialState;
     default:
       return state;
   }

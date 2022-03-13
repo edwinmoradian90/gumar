@@ -1,15 +1,20 @@
 import moment from 'moment';
-import React, {useCallback, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {ScrollView, Text, View} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import {Pressable, ScrollView, Text, View} from 'react-native';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch, useSelector} from 'react-redux';
 import * as Component from '../components';
 import {actions} from '../redux';
 import {currencies} from '../data/currency';
 import homeStyles from '../styles/home';
-import listStyles from '../styles/list/main';
-import {appTypes, transactionTypes, storeTypes} from '../types';
+import {
+  appTypes,
+  transactionTypes,
+  storeTypes,
+  modalTypes,
+  sortTypes,
+} from '../types';
 import {colors, helpers} from '../utils';
 
 export default function Home() {
@@ -29,70 +34,139 @@ export default function Home() {
     return symbol;
   }, [currency]);
 
-  function onLongPress() {
-    console.log('LONG');
-  }
+  const filterState = useSelector(
+    (state: storeTypes.RootState) => state.filter,
+  );
+  const {sortBy, isDescending} = useSelector(
+    (state: storeTypes.RootState) => state.sort,
+  );
 
   function onPress(transaction: transactionTypes.Transaction) {
-    console.log(transaction);
     dispatch(actions.transaction.select(transaction));
     navigation.navigate('EditScreen');
   }
 
-  function createDateMap(unit: string) {
-    const dateMap: any = {};
-    transactions.forEach((transaction: transactionTypes.Transaction) => {
-      if (!dateMap[transaction[unit] as any]) {
-        return (dateMap[transaction[unit] as any] = [transaction]);
-      }
+  function filter(item: any) {
+    if (!filterState.isUsingFilter) return true;
 
-      dateMap[transaction[unit] as any].push(transaction);
-    });
+    console.log(filterState);
 
-    return dateMap;
+    if (filterState.name && filterState.name !== item.name) return false;
+    if (
+      filterState.paymentMethods.length > 0 &&
+      filterState.paymentMethods.indexOf(item.paymentMethod) < 0
+    ) {
+      return false;
+    }
+    if (
+      filterState.installments.length > 0 &&
+      filterState.installments.indexOf(item.installment) < 0
+    ) {
+      return false;
+    }
+    if (
+      filterState.paymentIntervals.length > 0 &&
+      filterState.paymentIntervals.indexOf(item.paymentInterval) < 0
+    ) {
+      return false;
+    }
+
+    if (
+      filterState.amountRangeFrom > 0 &&
+      parseInt(item.amount) < parseInt(filterState.amountRangeFrom)
+    ) {
+      return false;
+    }
+
+    if (
+      filterState.amountRangeTo > 0 &&
+      parseInt(item.amount) > parseInt(filterState.amountRangeTo)
+    ) {
+      return false;
+    }
+
+    if (
+      filterState.dateRangeFrom &&
+      moment(filterState.dateRangeFrom).isAfter(item.date)
+    ) {
+      return false;
+    }
+
+    if (
+      filterState.dateRangeTo &&
+      moment(filterState.dateRange).isBefore(item.date)
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
-  function separateByMonth(dateMap: {[index: string]: string}) {
-    return helpers.months
-      .filter((month: string) => dateMap[month])
-      .map((month: string) => {
-        return (
-          <View style={{flex: 1}} key={month}>
-            <Text style={{textAlign: 'center'}}>{month}</Text>
-            <Component.List
-              scrollable={false}
-              data={dateMap[month]}
-              onPress={onPress}
-              onLongPress={onLongPress}
-              include={['name', 'amount']}
-              before={{key: 'amount', value: currencySymbol}}
-              styles={listStyles}
-            />
-          </View>
-        );
-      });
-  }
+  const sortedTransactions = useMemo(() => {
+    let compare;
+    switch (sortBy) {
+      case sortTypes.SortBy.DATE:
+        compare = isDescending ? helpers.compare.adate : helpers.compare.ddate;
+        break;
+      case sortTypes.SortBy.AMOUNT:
+        compare = isDescending
+          ? helpers.compare.aamount
+          : helpers.compare.damount;
+        break;
+      case sortTypes.SortBy.NAME:
+        compare = isDescending ? helpers.compare.aname : helpers.compare.dname;
+        break;
+      default:
+        break;
+    }
+    return [...transactions].sort(compare);
+  }, [transactions, isDescending, sortBy]);
 
-  function createDateSeparatedLists(unitOfTime: string = 'month') {
-    const dateMap = createDateMap(unitOfTime);
-    if (unitOfTime === 'month') return separateByMonth(dateMap);
-  }
-
-  const dateSeparatedList = useCallback(
-    () => createDateSeparatedLists('month'),
-    [transactions],
-  );
-
-  const settings = {
-    hide: {
-      beforeDate: '2022-05-25',
-    },
+  const sortButtonMap: {[index: string]: any} = {
+    aamount: <Component.Buttons.AAmountSort />,
+    damount: <Component.Buttons.DAmountSort />,
+    aname: <Component.Buttons.ANameSort />,
+    dname: <Component.Buttons.DNameSort />,
+    adate: <Component.Buttons.ADateSort />,
+    ddate: <Component.Buttons.DDateSort />,
   };
 
-  function filter(item: transactionTypes.Transaction): boolean {
-    if (!settings.hide.beforeDate) return true;
+  function SortButton({
+    sortBy,
+    isDescending,
+    styles,
+  }: {
+    sortBy: sortTypes.SortBy;
+    isDescending: boolean;
+    styles: any;
+  }) {
+    let Component;
+    console.log('RUNNING');
+    switch (sortBy) {
+      case sortTypes.SortBy.AMOUNT:
+        Component = isDescending
+          ? sortButtonMap.aamount
+          : sortButtonMap.damount;
+        break;
+      case sortTypes.SortBy.NAME:
+        Component = isDescending ? sortButtonMap.aname : sortButtonMap.dname;
+        break;
+      case sortTypes.SortBy.DATE:
+        Component = isDescending ? sortButtonMap.adate : sortButtonMap.ddate;
+        break;
+      default:
+        Component = sortButtonMap.adate;
+        break;
+    }
 
-    return moment(item.date).isBefore(settings.hide.beforeDate);
+    return React.cloneElement(Component, {
+      onPress: () => dispatch(actions.sort.setIsDescending(!isDescending)),
+      onLongPress: () =>
+        dispatch(
+          actions.modal.setVisible(modalTypes.ModalVisible.SORT_OPTIONS),
+        ),
+      styles,
+    });
   }
 
   // clean up modals
@@ -103,6 +177,12 @@ export default function Home() {
         left={['title']}
         right={['export', 'filter', 'add']}
       />
+      <SortButton
+        sortBy={sortBy}
+        isDescending={isDescending}
+        styles={homeStyles}
+      />
+
       <View>
         {status === appTypes.Status.SUCCESS &&
         transactions &&
@@ -113,17 +193,22 @@ export default function Home() {
             </Text>
             <Text style={homeStyles.p}>Go buy something!</Text>
             <View style={homeStyles.bagIcon}>
-              <Icon name="shopping-bag" size={50} color={colors.secondary} />
+              <FontAwesome5Icon
+                name="shopping-bag"
+                size={50}
+                color={colors.secondary}
+              />
             </View>
           </View>
         ) : (
-          <Component.IList data={transactions} filter={filter}>
+          <Component.IList data={sortedTransactions} filter={filter}>
             <Component.ListItem currency={currencySymbol} onPress={onPress} />
           </Component.IList>
         )}
         <Component.NewTransaction />
-        <Component.Filter />
+        <Component.Filter data={transactions} />
         <Component.Export />
+        <Component.SortOptions />
       </View>
     </ScrollView>
   );

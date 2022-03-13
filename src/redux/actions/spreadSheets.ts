@@ -45,8 +45,6 @@ async function setSheetValues(
   });
 
   const result = await data.json();
-
-  console.log({result});
 }
 
 export function create(

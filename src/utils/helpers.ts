@@ -33,7 +33,7 @@ export function capitalize(string: string) {
 }
 
 export function humanReadableDate(date: Date) {
-  return moment(date).format('MMM Do YYYY, h:mm');
+  return moment(date).format('MMM Do YYYY, h:mm A');
 }
 
 export function splitDate(date: Date) {
@@ -67,3 +67,82 @@ export const months = [
   'November',
   'December',
 ];
+
+export function findMinMax(
+  array: any[],
+  key?: string,
+): {min: string; max: string} {
+  let data = array;
+
+  if (key) {
+    data = array.map((item: any) => parseInt(item[key]));
+    console.log(data);
+  }
+
+  let min = data[0] || 0;
+  let max = 0;
+
+  data.forEach((value: number) => {
+    if (value >= max) max = value;
+    if (value <= min) min = value;
+  });
+
+  return {min: min.toString(), max: max.toString()};
+}
+
+export function isEmpty(data: any) {
+  if (Array.isArray(data) && data.length === 0) return true;
+  if (data.constructor === Object && Object.keys(data).length === 0)
+    return true;
+  return false;
+}
+
+// comparisons
+function ddate(a: any, b: any): 1 | -1 | 0 {
+  if (moment(a.date).isBefore(b.date)) return -1;
+  if (moment(b.date).isBefore(a.date)) return 1;
+  return 0;
+}
+
+function adate(a: any, b: any): 1 | -1 | 0 {
+  if (moment(a.date).isAfter(b.date)) return -1;
+  if (moment(b.date).isAfter(a.date)) return 1;
+  return 0;
+}
+
+function aamount(a: any, b: any) {
+  const intA = parseInt(a.amount);
+  const intB = parseInt(b.amount);
+  if (intA > intB) return -1;
+  if (intA < intB) return 1;
+  return 0;
+}
+
+function damount(a: any, b: any) {
+  const intA = parseInt(a.amount);
+  const intB = parseInt(b.amount);
+  if (intA > intB) return 1;
+  if (intA < intB) return -1;
+  return 0;
+}
+
+function aname(a: any, b: any) {
+  if (a.name > b.name) return 1;
+  if (a.name < b.name) return -1;
+  return 0;
+}
+
+function dname(a: any, b: any) {
+  if (a.name > b.name) return -1;
+  if (a.name < b.name) return 1;
+  return 0;
+}
+
+export const compare = {
+  adate,
+  ddate,
+  aamount,
+  damount,
+  aname,
+  dname,
+};

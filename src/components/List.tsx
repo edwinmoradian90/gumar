@@ -112,8 +112,6 @@ export default function List({
     );
   };
 
-  console.log({data});
-
   return (
     <View style={listContainer}>
       {status === appTypes.Status.SUCCESS &&

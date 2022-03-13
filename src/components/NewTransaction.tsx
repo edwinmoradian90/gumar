@@ -17,10 +17,9 @@ export default function NewTransaction() {
 
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
-  const [paymentMethod, setPaymentMethod] =
-    useState<transactionTypes.PaymentMethod>(
-      transactionTypes.PaymentMethod.CASH,
-    );
+  const [paymentMethod, setPaymentMethod] = useState(
+    transactionTypes.PaymentMethod.CASH,
+  );
 
   function onSubmit() {
     try {

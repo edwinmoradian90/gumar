@@ -2,6 +2,7 @@ import * as Buttons from './Buttons';
 import Card from './Card';
 import Export from './Export';
 import Filter from './Filter';
+import SortOptions from './SortOptions';
 import Header from './Header';
 import IList from './List/IList';
 import List from './List';
@@ -15,8 +16,9 @@ import Toggle from './Toggle';
 export {
   Buttons,
   Card,
-  Filter,
   Export,
+  Filter,
+  SortOptions,
   Header,
   IList,
   List,

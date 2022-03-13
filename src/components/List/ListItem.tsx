@@ -1,6 +1,5 @@
 import React from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {TouchableRipple} from 'react-native-paper';
 import {colors, helpers} from '../../utils';
 
 export default function ListItem({
@@ -12,7 +11,6 @@ export default function ListItem({
   listItemData?: any;
   onPress: (item: any) => void;
 }) {
-  console.log(listItemData);
   const {amount, date, name} = listItemData || {};
   return (
     <Pressable style={styles.container} onPress={() => onPress(listItemData)}>

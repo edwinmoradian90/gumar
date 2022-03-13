@@ -1,10 +1,23 @@
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 export enum Status {
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR',
-  LOADING = 'LOADING',
-  DEFAULT = 'DEFAULT',
+  SUCCESS = 'success',
+  ERROR = 'error',
+  LOADING = 'loading',
+}
+
+export enum EditTarget {
+  'NAME' = 'name',
+  'AMOUNT' = 'amount',
+  'PAYMENT_METHOD' = 'paymentMethod',
+  'DATE' = 'date',
+  'NONE' = 'none',
+}
+
+export enum Mode {
+  'DEFAULT' = 'default',
+  'EDIT' = 'edit',
+  'VIEW' = 'view',
 }
 
 type RootStackParamList = {

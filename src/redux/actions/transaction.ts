@@ -46,7 +46,12 @@ export function append(
   return (dispatch, getState) => {
     try {
       dispatch({type: constants.transaction.ACTION_TRANSACTION});
+
       const {transactions} = getState().transaction;
+      const {isUsingFilter} = getState().filter;
+
+      if (isUsingFilter) dispatch(actions.filter.clear());
+
       dispatch({
         type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
         transactions: [...transactions, newTransaction],

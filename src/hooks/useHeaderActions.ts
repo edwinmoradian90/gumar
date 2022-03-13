@@ -28,7 +28,6 @@ export default function useHeaderActions(overrideActions?: any) {
   }
 
   function handleExport() {
-    console.log('EXPORT');
     dispatch(actions.modal.setVisible(modalTypes.ModalVisible.EXPORT));
   }
 

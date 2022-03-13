@@ -28,8 +28,6 @@ export default function Login() {
     dispatch(actions.account.login());
   }
 
-  console.log({accessToken});
-
   useEffect(() => {
     GoogleSignin.configure(api.googleSigninConfig);
   }, []);
