@@ -4,7 +4,7 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 import {NavigationContainer} from '@react-navigation/native';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Edit, Home, Layout, Settings, Splash} from './src/views';
+import {Edit, Home, Layout, Settings, Splash, Stats} from './src/views';
 import {Export} from './src/components';
 import {colors} from './src/utils';
 
@@ -27,7 +27,7 @@ export default function App() {
   const Tab = createMaterialBottomTabNavigator();
   const HomeStack = createNativeStackNavigator();
   const SettingsStack = createNativeStackNavigator();
-  const ExportStack = createNativeStackNavigator();
+  const StatsStack = createNativeStackNavigator();
 
   function createScreen(
     Component:
@@ -51,7 +51,7 @@ export default function App() {
 
   const SettingScreen = createScreen(Settings.Setting);
 
-  const ExportScreen = createScreen(Export);
+  const StatsScreen = createScreen(Stats);
 
   function HomeScreenStack() {
     return (
@@ -74,11 +74,11 @@ export default function App() {
     );
   }
 
-  function ExportScreenStack() {
+  function StatsScreenStack() {
     return (
-      <ExportStack.Navigator screenOptions={{headerShown: false}}>
-        <ExportStack.Screen name="ExportScreen" component={ExportScreen} />
-      </ExportStack.Navigator>
+      <StatsStack.Navigator screenOptions={{headerShown: false}}>
+        <StatsStack.Screen name="StatsScreen" component={StatsScreen} />
+      </StatsStack.Navigator>
     );
   }
 
@@ -105,7 +105,7 @@ export default function App() {
         />
         <Tab.Screen
           name="Stats"
-          component={ExportScreenStack}
+          component={StatsScreenStack}
           options={{
             tabBarIcon: ({color}) => (
               <IonIcon name="md-analytics-outline" size={21} color={color} />

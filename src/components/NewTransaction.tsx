@@ -79,11 +79,25 @@ export default function NewTransaction() {
           <Picker
             style={style.newTransaction.input}
             selectedValue={paymentMethod}
-            onValueChange={(itemValue: number) => setPaymentMethod(itemValue)}>
-            <Picker.Item label="Cash" value={0} />
-            <Picker.Item label="Credit" value={1} />
-            <Picker.Item label="Debit" value={2} />
-            <Picker.Item label="Other" value={3} />
+            onValueChange={(itemValue: transactionTypes.PaymentMethod) =>
+              setPaymentMethod(itemValue)
+            }>
+            <Picker.Item
+              label="Cash"
+              value={transactionTypes.PaymentMethod.CASH}
+            />
+            <Picker.Item
+              label="Credit"
+              value={transactionTypes.PaymentMethod.CREDIT}
+            />
+            <Picker.Item
+              label="Debit"
+              value={transactionTypes.PaymentMethod.DEBIT}
+            />
+            <Picker.Item
+              label="Other"
+              value={transactionTypes.PaymentMethod.OTHER}
+            />
           </Picker>
           <Pressable
             style={[

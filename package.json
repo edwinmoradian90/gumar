@@ -27,13 +27,15 @@
     "react-native-paper": "^4.11.2",
     "react-native-safe-area-context": "^3.4.0",
     "react-native-screens": "^3.11.1",
+    "react-native-svg": "^12.3.0",
     "react-native-swipe-gestures": "^1.0.5",
     "react-native-uuid": "^2.0.1",
     "react-native-vector-icons": "^9.1.0",
     "react-redux": "^7.2.6",
     "redux": "^4.1.2",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.4.1"
+    "redux-thunk": "^2.4.1",
+    "victory-native": "^36.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

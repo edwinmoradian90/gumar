@@ -171,45 +171,47 @@ export default function Home() {
 
   // clean up modals
   return (
-    <ScrollView style={{flex: 1, backgroundColor: colors.primary}}>
+    <>
       <Component.Header
         title="Overview"
         left={['title']}
         right={['export', 'filter', 'add']}
       />
-      <SortButton
-        sortBy={sortBy}
-        isDescending={isDescending}
-        styles={homeStyles}
-      />
+      <ScrollView style={{flex: 1, backgroundColor: colors.primary}}>
+        <SortButton
+          sortBy={sortBy}
+          isDescending={isDescending}
+          styles={homeStyles}
+        />
 
-      <View>
-        {status === appTypes.Status.SUCCESS &&
-        transactions &&
-        transactions.length === 0 ? (
-          <View style={homeStyles.container}>
-            <Text style={homeStyles.p}>
-              Looks like you have no transactions...
-            </Text>
-            <Text style={homeStyles.p}>Go buy something!</Text>
-            <View style={homeStyles.bagIcon}>
-              <FontAwesome5Icon
-                name="shopping-bag"
-                size={50}
-                color={colors.secondary}
-              />
+        <View>
+          {status === appTypes.Status.SUCCESS &&
+          transactions &&
+          transactions.length === 0 ? (
+            <View style={homeStyles.container}>
+              <Text style={homeStyles.p}>
+                Looks like you have no transactions...
+              </Text>
+              <Text style={homeStyles.p}>Go buy something!</Text>
+              <View style={homeStyles.bagIcon}>
+                <FontAwesome5Icon
+                  name="shopping-bag"
+                  size={50}
+                  color={colors.secondary}
+                />
+              </View>
             </View>
-          </View>
-        ) : (
-          <Component.IList data={sortedTransactions} filter={filter}>
-            <Component.ListItem currency={currencySymbol} onPress={onPress} />
-          </Component.IList>
-        )}
-        <Component.NewTransaction />
-        <Component.Filter data={transactions} />
-        <Component.Export />
-        <Component.SortOptions />
-      </View>
-    </ScrollView>
+          ) : (
+            <Component.IList data={sortedTransactions} filter={filter}>
+              <Component.ListItem currency={currencySymbol} onPress={onPress} />
+            </Component.IList>
+          )}
+          <Component.NewTransaction />
+          <Component.Filter data={transactions} />
+          <Component.Export />
+          <Component.SortOptions />
+        </View>
+      </ScrollView>
+    </>
   );
 }
