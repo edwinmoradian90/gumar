@@ -1,4 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
+import moment from 'moment';
 import React, {useMemo} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {Card, Text, Appbar, Headline, Surface, Title} from 'react-native-paper';
@@ -27,7 +28,7 @@ export default function Stats() {
         .sort(helpers.compare.ddate)
         .map((transaction: transactionTypes.Transaction, index: number) => {
           return {
-            number: index + 1,
+            number: moment(transaction.date).format('DD'),
             amount: parseInt(transaction.amount),
           };
         })

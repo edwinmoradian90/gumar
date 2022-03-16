@@ -1,46 +1,43 @@
 import React from 'react';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import {Pressable, Text, View} from 'react-native';
+import {ScrollView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {Header, List} from '../../components';
+import {Appbar, Headline, RadioButton} from 'react-native-paper';
 import {currencies} from '../../data/currency';
 import {actions} from '../../redux';
-import settingsListStyles from '../../styles/list/settings';
 import settingsStyles from '../../styles/settings';
-import {storeTypes} from '../../types';
+import {currencyTypes, storeTypes} from '../../types';
 import {colors} from '../../utils';
+import {useNavigation} from '@react-navigation/native';
 
 export default function Currency() {
-  const {currency} = useSelector(
-    (state: storeTypes.RootState) => state.settings,
-  );
+  const {id} = useSelector((state: storeTypes.RootState) => state.currency);
   const dispatch = useDispatch();
-
-  function onPress(item: any) {
-    dispatch(actions.setting.selectCurrency(item.id));
-  }
-
-  // update type for item
-  const CheckMark = ({item}: {item?: any}) => {
-    if (item.id !== currency) return null;
-    return (
-      <Pressable>
-        <FontAwesome5Icon name="check" size={16} color={colors.primary} />
-      </Pressable>
-    );
-  };
+  const navigation = useNavigation();
 
   return (
-    <View style={settingsStyles.container}>
-      <Header title="Currency" right={['back', 'title']} />
-      <Text style={settingsStyles.heading}>Select a currency</Text>
-      <List
-        data={currencies}
-        exclude={['id']}
-        styles={settingsListStyles}
-        onPress={onPress}>
-        <CheckMark />
-      </List>
-    </View>
+    <>
+      <Appbar.Header
+        style={{backgroundColor: colors.primary, elevation: 0}}
+        dark={false}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Currency" />
+      </Appbar.Header>
+      <ScrollView style={settingsStyles.container}>
+        <Headline style={settingsStyles.heading}>Select a currency</Headline>
+        {currencies.map((currency: currencyTypes.Currency, index: number) => {
+          const label = `${currency.symbol}   ${currency.fullName}`;
+          return (
+            <RadioButton.Item
+              key={`currency-setting__${index}`}
+              mode="ios"
+              label={label}
+              value={currency.id}
+              status={currency.id === id ? 'checked' : 'unchecked'}
+              onPress={() => dispatch(actions.currency.select(currency))}
+            />
+          );
+        })}
+      </ScrollView>
+    </>
   );
 }

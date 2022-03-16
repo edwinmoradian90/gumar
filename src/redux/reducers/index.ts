@@ -1,5 +1,6 @@
 import account from './account';
 import app from './app';
+import currency from './currency';
 import filter from './filter';
 import home from './home';
 import modal from './modal';
@@ -11,6 +12,7 @@ import transaction from './transaction';
 export {
   account,
   app,
+  currency,
   filter,
   home,
   modal,

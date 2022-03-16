@@ -2,6 +2,7 @@ import {combineReducers} from 'redux';
 import {
   account,
   app,
+  currency,
   filter,
   home,
   modal,
@@ -14,6 +15,7 @@ import {
 const root = combineReducers({
   account,
   app,
+  currency,
   filter,
   home,
   modal,

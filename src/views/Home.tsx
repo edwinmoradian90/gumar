@@ -1,12 +1,11 @@
 import moment from 'moment';
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {Pressable, ScrollView, Text, View} from 'react-native';
+import {ScrollView, Text, View} from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch, useSelector} from 'react-redux';
 import * as Component from '../components';
 import {actions} from '../redux';
-import {currencies} from '../data/currency';
 import homeStyles from '../styles/home';
 import {
   appTypes,
@@ -16,6 +15,17 @@ import {
   sortTypes,
 } from '../types';
 import {colors, helpers} from '../utils';
+import {
+  Appbar,
+  Button,
+  Card,
+  Colors,
+  Divider,
+  Headline,
+  List,
+  Searchbar,
+  Title,
+} from 'react-native-paper';
 
 export default function Home() {
   const navigation = useNavigation<appTypes.Navigation>();
@@ -23,16 +33,6 @@ export default function Home() {
   const {transactions, status} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
-  const {currency} = useSelector(
-    (state: storeTypes.RootState) => state.settings,
-  );
-  const currencySymbol: any = useMemo(() => {
-    let symbol;
-    currencies.forEach((c: {[index: string]: string}) =>
-      c.id === currency ? (symbol = c.symbol) : null,
-    );
-    return symbol;
-  }, [currency]);
 
   const filterState = useSelector(
     (state: storeTypes.RootState) => state.filter,
@@ -41,10 +41,7 @@ export default function Home() {
     (state: storeTypes.RootState) => state.sort,
   );
 
-  function onPress(transaction: transactionTypes.Transaction) {
-    dispatch(actions.transaction.select(transaction));
-    navigation.navigate('EditScreen');
-  }
+  const [showMore, setShowMore] = useState(false);
 
   function filter(item: any) {
     if (!filterState.isUsingFilter) return true;
@@ -169,20 +166,61 @@ export default function Home() {
     });
   }
 
+  function getIcon(paymentMethod: transactionTypes.PaymentMethod) {
+    switch (paymentMethod) {
+      case transactionTypes.PaymentMethod.CASH:
+        return 'cash';
+      case transactionTypes.PaymentMethod.CREDIT:
+        return 'credit-card-outline';
+      case transactionTypes.PaymentMethod.DEBIT:
+        return 'bank-outline';
+      case transactionTypes.PaymentMethod.CHECK:
+        return 'checkbook';
+      case transactionTypes.PaymentMethod.OTHER:
+        return 'hand-coin-outline';
+      default:
+        return 'cash';
+    }
+  }
+
   // clean up modals
   return (
     <>
-      <Component.Header
-        title="Overview"
-        left={['title']}
-        right={['export', 'filter', 'add']}
-      />
-      <ScrollView style={{flex: 1, backgroundColor: colors.primary}}>
-        <SortButton
+      <Appbar.Header style={{backgroundColor: colors.primary}} dark={false}>
+        <Appbar.Content title="Overview" />
+        <Appbar.Action
+          icon="export"
+          onPress={() =>
+            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.EXPORT))
+          }
+        />
+        <Appbar.Action
+          icon="filter-variant"
+          onPress={() =>
+            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.FILTER))
+          }
+        />
+        <Appbar.Action
+          icon="plus"
+          onPress={() =>
+            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD))
+          }
+        />
+      </Appbar.Header>
+      <ScrollView style={{flex: 1, backgroundColor: Colors.grey100}}>
+        <Searchbar
+          style={{
+            elevation: 0,
+            borderBottomColor: Colors.grey300,
+            borderBottomWidth: 1,
+          }}
+          placeholder="Search"
+        />
+        {/* <SortButton
           sortBy={sortBy}
           isDescending={isDescending}
           styles={homeStyles}
-        />
+        /> */}
 
         <View>
           {status === appTypes.Status.SUCCESS &&
@@ -202,9 +240,90 @@ export default function Home() {
               </View>
             </View>
           ) : (
-            <Component.IList data={sortedTransactions} filter={filter}>
-              <Component.ListItem currency={currencySymbol} onPress={onPress} />
-            </Component.IList>
+            <View style={{marginHorizontal: 10}}>
+              <Card
+                style={{marginVertical: 10, paddingBottom: 20}}
+                elevation={3}>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Title style={{padding: 16}}>Recent</Title>
+                  <Button
+                    style={{margin: 10, marginTop: 10}}
+                    labelStyle={{fontSize: 12}}
+                    compact={true}
+                    color="black">
+                    View all
+                  </Button>
+                </View>
+                <Component.Transactions limit={3} />
+                {/* {transactions
+                  .slice(0, 10)
+                  .map(
+                    (
+                      transaction: transactionTypes.Transaction,
+                      index: number,
+                    ) => {
+                      return (
+                        <List.Item
+                          key={`transaction-list-item__${index}`}
+                          left={() => (
+                            <List.Icon
+                              icon={getIcon(transaction.paymentMethod)}
+                            />
+                          )}
+                          title={transaction.name}
+                        />
+                      );
+                    },
+                  )} */}
+              </Card>
+              <Card elevation={3} style={{paddingBottom: 20}}>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Title style={{padding: 16}}>By payment method</Title>
+                  <Button
+                    style={{margin: 10, marginTop: 10}}
+                    labelStyle={{fontSize: 12}}
+                    compact={true}
+                    color="black">
+                    View all
+                  </Button>
+                </View>
+                <Component.Category
+                  title="Cash"
+                  paymentMethod={transactionTypes.PaymentMethod.CASH}
+                  icon="cash"
+                />
+                <Component.Category
+                  title="Credit"
+                  paymentMethod={transactionTypes.PaymentMethod.CREDIT}
+                  icon="credit-card-outline"
+                />
+                <Component.Category
+                  title="Debit"
+                  paymentMethod={transactionTypes.PaymentMethod.DEBIT}
+                  icon="bank-outline"
+                />
+                <Component.Category
+                  title="Check"
+                  paymentMethod={transactionTypes.PaymentMethod.CHECK}
+                  icon="checkbook"
+                />
+                <Component.Category
+                  title="Other"
+                  paymentMethod={transactionTypes.PaymentMethod.OTHER}
+                  icon="hand-coin-outline"
+                />
+              </Card>
+            </View>
           )}
           <Component.NewTransaction />
           <Component.Filter data={transactions} />

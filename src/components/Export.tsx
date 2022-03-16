@@ -15,6 +15,8 @@ export default function Export() {
   const {modalVisible} = useSelector(
     (state: storeTypes.RootState) => state.modal,
   );
+
+  console.log(modalVisible, modalTypes.ModalVisible.EXPORT);
   return (
     <ReactNativeModal
       style={styles.modalContainer}

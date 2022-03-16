@@ -20,6 +20,14 @@ export enum Mode {
   'VIEW' = 'view',
 }
 
+export enum PAGE {
+  'HOME_SCREEN' = 'HomeScreen',
+  'EDIT_SCREEN' = 'EditScreen',
+  'SETTINGS_SCREEN' = 'SettingsScreen',
+  'SETTING_SCREEN' = 'SettingScreen',
+  'STATS_SCREEN' = 'StatsScreen',
+}
+
 type RootStackParamList = {
   HomeScreen: undefined;
   EditScreen: undefined;

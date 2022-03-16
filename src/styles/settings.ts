@@ -6,8 +6,7 @@ const settingsStyles = StyleSheet.create({
     flex: 1,
   },
   heading: {
-    color: mainText,
-    fontSize: 16,
+    padding: 16,
   },
 });
 

@@ -1,5 +1,6 @@
 import * as accountTypes from './account';
 import * as appTypes from './app';
+import * as currencyTypes from './currency';
 import * as editTypes from './edit';
 import * as modalTypes from './modal';
 import * as settingTypes from './settings';
@@ -9,9 +10,11 @@ import * as storeTypes from './store';
 import * as transactionTypes from './transaction';
 import * as filterTypes from './filter';
 
+// change to export const type = {...}
 export {
   accountTypes,
   appTypes,
+  currencyTypes,
   editTypes,
   modalTypes,
   settingTypes,

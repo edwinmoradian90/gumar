@@ -3,9 +3,11 @@ export interface Selected {
   id: string;
 }
 
-export interface InitialState {
+export interface State {
   selected: {[index: string]: string} | null;
-  currency: string | null;
+  currencySymbol: string;
+  currencyFullName: string;
+  currencyId: string;
   isUsingPassword: boolean;
   password: string;
 }

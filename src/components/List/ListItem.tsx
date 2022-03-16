@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: colors.secondary,
     padding: 10,
     margin: 10,
     width: '100%',
@@ -43,14 +42,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  name: {
-    color: colors.primary,
-  },
-  date: {
-    color: colors.primary,
-  },
-  amount: {
-    color: colors.primary,
-  },
+  name: {},
+  date: {},
+  amount: {},
   nameDateWrapper: {},
 });

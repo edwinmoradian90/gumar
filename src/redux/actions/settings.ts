@@ -10,10 +10,6 @@ export function selectSetting(selected: settingTypes.Selected) {
   return {type: SELECT_SETTING, selected};
 }
 
-export function selectCurrency(currency: string) {
-  return {type: SELECT_CURRENCY, currency};
-}
-
 export function setPasswordUse(isUsingPassword: boolean) {
   // maybe better name for SET_PASSWORD_STATE
   return {type: SET_PASSWORD_STATE, isUsingPassword};

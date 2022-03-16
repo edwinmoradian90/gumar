@@ -6,15 +6,25 @@ import {
   SET_PASSWORD_STATE,
 } from '../constants/settings';
 
-const initialState: settingTypes.InitialState = {
+const initialState: settingTypes.State = {
   selected: null,
-  currency: 'usd',
+  currencyId: 'usd',
+  currencySymbol: '$',
+  currencyFullName: 'United States Dollar',
   isUsingPassword: false,
   password: '',
 };
 
 export default function settingsReducer(state = initialState, action: any) {
-  const {type, selected, currency, isUsingPassword, password} = action || {};
+  const {
+    type,
+    selected,
+    currencyFullName,
+    currencySymbol,
+    currencyId,
+    isUsingPassword,
+    password,
+  } = action || {};
   switch (type) {
     case SELECT_SETTING:
       return {
@@ -24,7 +34,9 @@ export default function settingsReducer(state = initialState, action: any) {
     case SELECT_CURRENCY:
       return {
         ...state,
-        currency,
+        currencyId,
+        currencyFullName,
+        currencySymbol,
       };
     case SET_PASSWORD_STATE:
       return {
