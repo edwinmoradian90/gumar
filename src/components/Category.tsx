@@ -1,5 +1,6 @@
 import moment from 'moment';
 import React, {useCallback, useMemo, useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {View} from 'react-native';
 import {
   Button,
@@ -11,7 +12,7 @@ import {
   Text,
 } from 'react-native-paper';
 import {useSelector} from 'react-redux';
-import {storeTypes, transactionTypes} from '../types';
+import {appTypes, storeTypes, transactionTypes} from '../types';
 import {colors, helpers} from '../utils';
 
 export default function Category({
@@ -25,6 +26,7 @@ export default function Category({
   icon: string;
   iconColor?: string;
 }) {
+  const navigation = useNavigation<appTypes.Navigation>();
   const [showMenu, setShowMenu] = useState(false);
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
@@ -59,7 +61,10 @@ export default function Category({
     return `Last updated ${moment(lastUpdated).fromNow()}`;
   }, [transactions]);
 
-  function handleView() {}
+  function handleView() {
+    setShowMenu(false);
+    navigation.navigate('TransactionsScreen', {paymentMethod});
+  }
 
   function handleDelete() {}
 
@@ -69,26 +74,42 @@ export default function Category({
     <React.Fragment>
       <Divider inset={true} />
       <List.Item
-        left={() => <List.Icon color={iconColor} icon={icon} />}
+        style={{opacity: 0.875}}
+        left={() => (
+          <IconButton
+            style={{
+              backgroundColor: colors.secondary,
+              borderRadius: 5,
+              marginTop: 13,
+              marginLeft: 14,
+              marginRight: 10,
+            }}
+            size={20}
+            color={iconColor || colors.iconColor}
+            icon={icon}
+          />
+        )}
         title={title}
-        titleStyle={{fontSize: 18, fontWeight: 'bold'}}
+        titleStyle={{fontSize: 18, fontWeight: '600'}}
         description={description}
-        descriptionStyle={{fontSize: 12}}
+        descriptionStyle={{color: colors.muted, fontSize: 12}}
         right={() => (
           <View style={{alignItems: 'center', flexDirection: 'row'}}>
             <Text
               style={{
-                fontSize: 16,
-                fontWeight: 'bold',
+                fontSize: 20,
+                fontWeight: '600',
               }}>{`${symbol}${total}`}</Text>
             <Menu
               visible={showMenu}
               onDismiss={() => setShowMenu(false)}
               anchor={
                 <IconButton
+                  style={{padding: 0, margin: 0, marginTop: 2}}
                   onPress={() => setShowMenu(true)}
-                  color={Colors.grey500}
+                  color={colors.muted}
                   icon="dots-vertical"
+                  size={20}
                 />
               }>
               <Menu.Item

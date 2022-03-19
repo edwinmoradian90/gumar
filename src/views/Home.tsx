@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React, {useMemo, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {ScrollView, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch, useSelector} from 'react-redux';
 import * as Component from '../components';
@@ -21,15 +21,24 @@ import {
   Card,
   Colors,
   Divider,
-  Headline,
-  List,
+  IconButton,
   Searchbar,
+  Subheading,
   Title,
 } from 'react-native-paper';
+import useTotal from '../hooks/useTotal';
+import Svg, {Defs, Ellipse, LinearGradient, Rect, Stop} from 'react-native-svg';
 
 export default function Home() {
   const navigation = useNavigation<appTypes.Navigation>();
   const dispatch = useDispatch();
+  const total = useTotal({withSymbol: true});
+  const totalMonth = useTotal({
+    withSymbol: true,
+    dateRangeFrom: moment().startOf('month').format('YYYY-MM-DD hh:mm'),
+    dateRangeTo: moment().endOf('month').format('YYYY-MM-DD hh:mm'),
+  });
+
   const {transactions, status} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
@@ -40,8 +49,6 @@ export default function Home() {
   const {sortBy, isDescending} = useSelector(
     (state: storeTypes.RootState) => state.sort,
   );
-
-  const [showMore, setShowMore] = useState(false);
 
   function filter(item: any) {
     if (!filterState.isUsingFilter) return true;
@@ -183,6 +190,33 @@ export default function Home() {
     }
   }
 
+  const GradCard = ({children}: {children: React.ReactNode}) => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          margin: 10,
+          marginTop: 20,
+        }}>
+        <Svg
+          height="100%"
+          width="100%"
+          style={{
+            ...StyleSheet.absoluteFillObject,
+          }}>
+          <Defs>
+            <LinearGradient id="grad" x1="0%" y1="100%" x2="90%" y2="10%">
+              <Stop offset="0" stopColor={Colors.purple500} />
+              <Stop offset="1" stopColor={Colors.indigo500} />
+            </LinearGradient>
+          </Defs>
+          <Rect ry={10} width="100%" height="100%" fill="url(#grad)" />
+        </Svg>
+        {children}
+      </View>
+    );
+  };
+
   // clean up modals
   return (
     <>
@@ -207,15 +241,17 @@ export default function Home() {
           }
         />
       </Appbar.Header>
-      <ScrollView style={{flex: 1, backgroundColor: Colors.grey100}}>
+      <View style={{backgroundColor: colors.altBackground}}>
         <Searchbar
           style={{
             elevation: 0,
-            borderBottomColor: Colors.grey300,
-            borderBottomWidth: 1,
+            borderRadius: 30,
+            margin: 10,
           }}
           placeholder="Search"
         />
+      </View>
+      <ScrollView style={{flex: 1, backgroundColor: Colors.grey100}}>
         {/* <SortButton
           sortBy={sortBy}
           isDescending={isDescending}
@@ -240,89 +276,179 @@ export default function Home() {
               </View>
             </View>
           ) : (
-            <View style={{marginHorizontal: 10}}>
-              <Card
-                style={{marginVertical: 10, paddingBottom: 20}}
-                elevation={3}>
-                <View
+            <View>
+              <GradCard>
+                <Card
                   style={{
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <Title style={{padding: 16}}>Recent</Title>
-                  <Button
-                    style={{margin: 10, marginTop: 10}}
-                    labelStyle={{fontSize: 12}}
-                    compact={true}
-                    color="black">
-                    View all
-                  </Button>
-                </View>
-                <Component.Transactions limit={3} />
-                {/* {transactions
-                  .slice(0, 10)
-                  .map(
-                    (
-                      transaction: transactionTypes.Transaction,
-                      index: number,
-                    ) => {
-                      return (
-                        <List.Item
-                          key={`transaction-list-item__${index}`}
-                          left={() => (
-                            <List.Icon
-                              icon={getIcon(transaction.paymentMethod)}
-                            />
-                          )}
-                          title={transaction.name}
-                        />
-                      );
-                    },
-                  )} */}
-              </Card>
-              <Card elevation={3} style={{paddingBottom: 20}}>
-                <View
+                    backgroundColor: 'transparent',
+                    borderBottomEndRadius: 16,
+                    borderBottomStartRadius: 16,
+                    borderTopEndRadius: 16,
+                    borderTopStartRadius: 16,
+                    paddingVertical: 42,
+                    paddingHorizontal: 30,
+                    marginHorizontal: 10,
+                    marginBottom: 13,
+                    marginTop: 26,
+                  }}
+                  elevation={0}>
+                  <Card.Title
+                    title="At a glance"
+                    titleStyle={{
+                      color: colors.white,
+                      fontSize: 32,
+                      fontWeight: 'bold',
+                      marginBottom: 10,
+                    }}
+                  />
+                  <Card.Content
+                    style={{
+                      paddingHorizontal: 16,
+                      paddingTop: 26,
+                      opacity: 0.7,
+                    }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginBottom: 20,
+                      }}>
+                      <Text
+                        style={{
+                          color: colors.white,
+                          fontSize: 20,
+                          fontWeight: 'bold',
+                        }}>
+                        Total expense
+                      </Text>
+                      <Text
+                        style={{
+                          color: colors.white,
+                          fontSize: 20,
+                          fontWeight: 'bold',
+                        }}>
+                        {total}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
+                      <Text
+                        style={{
+                          color: colors.white,
+                          fontSize: 16,
+                          fontWeight: 'bold',
+                        }}>
+                        This month's expense
+                      </Text>
+                      <Text
+                        style={{
+                          color: colors.white,
+                          fontSize: 16,
+                          fontWeight: 'bold',
+                        }}>
+                        {totalMonth}
+                      </Text>
+                    </View>
+                  </Card.Content>
+                </Card>
+              </GradCard>
+              <View
+                style={{
+                  marginHorizontal: 10,
+                }}>
+                <Card
                   style={{
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
+                    marginVertical: 10,
+                    paddingBottom: 16,
                   }}>
-                  <Title style={{padding: 16}}>By payment method</Title>
-                  <Button
-                    style={{margin: 10, marginTop: 10}}
-                    labelStyle={{fontSize: 12}}
-                    compact={true}
-                    color="black">
-                    View all
-                  </Button>
-                </View>
-                <Component.Category
-                  title="Cash"
-                  paymentMethod={transactionTypes.PaymentMethod.CASH}
-                  icon="cash"
-                />
-                <Component.Category
-                  title="Credit"
-                  paymentMethod={transactionTypes.PaymentMethod.CREDIT}
-                  icon="credit-card-outline"
-                />
-                <Component.Category
-                  title="Debit"
-                  paymentMethod={transactionTypes.PaymentMethod.DEBIT}
-                  icon="bank-outline"
-                />
-                <Component.Category
-                  title="Check"
-                  paymentMethod={transactionTypes.PaymentMethod.CHECK}
-                  icon="checkbook"
-                />
-                <Component.Category
-                  title="Other"
-                  paymentMethod={transactionTypes.PaymentMethod.OTHER}
-                  icon="hand-coin-outline"
-                />
-              </Card>
+                  <Card.Title
+                    title="Recent"
+                    style={{
+                      backgroundColor: colors.background,
+                    }}
+                    titleStyle={{
+                      color: colors.title,
+                      marginLeft: 5,
+                      fontSize: 22,
+                      fontWeight: '600',
+                      opacity: 0.875,
+                    }}
+                    rightStyle={{marginTop: 3}}
+                    right={() => (
+                      <Card.Actions>
+                        <Button
+                          labelStyle={{
+                            color: colors.text,
+                            fontSize: 11,
+                          }}
+                          onPress={() =>
+                            navigation.navigate('TransactionsScreen')
+                          }>
+                          VIEW ALL
+                        </Button>
+                      </Card.Actions>
+                    )}
+                  />
+                  <Component.Transactions limit={3} />
+                </Card>
+                <Card style={{paddingBottom: 16, marginBottom: 10}}>
+                  <Card.Title
+                    title="By payment method"
+                    style={{
+                      backgroundColor: colors.background,
+                      opacity: 0.875,
+                    }}
+                    titleStyle={{
+                      color: colors.text,
+                      marginLeft: 5,
+                      fontSize: 22,
+                      fontWeight: '600',
+                    }}
+                    right={() => (
+                      <Card.Actions>
+                        <Button
+                          labelStyle={{
+                            color: colors.text,
+                            fontSize: 11,
+                          }}
+                          onPress={() =>
+                            navigation.navigate('TransactionsScreen')
+                          }>
+                          VIEW ALL
+                        </Button>
+                      </Card.Actions>
+                    )}
+                  />
+                  <Component.Category
+                    title="Cash"
+                    paymentMethod={transactionTypes.PaymentMethod.CASH}
+                    icon="cash"
+                  />
+                  <Component.Category
+                    title="Credit"
+                    paymentMethod={transactionTypes.PaymentMethod.CREDIT}
+                    icon="credit-card-outline"
+                  />
+                  <Component.Category
+                    title="Debit"
+                    paymentMethod={transactionTypes.PaymentMethod.DEBIT}
+                    icon="bank-outline"
+                  />
+                  <Component.Category
+                    title="Check"
+                    paymentMethod={transactionTypes.PaymentMethod.CHECK}
+                    icon="checkbook"
+                  />
+                  <Component.Category
+                    title="Other"
+                    paymentMethod={transactionTypes.PaymentMethod.OTHER}
+                    icon="hand-coin-outline"
+                  />
+                </Card>
+              </View>
             </View>
           )}
           <Component.NewTransaction />

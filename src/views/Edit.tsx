@@ -168,6 +168,10 @@ function Edit() {
             label="Debit"
           />
           <Picker.Item
+            value={transactionTypes.PaymentMethod.CHECK}
+            label="Check"
+          />
+          <Picker.Item
             value={transactionTypes.PaymentMethod.OTHER}
             label="Other"
           />

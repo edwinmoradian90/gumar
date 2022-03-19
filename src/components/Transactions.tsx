@@ -13,19 +13,28 @@ import {
 } from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
-import {storeTypes, transactionTypes} from '../types';
-import {helpers} from '../utils';
+import {appTypes, storeTypes, transactionTypes} from '../types';
+import {colors, filter, helpers} from '../utils';
+import {useNavigation} from '@react-navigation/native';
 
 function Transactions({
-  filter,
+  //   filter,
+  paymentMethod,
+  dateRangeFrom,
+  dateRangeTo,
   sortBy,
   limit,
 }: {
-  filter?: (transaction: transactionTypes.Transaction) => boolean;
+  //   filter?: (transaction: transactionTypes.Transaction) => boolean;
+  paymentMethod?: transactionTypes.PaymentMethod;
+  dateRangeFrom?: string;
+  dateRangeTo?: string;
   sortBy?: (a: any, b: any) => -1 | 1 | 0;
   limit?: number;
 }) {
   const dispatch = useDispatch();
+  const navigation = useNavigation<appTypes.Navigation>();
+
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
@@ -44,8 +53,10 @@ function Transactions({
 
     return transactions
       .filter((transaction: transactionTypes.Transaction) => {
-        if (!filter) return true;
-        return filter(transaction);
+        return filter.apply([
+          filter.conditions.paymentMethod(transaction, paymentMethod),
+          filter.conditions.dateRange(transaction, dateRangeFrom, dateRangeTo),
+        ]);
       })
       .sort(sortBy || helpers.compare.adate)
       .slice(
@@ -90,6 +101,12 @@ function Transactions({
     setShowMore(!showMore);
   }
 
+  function handleView(transaction: transactionTypes.Transaction) {
+    setShowMenu({...showMenu, [transaction.id]: false});
+    dispatch(actions.transaction.select(transaction));
+    navigation.navigate('EditScreen');
+  }
+
   function handleDelete(transactionId: string) {
     setShowAlert(true);
     setShowMenu({...showMenu, [transactionId]: false});
@@ -102,22 +119,89 @@ function Transactions({
       {modifiedTransactions.map(
         (transaction: transactionTypes.Transaction, index: number) => {
           const icon = getIcon(transaction.paymentMethod);
-          const date = moment(transaction.date).format('MMMM DD YYYY, hh:mm A');
+          const date = moment(transaction.date).format('MMMM DD YYYY');
+          const time = moment(transaction.date).format('hh:mm A');
+
           return (
-            <View key={`transaction-list-item__${index}`}>
+            <View
+              style={{backgroundColor: colors.primary, opacity: 0.875}}
+              key={`transaction-list-item__${index}`}>
               <Divider inset={true} />
               <List.Item
                 title={transaction.name}
-                titleStyle={{fontSize: 18, fontWeight: 'bold'}}
-                description={date}
-                descriptionStyle={{fontSize: 12}}
-                left={() => <List.Icon icon={icon} />}
+                titleStyle={{fontSize: 20, fontWeight: '600'}}
+                description={() => (
+                  <React.Fragment>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        marginTop: 2,
+                      }}>
+                      <IconButton
+                        style={{
+                          padding: 0,
+                          margin: 0,
+                          marginTop: 2,
+                          marginRight: 3,
+                          marginLeft: -3,
+                        }}
+                        size={12}
+                        icon="calendar"
+                        color={colors.muted}
+                      />
+                      <Text style={{color: colors.muted, fontSize: 12}}>
+                        {date}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                      }}>
+                      <IconButton
+                        style={{
+                          padding: 0,
+                          margin: 0,
+                          marginRight: 3,
+                          marginLeft: -3,
+                        }}
+                        size={12}
+                        icon="clock-time-five-outline"
+                        color={colors.muted}
+                      />
+                      <Text style={{color: colors.muted, fontSize: 12}}>
+                        {time}
+                      </Text>
+                    </View>
+                  </React.Fragment>
+                )}
+                left={() => (
+                  <IconButton
+                    style={{
+                      backgroundColor: colors.secondary,
+                      borderRadius: 5,
+                      marginTop: 14,
+                      marginLeft: 14,
+                      marginRight: 10,
+                    }}
+                    color={colors.iconColor}
+                    icon={icon}
+                    size={20}
+                  />
+                )}
                 right={() => (
-                  <View style={{alignItems: 'center', flexDirection: 'row'}}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                    }}>
                     <Text
                       style={{
-                        fontSize: 16,
-                        fontWeight: 'bold',
+                        fontSize: 20,
+                        fontWeight: '600',
                       }}>{`${symbol}${transaction.amount}`}</Text>
                     <Menu
                       visible={showMenu[transaction.id]}
@@ -126,14 +210,24 @@ function Transactions({
                       }
                       anchor={
                         <IconButton
-                          onPress={() => {
-                            setShowMenu({...showMenu, [transaction.id]: true});
+                          style={{
+                            padding: 0,
+                            margin: 0,
+                            marginTop: 2,
                           }}
-                          color={Colors.grey500}
+                          onPress={() =>
+                            setShowMenu({...showMenu, [transaction.id]: true})
+                          }
+                          size={20}
+                          color={colors.mutedIcon}
                           icon="dots-vertical"
                         />
                       }>
-                      <Menu.Item title="View" icon="view-list-outline" />
+                      <Menu.Item
+                        title="View"
+                        icon="view-list-outline"
+                        onPress={() => handleView(transaction)}
+                      />
                       <Divider
                         style={{marginHorizontal: 20, marginVertical: 10}}
                       />
@@ -154,9 +248,10 @@ function Transactions({
                 deny="Cancel"
                 visible={showAlert}
                 onDismiss={() => setShowAlert(false)}
-                onConfirm={() =>
-                  dispatch(actions.transaction.remove(transaction.id))
-                }
+                onConfirm={() => {
+                  if (modifiedTransactions.length === 1) navigation.goBack();
+                  dispatch(actions.transaction.remove(transaction.id));
+                }}
                 onDeny={() => setShowAlert(false)}
               />
             </View>
@@ -164,7 +259,9 @@ function Transactions({
         },
       )}
       {limit && limit > 0 && limit < transactions.length && (
-        <Button onPress={toggleShowMore}>
+        <Button
+          labelStyle={{fontSize: 12, color: colors.secondary}}
+          onPress={toggleShowMore}>
           {showMore ? 'Show less' : 'Show more'}
         </Button>
       )}

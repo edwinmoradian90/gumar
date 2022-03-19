@@ -1,4 +1,6 @@
+import {RouteProp} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {transactionTypes} from '.';
 
 export enum Status {
   SUCCESS = 'success',
@@ -28,11 +30,23 @@ export enum PAGE {
   'STATS_SCREEN' = 'StatsScreen',
 }
 
-type RootStackParamList = {
+export type RootStackParamList = {
   HomeScreen: undefined;
   EditScreen: undefined;
   SettingsScreen: undefined;
   SettingScreen: undefined;
+  TransactionsScreen:
+    | {paymentMethod: transactionTypes.PaymentMethod}
+    | undefined;
 };
 
 export type Navigation = NativeStackNavigationProp<RootStackParamList>;
+
+export type TransactionsScreenProp = RouteProp<
+  RootStackParamList,
+  'TransactionsScreen'
+>;
+
+export interface TransactionScreenProps {
+  route?: TransactionsScreenProp;
+}

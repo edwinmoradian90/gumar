@@ -1,5 +1,6 @@
 import React from 'react';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
+import {Colors} from 'react-native-paper';
 import {colors} from '../utils';
 
 export default function Layout({

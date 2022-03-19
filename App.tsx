@@ -4,9 +4,9 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 import {NavigationContainer} from '@react-navigation/native';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Edit, Home, Layout, Settings, Splash, Stats} from './src/views';
-import {Export} from './src/components';
+import * as View from './src/views';
 import {colors} from './src/utils';
+import {appTypes} from './src/types';
 
 let count = 0;
 
@@ -36,28 +36,30 @@ export default function App() {
   ) {
     return function () {
       return (
-        <Layout>
+        <View.Layout>
           <Component />
-        </Layout>
+        </View.Layout>
       );
     };
   }
 
-  const HomeScreen = createScreen(Home);
-
-  const EditScreen = createScreen(Edit);
-
-  const SettingsScreen = createScreen(Settings.Settings);
-
-  const SettingScreen = createScreen(Settings.Setting);
-
-  const StatsScreen = createScreen(Stats);
+  const HomeScreen = createScreen(View.Home);
+  const EditScreen = createScreen(View.Edit);
+  const SettingsScreen = createScreen(View.Settings.Settings);
+  const SettingScreen = createScreen(View.Settings.Setting);
+  const TransactionsScreen: React.FC<appTypes.TransactionsScreenProp> =
+    createScreen(View.Transactions);
+  const StatsScreen = createScreen(View.Stats);
 
   function HomeScreenStack() {
     return (
       <HomeStack.Navigator screenOptions={{headerShown: false}}>
         <HomeStack.Screen name="HomeScreen" component={HomeScreen} />
         <HomeStack.Screen name="EditScreen" component={EditScreen} />
+        <HomeStack.Screen
+          name="TransactionsScreen"
+          component={TransactionsScreen}
+        />
       </HomeStack.Navigator>
     );
   }
@@ -82,7 +84,7 @@ export default function App() {
     );
   }
 
-  if (isSplash) return <Splash />;
+  if (isSplash) return <View.Splash />;
 
   return (
     <NavigationContainer>
