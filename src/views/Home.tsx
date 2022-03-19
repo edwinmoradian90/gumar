@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, {useMemo, useState} from 'react';
+import React, {useMemo} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
@@ -15,19 +15,9 @@ import {
   sortTypes,
 } from '../types';
 import {colors, helpers} from '../utils';
-import {
-  Appbar,
-  Button,
-  Card,
-  Colors,
-  Divider,
-  IconButton,
-  Searchbar,
-  Subheading,
-  Title,
-} from 'react-native-paper';
+import {Appbar, Button, Card, Colors, Searchbar} from 'react-native-paper';
 import useTotal from '../hooks/useTotal';
-import Svg, {Defs, Ellipse, LinearGradient, Rect, Stop} from 'react-native-svg';
+import Svg, {Defs, LinearGradient, Rect, Stop} from 'react-native-svg';
 
 export default function Home() {
   const navigation = useNavigation<appTypes.Navigation>();
@@ -203,6 +193,7 @@ export default function Home() {
           width="100%"
           style={{
             ...StyleSheet.absoluteFillObject,
+            opacity: 0.9,
           }}>
           <Defs>
             <LinearGradient id="grad" x1="0%" y1="100%" x2="90%" y2="10%">
@@ -241,16 +232,6 @@ export default function Home() {
           }
         />
       </Appbar.Header>
-      <View style={{backgroundColor: colors.altBackground}}>
-        <Searchbar
-          style={{
-            elevation: 0,
-            borderRadius: 30,
-            margin: 10,
-          }}
-          placeholder="Search"
-        />
-      </View>
       <ScrollView style={{flex: 1, backgroundColor: Colors.grey100}}>
         {/* <SortButton
           sortBy={sortBy}
@@ -277,6 +258,16 @@ export default function Home() {
             </View>
           ) : (
             <View>
+              <View style={{backgroundColor: colors.altBackground}}>
+                <Searchbar
+                  style={{
+                    elevation: 0,
+                    borderRadius: 30,
+                    margin: 10,
+                  }}
+                  placeholder="Search"
+                />
+              </View>
               <GradCard>
                 <Card
                   style={{
@@ -374,7 +365,6 @@ export default function Home() {
                       marginLeft: 5,
                       fontSize: 22,
                       fontWeight: '600',
-                      opacity: 0.875,
                     }}
                     rightStyle={{marginTop: 3}}
                     right={() => (
@@ -399,10 +389,9 @@ export default function Home() {
                     title="By payment method"
                     style={{
                       backgroundColor: colors.background,
-                      opacity: 0.875,
                     }}
                     titleStyle={{
-                      color: colors.text,
+                      color: colors.title,
                       marginLeft: 5,
                       fontSize: 22,
                       fontWeight: '600',

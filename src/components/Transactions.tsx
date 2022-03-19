@@ -124,7 +124,7 @@ function Transactions({
 
           return (
             <View
-              style={{backgroundColor: colors.primary, opacity: 0.875}}
+              style={{backgroundColor: colors.primary}}
               key={`transaction-list-item__${index}`}>
               <Divider inset={true} />
               <List.Item

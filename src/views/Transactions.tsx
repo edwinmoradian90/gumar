@@ -6,6 +6,7 @@ import {useDispatch} from 'react-redux';
 import * as Component from '../components';
 import {actions} from '../redux';
 import {appTypes, modalTypes} from '../types';
+import {colors} from '../utils';
 
 export default function Transactions() {
   const dispatch = useDispatch();
@@ -18,7 +19,10 @@ export default function Transactions() {
         style={{backgroundColor: Colors.white, elevation: 0}}
         dark={false}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title="Transactions" />
+        <Appbar.Content
+          titleStyle={{color: colors.title}}
+          title="Transactions"
+        />
         <Appbar.Action
           icon="export"
           onPress={() =>

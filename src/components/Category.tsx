@@ -74,7 +74,6 @@ export default function Category({
     <React.Fragment>
       <Divider inset={true} />
       <List.Item
-        style={{opacity: 0.875}}
         left={() => (
           <IconButton
             style={{
@@ -90,7 +89,7 @@ export default function Category({
           />
         )}
         title={title}
-        titleStyle={{fontSize: 18, fontWeight: '600'}}
+        titleStyle={{color: colors.text, fontSize: 18, fontWeight: '600'}}
         description={description}
         descriptionStyle={{color: colors.muted, fontSize: 12}}
         right={() => (
