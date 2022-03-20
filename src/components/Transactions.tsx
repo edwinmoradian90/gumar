@@ -129,7 +129,7 @@ function Transactions({
               <Divider inset={true} />
               <List.Item
                 title={transaction.name}
-                titleStyle={{fontSize: 20, fontWeight: '600'}}
+                titleStyle={{fontSize: 16, fontWeight: '300'}}
                 description={() => (
                   <React.Fragment>
                     <View
@@ -151,7 +151,12 @@ function Transactions({
                         icon="calendar"
                         color={colors.muted}
                       />
-                      <Text style={{color: colors.muted, fontSize: 12}}>
+                      <Text
+                        style={{
+                          color: colors.muted,
+                          fontSize: 12,
+                          fontWeight: '300',
+                        }}>
                         {date}
                       </Text>
                     </View>
@@ -172,7 +177,12 @@ function Transactions({
                         icon="clock-time-five-outline"
                         color={colors.muted}
                       />
-                      <Text style={{color: colors.muted, fontSize: 12}}>
+                      <Text
+                        style={{
+                          color: colors.muted,
+                          fontSize: 12,
+                          fontWeight: '300',
+                        }}>
                         {time}
                       </Text>
                     </View>
@@ -201,7 +211,7 @@ function Transactions({
                     <Text
                       style={{
                         fontSize: 20,
-                        fontWeight: '600',
+                        fontWeight: '300',
                       }}>{`${symbol}${transaction.amount}`}</Text>
                     <Menu
                       visible={showMenu[transaction.id]}

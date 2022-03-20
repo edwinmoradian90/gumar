@@ -185,7 +185,7 @@ export default function Home() {
       <View
         style={{
           flex: 1,
-          margin: 10,
+          margin: 20,
           marginTop: 20,
         }}>
         <Svg
@@ -263,7 +263,7 @@ export default function Home() {
                   style={{
                     elevation: 0,
                     borderRadius: 30,
-                    margin: 10,
+                    margin: 20,
                   }}
                   placeholder="Search"
                 />
@@ -276,8 +276,8 @@ export default function Home() {
                     borderBottomStartRadius: 16,
                     borderTopEndRadius: 16,
                     borderTopStartRadius: 16,
-                    paddingVertical: 42,
-                    paddingHorizontal: 30,
+                    paddingVertical: 10,
+                    paddingHorizontal: 20,
                     marginHorizontal: 10,
                     marginBottom: 13,
                     marginTop: 26,
@@ -287,58 +287,51 @@ export default function Home() {
                     title="At a glance"
                     titleStyle={{
                       color: colors.white,
-                      fontSize: 32,
-                      fontWeight: 'bold',
+                      fontSize: 40,
+                      fontWeight: '200',
                       marginBottom: 10,
+                      paddingVertical: 10,
                     }}
                   />
                   <Card.Content
                     style={{
                       paddingHorizontal: 16,
-                      paddingTop: 26,
-                      opacity: 0.7,
                     }}>
                     <View
                       style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
                         marginBottom: 20,
                       }}>
                       <Text
                         style={{
                           color: colors.white,
-                          fontSize: 20,
-                          fontWeight: 'bold',
+                          fontSize: 22,
+                          fontWeight: '200',
                         }}>
                         Total expense
                       </Text>
                       <Text
                         style={{
                           color: colors.white,
-                          fontSize: 20,
-                          fontWeight: 'bold',
+                          fontSize: 26,
+                          fontWeight: '200',
                         }}>
                         {total}
                       </Text>
                     </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                      }}>
+                    <View style={{}}>
                       <Text
                         style={{
                           color: colors.white,
-                          fontSize: 16,
-                          fontWeight: 'bold',
+                          fontSize: 22,
+                          fontWeight: '200',
                         }}>
-                        This month's expense
+                        This month
                       </Text>
                       <Text
                         style={{
                           color: colors.white,
-                          fontSize: 16,
-                          fontWeight: 'bold',
+                          fontSize: 26,
+                          fontWeight: '200',
                         }}>
                         {totalMonth}
                       </Text>
@@ -348,11 +341,11 @@ export default function Home() {
               </GradCard>
               <View
                 style={{
-                  marginHorizontal: 10,
+                  marginHorizontal: 20,
                 }}>
                 <Card
                   style={{
-                    marginVertical: 10,
+                    marginVertical: 20,
                     paddingBottom: 16,
                   }}>
                   <Card.Title
@@ -364,7 +357,7 @@ export default function Home() {
                       color: colors.title,
                       marginLeft: 5,
                       fontSize: 22,
-                      fontWeight: '600',
+                      fontWeight: '300',
                     }}
                     rightStyle={{marginTop: 3}}
                     right={() => (
@@ -384,7 +377,7 @@ export default function Home() {
                   />
                   <Component.Transactions limit={3} />
                 </Card>
-                <Card style={{paddingBottom: 16, marginBottom: 10}}>
+                <Card style={{paddingBottom: 16, marginBottom: 30}}>
                   <Card.Title
                     title="By payment method"
                     style={{
@@ -394,7 +387,7 @@ export default function Home() {
                       color: colors.title,
                       marginLeft: 5,
                       fontSize: 22,
-                      fontWeight: '600',
+                      fontWeight: '300',
                     }}
                     right={() => (
                       <Card.Actions>

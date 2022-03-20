@@ -79,7 +79,7 @@ export default function Category({
             style={{
               backgroundColor: colors.secondary,
               borderRadius: 5,
-              marginTop: 13,
+              marginTop: 11,
               marginLeft: 14,
               marginRight: 10,
             }}
@@ -89,15 +89,15 @@ export default function Category({
           />
         )}
         title={title}
-        titleStyle={{color: colors.text, fontSize: 18, fontWeight: '600'}}
+        titleStyle={{color: colors.text, fontSize: 16, fontWeight: '300'}}
         description={description}
         descriptionStyle={{color: colors.muted, fontSize: 12}}
         right={() => (
           <View style={{alignItems: 'center', flexDirection: 'row'}}>
             <Text
               style={{
-                fontSize: 20,
-                fontWeight: '600',
+                fontSize: 18,
+                fontWeight: '300',
               }}>{`${symbol}${total}`}</Text>
             <Menu
               visible={showMenu}
