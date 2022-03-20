@@ -25,18 +25,21 @@ export default function Transactions() {
         />
         <Appbar.Action
           icon="export"
+          color={colors.iconButtonColor}
           onPress={() =>
             dispatch(actions.modal.setVisible(modalTypes.ModalVisible.EXPORT))
           }
         />
         <Appbar.Action
           icon="filter-variant"
+          color={colors.iconButtonColor}
           onPress={() =>
             dispatch(actions.modal.setVisible(modalTypes.ModalVisible.FILTER))
           }
         />
         <Appbar.Action
           icon="plus"
+          color={colors.iconButtonColor}
           onPress={() =>
             dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD))
           }

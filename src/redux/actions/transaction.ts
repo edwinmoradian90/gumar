@@ -56,16 +56,6 @@ export function append(
         type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
         transactions: [...transactions, newTransaction],
       });
-      // Alert.alert('Transaction created.', '', [
-      //   {
-      //     text: 'Add another',
-      //     onPress: () =>
-      //       dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD)),
-      //   },
-      //   {
-      //     text: 'Close',
-      //   },
-      // ]);
     } catch (error) {
       console.error(error);
       dispatch({type: constants.transaction.ACTION_TRANSACTION_FAILURE, error});

@@ -210,6 +210,7 @@ function Transactions({
                     }}>
                     <Text
                       style={{
+                        color: colors.text,
                         fontSize: 20,
                         fontWeight: '300',
                       }}>{`${symbol}${transaction.amount}`}</Text>

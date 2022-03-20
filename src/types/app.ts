@@ -9,11 +9,12 @@ export enum Status {
 }
 
 export enum EditTarget {
-  'NAME' = 'name',
-  'AMOUNT' = 'amount',
-  'PAYMENT_METHOD' = 'paymentMethod',
-  'DATE' = 'date',
-  'NONE' = 'none',
+  NAME = 'name',
+  AMOUNT = 'amount',
+  PAYMENT_METHOD = 'paymentMethod',
+  DATE = 'date',
+  TIME = 'time',
+  NONE = 'none',
 }
 
 export enum Mode {

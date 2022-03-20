@@ -1,24 +1,33 @@
 import React, {useRef} from 'react';
-import {ScrollView, Text, TextInput, View} from 'react-native';
-import {Header, Card} from '../components';
+import {ScrollView, View} from 'react-native';
+import {Headline, IconButton, Text, TextInput} from 'react-native-paper';
 import DatePicker from 'react-native-date-picker';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import {Card, List} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
-import editHeaderStyles from '../styles/header/edit';
 import {humanReadableDate} from '../utils/helpers';
 import {appTypes, storeTypes, transactionTypes} from '../types';
 import {actions} from '../redux';
 import {style} from '../styles';
 import {Picker} from '@react-native-picker/picker';
+import {Appbar} from 'react-native-paper';
+import {useNavigation} from '@react-navigation/native';
+import * as Component from '../components';
+import {colors} from '../utils';
+import moment from 'moment';
+import getSymbolFromCurrency from 'currency-symbol-map';
 
 function Edit() {
   const dispatch = useDispatch();
+  const navigation = useNavigation<appTypes.Navigation>();
+
+  const {name} = useSelector((state: storeTypes.RootState) => state.currency);
+  const currencySymbol = getSymbolFromCurrency(name) || '$';
   const {selected, status} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
   const {editTarget} = useSelector((state: storeTypes.RootState) => state.app);
 
-  const content = useRef<String>('');
+  const content = useRef<string>('');
   const editTargetRef = useRef(appTypes.EditTarget.NONE);
 
   function setContent(data: string) {
@@ -81,44 +90,57 @@ function Edit() {
 
   const NameSection = () => {
     return (
-      <Card onPress={onPress(appTypes.EditTarget.NAME)}>
-        <View style={style.edit.heading}>
-          <Text style={style.edit.headingTitle}>Name</Text>
-        </View>
-        {editTarget === appTypes.EditTarget.NAME ? (
-          <TextInput
-            autoFocus
-            onChangeText={(content: string) => setContent(content)}
-            placeholder="Name"
-            defaultValue={selected.name}
-            onEndEditing={() => save(content.current)}
-          />
-        ) : (
-          <Text>{selected.name}</Text>
+      <List.Item
+        left={() => <List.Icon icon="draw-pen" />}
+        title="Name"
+        description={() => (
+          <>
+            {editTarget === appTypes.EditTarget.NAME ? (
+              <TextInput
+                autoFocus
+                style={{backgroundColor: colors.altBackground}}
+                onChangeText={(content: string) => setContent(content)}
+                placeholder="Name"
+                defaultValue={selected.name}
+                onEndEditing={() => save(content.current)}
+              />
+            ) : (
+              <Text>{selected.name}</Text>
+            )}
+          </>
         )}
-      </Card>
+        onPress={onPress(appTypes.EditTarget.NAME)}
+      />
     );
   };
 
   const AmountSection = () => {
     return (
-      <Card onPress={onPress(appTypes.EditTarget.AMOUNT)}>
-        <View style={style.edit.heading}>
-          <Text style={style.edit.headingTitle}>Amount</Text>
-        </View>
-        {editTarget === appTypes.EditTarget.AMOUNT ? (
-          <TextInput
-            autoFocus
-            keyboardType="numeric"
-            onChangeText={(content: string) => setContent(content)}
-            placeholder="Amount"
-            defaultValue={content.current as string}
-            onEndEditing={() => save(content.current)}
-          />
-        ) : (
-          <Text>{selected.amount}</Text>
+      <List.Item
+        left={() => <List.Icon icon="cash-multiple" />}
+        title="Amount"
+        description={() => (
+          <>
+            {editTarget === appTypes.EditTarget.AMOUNT ? (
+              <TextInput
+                autoFocus
+                style={{backgroundColor: colors.altBackground}}
+                keyboardType="numeric"
+                onChangeText={(content: string) => setContent(content)}
+                placeholder="Amount"
+                defaultValue={content.current}
+                onEndEditing={() => save(content.current)}
+              />
+            ) : (
+              <Text>
+                {currencySymbol}
+                {selected.amount}
+              </Text>
+            )}
+          </>
         )}
-      </Card>
+        onPress={onPress(appTypes.EditTarget.AMOUNT)}
+      />
     );
   };
 
@@ -126,71 +148,139 @@ function Edit() {
     const dateObj = new Date(selected.date);
 
     return (
-      <Card onPress={onPress(appTypes.EditTarget.DATE)}>
-        <View style={style.edit.heading}>
-          <Text style={style.edit.headingTitle}>Date</Text>
-        </View>
-        <Text style={style.edit.sectionText}>{humanReadableDate(dateObj)}</Text>
-        <DatePicker
-          modal
-          open={editTarget === appTypes.EditTarget.DATE}
-          date={dateObj}
-          onConfirm={(date: Date) => save(date)}
-          onCancel={close}
-        />
-      </Card>
+      <List.Item
+        left={() => (
+          <List.Icon color={colors.iconButtonColor} icon="calendar" />
+        )}
+        title="Date"
+        description={() => (
+          <>
+            {editTarget === appTypes.EditTarget.DATE ? (
+              <DatePicker
+                modal
+                mode="date"
+                androidVariant="iosClone"
+                open={editTarget === appTypes.EditTarget.DATE}
+                date={dateObj}
+                onConfirm={(date: Date) => save(date)}
+                onCancel={close}
+              />
+            ) : (
+              <Text>{date}</Text>
+            )}
+          </>
+        )}
+        onPress={onPress(appTypes.EditTarget.DATE)}
+      />
+    );
+  };
+
+  const TimeSection = () => {
+    const dateObj = new Date(selected.date);
+
+    return (
+      <List.Item
+        left={() => (
+          <List.Icon
+            color={colors.iconButtonColor}
+            icon="clock-time-five-outline"
+          />
+        )}
+        title="Time"
+        description={() => (
+          <>
+            {editTarget === appTypes.EditTarget.TIME ? (
+              <DatePicker
+                modal
+                mode="time"
+                androidVariant="iosClone"
+                open={editTarget === appTypes.EditTarget.TIME}
+                date={dateObj}
+                onConfirm={(date: Date) => save(date)}
+                onCancel={close}
+              />
+            ) : (
+              <Text>{time}</Text>
+            )}
+          </>
+        )}
+        onPress={onPress(appTypes.EditTarget.TIME)}
+      />
     );
   };
 
   const PaymentMethodSection = () => {
     return (
-      <Card>
-        <View style={style.edit.heading}>
-          <Text style={style.edit.headingTitle}>Payment Method</Text>
-        </View>
-        <Picker
-          style={{height: 60}}
-          onFocus={onPressWithRef(appTypes.EditTarget.PAYMENT_METHOD)}
-          selectedValue={selected.paymentMethod}
-          onValueChange={(paymentMethod: transactionTypes.PaymentMethod) =>
-            saveWithRef(paymentMethod)
-          }>
-          <Picker.Item
-            value={transactionTypes.PaymentMethod.CASH}
-            label="Cash"
+      <List.Item
+        left={() => (
+          <List.Icon
+            color={colors.iconButtonColor}
+            icon="credit-card-search-outline"
           />
-          <Picker.Item
-            value={transactionTypes.PaymentMethod.CREDIT}
-            label="Credit"
-          />
-          <Picker.Item
-            value={transactionTypes.PaymentMethod.DEBIT}
-            label="Debit"
-          />
-          <Picker.Item
-            value={transactionTypes.PaymentMethod.CHECK}
-            label="Check"
-          />
-          <Picker.Item
-            value={transactionTypes.PaymentMethod.OTHER}
-            label="Other"
-          />
-        </Picker>
-      </Card>
+        )}
+        title="Payment method"
+        description={() => (
+          <>
+            <Picker
+              style={{height: 60}}
+              onFocus={onPressWithRef(appTypes.EditTarget.PAYMENT_METHOD)}
+              selectedValue={selected.paymentMethod}
+              onValueChange={(paymentMethod: transactionTypes.PaymentMethod) =>
+                saveWithRef(paymentMethod)
+              }>
+              <Picker.Item
+                value={transactionTypes.PaymentMethod.CASH}
+                label="Cash"
+              />
+              <Picker.Item
+                value={transactionTypes.PaymentMethod.CREDIT}
+                label="Credit"
+              />
+              <Picker.Item
+                value={transactionTypes.PaymentMethod.DEBIT}
+                label="Debit"
+              />
+              <Picker.Item
+                value={transactionTypes.PaymentMethod.CHECK}
+                label="Check"
+              />
+              <Picker.Item
+                value={transactionTypes.PaymentMethod.OTHER}
+                label="Other"
+              />
+            </Picker>
+          </>
+        )}
+      />
     );
   };
 
+  const date = moment(selected.date).format('MMMM DD YYYY');
+  const time = moment(selected.date).format('hh:ss A');
+
   return (
     <React.Fragment>
-      <Header left={['back']} right={['trash']} styles={editHeaderStyles} />
+      <Appbar.Header>
+        <Appbar.BackAction
+          color={colors.iconButtonColor}
+          onPress={() => navigation.goBack()}
+        />
+        <Appbar.Content color={colors.title} title={selected.name} />
+        <Appbar.Action
+          icon="trash-can-outline"
+          color={colors.iconButtonColor}
+        />
+      </Appbar.Header>
       <ScrollView style={style.edit.container}>
         {selected && (
           <View style={style.edit.snapshotContainer}>
-            <Text style={style.edit.snapshotAmount}>${selected.amount}</Text>
+            <Headline>
+              {currencySymbol}
+              {selected.amount}
+            </Headline>
             <Text style={style.edit.snapshotName}>{selected.name}</Text>
-            <Text style={style.edit.snapshotDate}>
-              {humanReadableDate(selected.date.toString())}
-            </Text>
+            <Text style={style.edit.snapshotDate}>{date}</Text>
+            <Text>{time}</Text>
           </View>
         )}
         {selected && (
@@ -198,6 +288,7 @@ function Edit() {
             <NameSection />
             <AmountSection />
             <DateSection />
+            <TimeSection />
             <PaymentMethodSection />
           </React.Fragment>
         )}

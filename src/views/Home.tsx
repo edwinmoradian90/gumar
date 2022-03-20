@@ -17,14 +17,12 @@ import {
 import {colors, helpers} from '../utils';
 import {Appbar, Button, Card, Colors, Searchbar} from 'react-native-paper';
 import useTotal from '../hooks/useTotal';
-import Svg, {Defs, LinearGradient, Rect, Stop} from 'react-native-svg';
 
 export default function Home() {
   const navigation = useNavigation<appTypes.Navigation>();
   const dispatch = useDispatch();
-  const total = useTotal({withSymbol: true});
-  const totalMonth = useTotal({
-    withSymbol: true,
+  const [total, symbol] = useTotal();
+  const [totalMonth, monthSymbol] = useTotal({
     dateRangeFrom: moment().startOf('month').format('YYYY-MM-DD hh:mm'),
     dateRangeTo: moment().endOf('month').format('YYYY-MM-DD hh:mm'),
   });
@@ -180,34 +178,6 @@ export default function Home() {
     }
   }
 
-  const GradCard = ({children}: {children: React.ReactNode}) => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          margin: 20,
-          marginTop: 20,
-        }}>
-        <Svg
-          height="100%"
-          width="100%"
-          style={{
-            ...StyleSheet.absoluteFillObject,
-            opacity: 0.9,
-          }}>
-          <Defs>
-            <LinearGradient id="grad" x1="0%" y1="100%" x2="90%" y2="10%">
-              <Stop offset="0" stopColor={Colors.purple500} />
-              <Stop offset="1" stopColor={Colors.indigo500} />
-            </LinearGradient>
-          </Defs>
-          <Rect ry={10} width="100%" height="100%" fill="url(#grad)" />
-        </Svg>
-        {children}
-      </View>
-    );
-  };
-
   // clean up modals
   return (
     <>
@@ -257,18 +227,8 @@ export default function Home() {
               </View>
             </View>
           ) : (
-            <View>
-              <View style={{backgroundColor: colors.altBackground}}>
-                <Searchbar
-                  style={{
-                    elevation: 0,
-                    borderRadius: 30,
-                    margin: 20,
-                  }}
-                  placeholder="Search"
-                />
-              </View>
-              <GradCard>
+            <View style={{paddingTop: 100}}>
+              <Component.Gradient.Rectangle>
                 <Card
                   style={{
                     backgroundColor: 'transparent',
@@ -286,9 +246,9 @@ export default function Home() {
                   <Card.Title
                     title="At a glance"
                     titleStyle={{
-                      color: colors.white,
+                      color: colors.secondaryHighlight,
                       fontSize: 40,
-                      fontWeight: '200',
+                      fontWeight: '300',
                       marginBottom: 10,
                       paddingVertical: 10,
                     }}
@@ -312,13 +272,14 @@ export default function Home() {
                       <Text
                         style={{
                           color: colors.white,
-                          fontSize: 26,
+                          fontSize: 28,
                           fontWeight: '200',
                         }}>
-                        {total}
+                        {symbol}
+                        {total.toLocaleString()}
                       </Text>
                     </View>
-                    <View style={{}}>
+                    <View>
                       <Text
                         style={{
                           color: colors.white,
@@ -333,12 +294,13 @@ export default function Home() {
                           fontSize: 26,
                           fontWeight: '200',
                         }}>
-                        {totalMonth}
+                        {symbol}
+                        {totalMonth.toLocaleString()}
                       </Text>
                     </View>
                   </Card.Content>
                 </Card>
-              </GradCard>
+              </Component.Gradient.Rectangle>
               <View
                 style={{
                   marginHorizontal: 20,
@@ -439,6 +401,7 @@ export default function Home() {
           <Component.SortOptions />
         </View>
       </ScrollView>
+      <Component.Search />
     </>
   );
 }

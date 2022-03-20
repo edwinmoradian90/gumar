@@ -22,3 +22,4 @@ export const white = '#ffffff';
 export const hightlightWhite = highlightColor(white, 20);
 export const mutedIcon = Colors.grey500;
 export const iconColor = Colors.grey300;
+export const iconButtonColor = black;

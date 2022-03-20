@@ -1,20 +1,24 @@
 import {StyleSheet} from 'react-native';
-import {gray, mainText, muted, white} from '../utils/colors';
+import {colors} from '../utils';
 
 const editStyles = StyleSheet.create({
   container: {
-    backgroundColor: white,
+    backgroundColor: colors.background,
+    marginHorizontal: 20,
   },
   card: {
     alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: gray,
     margin: 0,
     padding: 0,
     paddingVertical: 20,
     marginHorizontal: 20,
     display: 'flex',
     flexDirection: 'row',
+  },
+  cardTitle: {
+    color: colors.title,
+    fontSize: 32,
+    fontWeight: '300',
   },
   heading: {
     alignItems: 'center',
@@ -23,21 +27,19 @@ const editStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   headingTitle: {
-    color: muted,
+    color: colors.muted,
     fontSize: 12,
   },
   sectionText: {
-    color: mainText,
+    color: colors.text,
     fontSize: 16,
     fontWeight: '500',
   },
   datePicker: {
-    backgroundColor: 'grey',
+    backgroundColor: colors.muted,
   },
   snapshotContainer: {
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: gray,
     display: 'flex',
     justifyContent: 'center',
     paddingVertical: 20,
@@ -45,7 +47,7 @@ const editStyles = StyleSheet.create({
     marginHorizontal: 16,
   },
   snapshotAmount: {
-    color: mainText,
+    color: colors.text,
     fontSize: 50,
     fontWeight: 'bold',
     paddingBottom: 6,
@@ -55,13 +57,13 @@ const editStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   snapshotDate: {
-    color: muted,
+    color: colors.muted,
     fontSize: 14,
     fontWeight: '600',
   },
   icon: {
     alignItems: 'center',
-    backgroundColor: gray,
+    backgroundColor: colors.muted,
     borderRadius: 22,
     display: 'flex',
     height: 44,
