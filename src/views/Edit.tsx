@@ -1,17 +1,21 @@
 import React, {useRef} from 'react';
 import {ScrollView, View} from 'react-native';
-import {Headline, IconButton, Text, TextInput} from 'react-native-paper';
+import {Headline, Text, TextInput} from 'react-native-paper';
 import DatePicker from 'react-native-date-picker';
-import {Card, List} from 'react-native-paper';
+import {List} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
-import {humanReadableDate} from '../utils/helpers';
-import {appTypes, storeTypes, transactionTypes} from '../types';
+import {
+  alertTypes,
+  appTypes,
+  snackbarTypes,
+  storeTypes,
+  transactionTypes,
+} from '../types';
 import {actions} from '../redux';
 import {style} from '../styles';
 import {Picker} from '@react-native-picker/picker';
 import {Appbar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
-import * as Component from '../components';
 import {colors} from '../utils';
 import moment from 'moment';
 import getSymbolFromCurrency from 'currency-symbol-map';
@@ -37,6 +41,41 @@ function Edit() {
   function clearContent() {
     content.current = '';
   }
+
+  // move
+  function handleSnackbar(): void {
+    const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
+    const snackbar: Partial<snackbarTypes.State> = {
+      message: 'Transaction deleted',
+      onDismiss,
+    };
+
+    dispatch(actions.snackbar.setVisible(snackbar));
+  }
+
+  function handleAlert(selectedId: string): void {
+    const onConfirm = () => {
+      navigation.goBack();
+      dispatch(actions.transaction.remove(selectedId));
+      dispatch(actions.alert.setNotVisible());
+      handleSnackbar();
+    };
+    const onDismiss = () => dispatch(actions.alert.setNotVisible());
+
+    const alert: Partial<alertTypes.State> = {
+      title: 'Are you sure?',
+      body: 'This action is not reversible. Delete transaction?',
+      confirm: 'Delete',
+      deny: 'Cancel',
+      onDeny: onDismiss,
+      onConfirm,
+      onDismiss,
+    };
+
+    dispatch(actions.alert.setVisible(alert));
+  }
+
+  const handleDelete = (selectedId: string) => handleAlert(selectedId);
 
   // Picker closes on rerender so we save change to ref to avoid rerender
   function onPressWithRef(newEditTarget: appTypes.EditTarget) {
@@ -269,6 +308,7 @@ function Edit() {
         <Appbar.Action
           icon="trash-can-outline"
           color={colors.iconButtonColor}
+          onPress={() => handleDelete(selected.id)}
         />
       </Appbar.Header>
       <ScrollView style={style.edit.container}>

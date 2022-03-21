@@ -7,10 +7,18 @@ import {Picker} from '@react-native-picker/picker';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
 import {style} from '../styles';
-import {modalTypes, storeTypes, transactionTypes} from '../types';
+import {
+  appTypes,
+  modalTypes,
+  snackbarTypes,
+  storeTypes,
+  transactionTypes,
+} from '../types';
+import {useNavigation} from '@react-navigation/native';
 
 export default function NewTransaction() {
   const dispatch = useDispatch();
+  const navigation = useNavigation<appTypes.Navigation>();
   const {modalVisible} = useSelector(
     (state: storeTypes.RootState) => state.modal,
   );
@@ -35,6 +43,21 @@ export default function NewTransaction() {
 
       dispatch(actions.transaction.append(newTransaction));
       dispatch(actions.modal.setNotVisible());
+
+      const actionOnpress = () => {
+        dispatch(actions.transaction.select(newTransaction));
+        dispatch(actions.snackbar.setNotVisible());
+        navigation.navigate('EditScreen');
+      };
+      const snackbar: Partial<snackbarTypes.State> = {
+        visible: true,
+        message: `Transaction added to "${paymentMethod}".`,
+        onDismiss: () => dispatch(actions.snackbar.setNotVisible()),
+        actionLabel: 'View',
+        actionOnpress,
+      };
+
+      dispatch(actions.snackbar.setVisible(snackbar));
 
       setName('');
       setAmount('');

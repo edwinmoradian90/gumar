@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 import {List, Searchbar, Surface} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
@@ -13,8 +13,10 @@ export default function Search() {
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
+
   // TODO: move to redux, turn off scroll when active, remove search bar background
   const [searchQuery, setSearchQuery] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 
   const onChangeSearch = (query: string) => setSearchQuery(query);
 
@@ -27,20 +29,18 @@ export default function Search() {
   const Results = ({filteredData}: {filteredData: any}) => {
     if (!filteredData || filteredData.length === 0 || searchQuery === '')
       return null;
-    console.log(filteredData);
+
     return (
       <Surface
         style={{
-          flex: 1,
-          borderBottomEndRadius: 5,
-          borderBottomStartRadius: 5,
+          borderRadius: 5,
+          elevation: 4,
           position: 'absolute',
           top: 70,
           left: 0,
           marginLeft: 20,
           justifyContent: 'center',
           width: '90%',
-          elevation: 7,
         }}>
         {filteredData !== undefined &&
           filteredData.map((data: any, index: number) => {
@@ -75,13 +75,15 @@ export default function Search() {
       }}>
       <Searchbar
         style={{
-          elevation: 0,
+          elevation: isFocused ? 7 : 0,
           borderRadius: 30,
           margin: 20,
         }}
         placeholder="Search"
         onChangeText={onChangeSearch}
         value={searchQuery}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
       <Results filteredData={filteredData} />
     </View>

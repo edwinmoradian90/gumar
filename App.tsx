@@ -8,8 +8,6 @@ import * as View from './src/views';
 import {colors} from './src/utils';
 import {appTypes} from './src/types';
 
-let count = 0;
-
 export default function App() {
   const [isSplash, setIsSplash] = useState(true);
 
@@ -19,10 +17,6 @@ export default function App() {
       setIsSplash(false);
     }, 3000);
   }, []);
-
-  count += 1;
-
-  console.log('APP renders ', count);
 
   const Tab = createMaterialBottomTabNavigator();
   const HomeStack = createNativeStackNavigator();

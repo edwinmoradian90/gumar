@@ -1,0 +1,2 @@
+export const SET_VISIBLE = 'SET_ALERT_VISIBLE';
+export const SET_NOT_VISIBLE = 'SET_ALERT_NOT_VISIBLE';

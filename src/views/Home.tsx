@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, {useMemo} from 'react';
+import React, {useMemo, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';

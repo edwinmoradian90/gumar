@@ -2,16 +2,23 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {ScrollView} from 'react-native';
 import {Appbar, Colors} from 'react-native-paper';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import * as Component from '../components';
 import {actions} from '../redux';
-import {appTypes, modalTypes} from '../types';
+import {appTypes, modalTypes, storeTypes} from '../types';
 import {colors} from '../utils';
 
 export default function Transactions() {
   const dispatch = useDispatch();
   const route = useRoute<appTypes.TransactionsScreenProp>();
   const navigation = useNavigation();
+  const {paymentMethods} = useSelector(
+    (state: storeTypes.RootState) => state.filter,
+  );
+
+  function handleAdd() {
+    dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD));
+  }
 
   return (
     <React.Fragment>
@@ -40,9 +47,7 @@ export default function Transactions() {
         <Appbar.Action
           icon="plus"
           color={colors.iconButtonColor}
-          onPress={() =>
-            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD))
-          }
+          onPress={handleAdd}
         />
       </Appbar.Header>
       <ScrollView>

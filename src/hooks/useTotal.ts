@@ -1,4 +1,3 @@
-import moment from 'moment';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import React, {useMemo} from 'react';
 import {useSelector} from 'react-redux';
@@ -13,38 +12,30 @@ interface UseTotalProps {
 }
 
 export default function useTotal(props?: UseTotalProps): string[] {
-  {
-    const {paymentMethod, dateRangeFrom, dateRangeTo} = props || {};
+  const {paymentMethod, dateRangeFrom, dateRangeTo} = props || {};
 
-    const {transactions} = useSelector(
-      (state: storeTypes.RootState) => state.transaction,
-    );
-    const {name} = useSelector((state: storeTypes.RootState) => state.currency);
+  const {transactions} = useSelector(
+    (state: storeTypes.RootState) => state.transaction,
+  );
+  const {name} = useSelector((state: storeTypes.RootState) => state.currency);
 
-    const symbol = getSymbolFromCurrency(name) || '$';
+  const symbol = getSymbolFromCurrency(name) || '$';
 
-    if (transactions.length === 0) return ['0', symbol];
+  // event emitter.removelistener('change') error caused by useMemo
+  const total = useMemo(() => {
+    if (transactions.length === 0) return '0';
+    return transactions
+      .filter((transaction: transactionTypes.Transaction) =>
+        filter.apply([
+          filter.conditions.paymentMethod(transaction, paymentMethod),
+          filter.conditions.dateRange(transaction, dateRangeFrom, dateRangeTo),
+        ]),
+      )
+      .reduce(
+        (a: number, b: transactionTypes.Transaction) => a + parseInt(b.amount),
+        0,
+      );
+  }, [transactions, dateRangeFrom, dateRangeTo, paymentMethod]);
 
-    // event emitter.removelistener('change') error caused by useMemo
-    const total = useMemo(() => {
-      return transactions
-        .filter((transaction: transactionTypes.Transaction) =>
-          filter.apply([
-            filter.conditions.paymentMethod(transaction, paymentMethod),
-            filter.conditions.dateRange(
-              transaction,
-              dateRangeFrom,
-              dateRangeTo,
-            ),
-          ]),
-        )
-        .reduce(
-          (a: number, b: transactionTypes.Transaction) =>
-            a + parseInt(b.amount),
-          0,
-        );
-    }, [transactions, paymentMethod, dateRangeFrom, dateRangeTo]);
-
-    return [total, symbol];
-  }
+  return [total, symbol];
 }
