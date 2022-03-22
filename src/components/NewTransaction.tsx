@@ -15,6 +15,7 @@ import {
   transactionTypes,
 } from '../types';
 import {useNavigation} from '@react-navigation/native';
+import {helpers} from '../utils';
 
 export default function NewTransaction() {
   const dispatch = useDispatch();
@@ -51,7 +52,7 @@ export default function NewTransaction() {
       };
       const snackbar: Partial<snackbarTypes.State> = {
         visible: true,
-        message: `Transaction added to "${paymentMethod}".`,
+        message: `Transaction added to "${helpers.capitalize(paymentMethod)}"`,
         onDismiss: () => dispatch(actions.snackbar.setNotVisible()),
         actionLabel: 'View',
         actionOnpress,
@@ -67,7 +68,7 @@ export default function NewTransaction() {
   }
 
   return (
-    <>
+    <React.Fragment>
       <ReactNativeModal
         style={style.newTransaction.modalContainer}
         isVisible={modalVisible === modalTypes.ModalVisible.ADD}
@@ -102,7 +103,9 @@ export default function NewTransaction() {
             <Text>Payment type</Text>
             <Picker
               style={style.newTransaction.input}
-              selectedValue={paymentMethod}
+              selectedValue={
+                paymentMethod || transactionTypes.PaymentMethod.CASH
+              }
               onValueChange={(itemValue: transactionTypes.PaymentMethod) =>
                 setPaymentMethod(itemValue)
               }>
@@ -138,6 +141,6 @@ export default function NewTransaction() {
           </View>
         </View>
       </ReactNativeModal>
-    </>
+    </React.Fragment>
   );
 }

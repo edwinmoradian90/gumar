@@ -13,7 +13,12 @@ import {Header} from '.';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
 import {Picker} from '@react-native-picker/picker';
-import {modalTypes, storeTypes, transactionTypes} from '../types';
+import {
+  modalTypes,
+  snackbarTypes,
+  storeTypes,
+  transactionTypes,
+} from '../types';
 import {colors, helpers} from '../utils';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
@@ -72,6 +77,19 @@ export default function Filter({data}: {data: any}) {
     dispatch(actions.filter.clear());
   }
 
+  function handleSnackbar() {
+    const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
+
+    const snackbar: Partial<snackbarTypes.State> = {
+      message: 'Filter applied.',
+      actionLabel: 'Dismiss',
+      actionOnpress: onDismiss,
+      onDismiss,
+    };
+
+    dispatch(actions.snackbar.setVisible(snackbar));
+  }
+
   function handleSubmit() {
     const selectedPaymentMethods = Object.keys(paymentMethods).filter(
       (key: string) => paymentMethods[key],
@@ -93,6 +111,8 @@ export default function Filter({data}: {data: any}) {
 
     dispatch(actions.filter.create(filter));
     dispatch(actions.modal.setNotVisible());
+
+    handleSnackbar();
   }
 
   const InstallmentOption = ({name, type}: {name: string; type: string}) => {

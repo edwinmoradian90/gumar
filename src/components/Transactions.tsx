@@ -1,7 +1,6 @@
 import moment from 'moment';
 import React, {useMemo, useRef, useState} from 'react';
 import {ScrollView, View} from 'react-native';
-import {Alert} from '.';
 import {
   Button,
   Colors,
@@ -13,12 +12,17 @@ import {
 } from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
-import {appTypes, storeTypes, transactionTypes} from '../types';
+import {
+  alertTypes,
+  appTypes,
+  snackbarTypes,
+  storeTypes,
+  transactionTypes,
+} from '../types';
 import {colors, filter, helpers} from '../utils';
 import {useNavigation} from '@react-navigation/native';
 
 function Transactions({
-  //   filter,
   paymentMethod,
   dateRangeFrom,
   dateRangeTo,
@@ -38,9 +42,9 @@ function Transactions({
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
+
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
   const [showMore, setShowMore] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
   // fix type
   const scrollRef: any = useRef(null);
 
@@ -48,7 +52,6 @@ function Transactions({
   const additionalLimit = 7;
 
   const modifiedTransactions = useMemo(() => {
-    console.log('WOEO');
     if (transactions.length === 0) return [];
 
     return transactions
@@ -96,7 +99,7 @@ function Transactions({
   }
 
   function toggleShowMore() {
-    // fix later
+    // TODO: fix later
     if (showMore) scrollRef?.current?.scrollTo({y: 0, animated: true});
     setShowMore(!showMore);
   }
@@ -107,9 +110,45 @@ function Transactions({
     navigation.navigate('EditScreen');
   }
 
-  function handleDelete(transactionId: string) {
-    setShowAlert(true);
-    setShowMenu({...showMenu, [transactionId]: false});
+  function handleSnackbar() {
+    const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
+
+    const snackbar: Partial<snackbarTypes.State> = {
+      message: 'Transaction deleted.',
+      actionLabel: 'Dismiss',
+      actionOnpress: onDismiss,
+      onDismiss,
+    };
+
+    dispatch(actions.snackbar.setVisible(snackbar));
+  }
+
+  function handleAlert(selectedId: string) {
+    const onConfirm = () => {
+      if (modifiedTransactions.length === 1) navigation.goBack();
+      dispatch(actions.alert.setNotVisible());
+      dispatch(actions.transaction.remove(selectedId));
+      handleSnackbar();
+    };
+
+    const onDismiss = () => dispatch(actions.alert.setNotVisible());
+
+    const alert: Partial<alertTypes.State> = {
+      title: 'Are you sure?',
+      body: 'This action is irreversible. Delete transaction?',
+      confirm: 'Delete',
+      deny: 'Cancel',
+      onDeny: onDismiss,
+      onConfirm,
+      onDismiss,
+    };
+
+    dispatch(actions.alert.setVisible(alert));
+  }
+
+  function handleDelete(selectedId: string) {
+    setShowMenu({...showMenu, [selectedId]: false});
+    handleAlert(selectedId);
   }
 
   if (transactions.length === 0) return <Text>Nothing here...</Text>;
@@ -211,7 +250,7 @@ function Transactions({
                     <Text
                       style={{
                         color: colors.text,
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: '300',
                       }}>{`${symbol}${transaction.amount}`}</Text>
                     <Menu
@@ -251,19 +290,6 @@ function Transactions({
                     </Menu>
                   </View>
                 )}
-              />
-              <Alert
-                title="Are you sure?"
-                body="This action is not reversible. Delete transaction?"
-                confirm="Delete"
-                deny="Cancel"
-                visible={showAlert}
-                onDismiss={() => setShowAlert(false)}
-                onConfirm={() => {
-                  if (modifiedTransactions.length === 1) navigation.goBack();
-                  dispatch(actions.transaction.remove(transaction.id));
-                }}
-                onDeny={() => setShowAlert(false)}
               />
             </View>
           );

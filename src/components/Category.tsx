@@ -3,7 +3,6 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {View} from 'react-native';
 import {
-  Button,
   Colors,
   Divider,
   IconButton,
@@ -58,7 +57,7 @@ export default function Category({
   }, [transactions]);
 
   const description = useMemo(() => {
-    return `Last updated ${moment(lastUpdated).fromNow()}`;
+    return `Updated ${moment(lastUpdated).fromNow()}`;
   }, [transactions]);
 
   function handleView() {
@@ -91,12 +90,15 @@ export default function Category({
         title={title}
         titleStyle={{color: colors.text, fontSize: 16, fontWeight: '300'}}
         description={description}
-        descriptionStyle={{color: colors.muted, fontSize: 12}}
+        descriptionStyle={{
+          color: colors.muted,
+          fontSize: 12,
+        }}
         right={() => (
           <View style={{alignItems: 'center', flexDirection: 'row'}}>
             <Text
               style={{
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: '300',
               }}>{`${symbol}${total}`}</Text>
             <Menu

@@ -19,6 +19,7 @@ export default function Layout({
       <StatusBar backgroundColor={colors.primary} barStyle="dark-content" />
       {children}
       <Snackbar
+        duration={5000}
         visible={snackbar.visible}
         onDismiss={snackbar.onDismiss}
         action={{
@@ -45,6 +46,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.primary,
-    justifyContent: 'space-between',
   },
 });

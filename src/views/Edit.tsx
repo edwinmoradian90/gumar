@@ -26,13 +26,16 @@ function Edit() {
 
   const {name} = useSelector((state: storeTypes.RootState) => state.currency);
   const currencySymbol = getSymbolFromCurrency(name) || '$';
-  const {selected, status} = useSelector(
+  const {selected} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
   const {editTarget} = useSelector((state: storeTypes.RootState) => state.app);
 
   const content = useRef<string>('');
   const editTargetRef = useRef(appTypes.EditTarget.NONE);
+
+  const date = moment(selected.date).format('MMMM DD YYYY');
+  const time = moment(selected.date).format('hh:mm A');
 
   function setContent(data: string) {
     content.current = data;
@@ -47,6 +50,8 @@ function Edit() {
     const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
     const snackbar: Partial<snackbarTypes.State> = {
       message: 'Transaction deleted',
+      actionLabel: 'Dismiss',
+      actionOnpress: onDismiss,
       onDismiss,
     };
 
@@ -117,7 +122,12 @@ function Edit() {
   }
 
   function save(data: any) {
-    const updatedTransaction = {...selected, [editTarget]: data};
+    let key =
+      editTarget === appTypes.EditTarget.TIME
+        ? appTypes.EditTarget.DATE
+        : editTarget;
+
+    const updatedTransaction = {...selected, [key]: data};
 
     close();
 
@@ -200,7 +210,7 @@ function Edit() {
                 mode="date"
                 androidVariant="iosClone"
                 open={editTarget === appTypes.EditTarget.DATE}
-                date={dateObj}
+                date={selected.date}
                 onConfirm={(date: Date) => save(date)}
                 onCancel={close}
               />
@@ -234,8 +244,11 @@ function Edit() {
                 mode="time"
                 androidVariant="iosClone"
                 open={editTarget === appTypes.EditTarget.TIME}
-                date={dateObj}
-                onConfirm={(date: Date) => save(date)}
+                date={selected.date}
+                onConfirm={(date: Date) => {
+                  console.log(date);
+                  save(date);
+                }}
                 onCancel={close}
               />
             ) : (
@@ -294,12 +307,9 @@ function Edit() {
     );
   };
 
-  const date = moment(selected.date).format('MMMM DD YYYY');
-  const time = moment(selected.date).format('hh:ss A');
-
   return (
     <React.Fragment>
-      <Appbar.Header>
+      <Appbar.Header style={{backgroundColor: colors.background, elevation: 0}}>
         <Appbar.BackAction
           color={colors.iconButtonColor}
           onPress={() => navigation.goBack()}
