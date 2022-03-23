@@ -18,6 +18,12 @@ export default function Transactions() {
   );
 
   const paymentMethod = route.params?.paymentMethod;
+  const isSearchResult =
+    route.params?.navigationInitiator === appTypes.NavigationInitiator.SEARCH;
+
+  function handleBack() {
+    navigation.goBack();
+  }
 
   function handleAdd() {
     dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD));
@@ -44,10 +50,10 @@ export default function Transactions() {
       <Appbar.Header
         style={{backgroundColor: Colors.white, elevation: 0}}
         dark={false}>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.BackAction onPress={handleBack} />
         <Appbar.Content
           titleStyle={{color: colors.title}}
-          title="Transactions"
+          title={isSearchResult ? 'Search results' : 'Transactions'}
           subtitle={paymentMethod && helpers.capitalize(paymentMethod)}
           subtitleStyle={{color: colors.muted, fontSize: 14}}
         />
@@ -85,8 +91,18 @@ export default function Transactions() {
         />
       </Appbar.Header>
       <ScrollView>
-        <Component.Transactions paymentMethod={paymentMethod} />
+        <Component.Transactions
+          paymentMethod={paymentMethod}
+          startSpace={isSearchResult ? 0 : 80}
+          isSearchResult={isSearchResult}
+        />
       </ScrollView>
+      {!isSearchResult && (
+        <Component.Search
+          containerBackgroundColor={colors.white}
+          searchBackgroundColor={colors.altBackground}
+        />
+      )}
     </React.Fragment>
   );
 }

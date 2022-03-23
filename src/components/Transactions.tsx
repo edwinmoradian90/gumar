@@ -20,7 +20,7 @@ import {
   transactionTypes,
 } from '../types';
 import {colors, filter, helpers} from '../utils';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 function Transactions({
   paymentMethod,
@@ -28,6 +28,8 @@ function Transactions({
   dateRangeTo,
   sortBy,
   limit,
+  startSpace = 0,
+  isSearchResult = false,
 }: {
   //   filter?: (transaction: transactionTypes.Transaction) => boolean;
   paymentMethod?: transactionTypes.PaymentMethod;
@@ -35,13 +37,18 @@ function Transactions({
   dateRangeTo?: string;
   sortBy?: (a: any, b: any) => -1 | 1 | 0;
   limit?: number;
+  startSpace?: number;
+  isSearchResult?: boolean;
 }) {
   const dispatch = useDispatch();
   const navigation = useNavigation<appTypes.Navigation>();
+  const route = useRoute();
 
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
+
+  const search = useSelector((state: storeTypes.RootState) => state.search);
 
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
   const [showMore, setShowMore] = useState(false);
@@ -51,8 +58,13 @@ function Transactions({
   // add to redux
   const additionalLimit = 7;
 
+  // TODO: make hook
   const modifiedTransactions = useMemo(() => {
     if (transactions.length === 0) return [];
+
+    // TODO: extract out
+    if (search.results.length > 0 && isSearchResult)
+      return search.results.sort(sortBy || helpers.compare.adate);
 
     return transactions
       .filter((transaction: transactionTypes.Transaction) => {
@@ -154,7 +166,7 @@ function Transactions({
   if (transactions.length === 0) return <Text>Nothing here...</Text>;
 
   return (
-    <ScrollView ref={scrollRef}>
+    <ScrollView style={{paddingTop: startSpace}} ref={scrollRef}>
       {modifiedTransactions.map(
         (transaction: transactionTypes.Transaction, index: number) => {
           const icon = getIcon(transaction.paymentMethod);

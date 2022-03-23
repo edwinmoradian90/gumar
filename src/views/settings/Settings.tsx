@@ -1,16 +1,18 @@
 import React from 'react';
 import {useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
-import {IconButton, List} from 'react-native-paper';
+import {Divider, IconButton, List} from 'react-native-paper';
 import {selectSetting} from '../../redux/actions/settings';
 import {appTypes, settingTypes} from '../../types';
 import {colors} from '../../utils';
 import {Appbar} from 'react-native-paper';
+import {View} from 'react-native';
 // TODO: move to data
 
 interface Setting {
   id: string;
   name: string;
+  description?: string;
   iconLeft: string;
 }
 
@@ -18,22 +20,25 @@ const settingsData = [
   {
     id: 'currency',
     name: 'Currency',
+    description: 'Select the currency used in your transactions',
     iconLeft: 'swap-horizontal',
   },
   {
     id: 'account',
     name: 'Account',
+    description: 'Connect to your google account',
     iconLeft: 'account-check-outline',
   },
   {
     id: 'privacy-security',
     name: 'Privacy & Security',
+    description: 'Add and update app password',
     iconLeft: 'hand-front-right-outline',
-    // iconLeft: 'shield-lock-outline',
   },
   {
     id: 'terms-of-use',
     name: 'Terms of use',
+    description: 'Privacy policy and terms of service',
     iconLeft: 'file-document-multiple-outline',
   },
 ];
@@ -61,6 +66,7 @@ export default function Settings() {
             <List.Item
               key={`setting-list-item__${setting.id}`}
               title={setting.name}
+              description={setting?.description}
               left={() => (
                 <IconButton
                   color={colors.iconButtonColor}

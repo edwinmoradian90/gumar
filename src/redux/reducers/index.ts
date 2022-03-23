@@ -5,6 +5,7 @@ import currency from './currency';
 import filter from './filter';
 import home from './home';
 import modal from './modal';
+import search from './search';
 import settings from './settings';
 import snackbar from './snackbar';
 import sort from './sort';
@@ -19,6 +20,7 @@ export {
   filter,
   home,
   modal,
+  search,
   settings,
   snackbar,
   sort,

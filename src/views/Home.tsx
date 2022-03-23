@@ -15,14 +15,14 @@ import {
   sortTypes,
 } from '../types';
 import {colors, helpers} from '../utils';
-import {Appbar, Button, Card, Colors, Searchbar} from 'react-native-paper';
+import {Appbar, Button, Card, Colors} from 'react-native-paper';
 import useTotal from '../hooks/useTotal';
 
 export default function Home() {
   const navigation = useNavigation<appTypes.Navigation>();
   const dispatch = useDispatch();
   const [total, symbol] = useTotal();
-  const [totalMonth, monthSymbol] = useTotal({
+  const [totalMonth] = useTotal({
     dateRangeFrom: moment().startOf('month').format('YYYY-MM-DD hh:mm'),
     dateRangeTo: moment().endOf('month').format('YYYY-MM-DD hh:mm'),
   });
@@ -37,6 +37,7 @@ export default function Home() {
   const {sortBy, isDescending} = useSelector(
     (state: storeTypes.RootState) => state.sort,
   );
+  const search = useSelector((state: storeTypes.RootState) => state.search);
 
   function filter(item: any) {
     if (!filterState.isUsingFilter) return true;
@@ -180,7 +181,7 @@ export default function Home() {
 
   // clean up modals
   return (
-    <>
+    <React.Fragment>
       <Appbar.Header style={{backgroundColor: colors.primary}} dark={false}>
         <Appbar.Content title="Overview" />
         <Appbar.Action
@@ -202,14 +203,16 @@ export default function Home() {
           }
         />
       </Appbar.Header>
-      <ScrollView style={{flex: 1, backgroundColor: Colors.grey100}}>
+      <ScrollView
+        scrollEnabled={!search.isFocused}
+        style={{flex: 1, backgroundColor: Colors.grey100}}>
         {/* <SortButton
           sortBy={sortBy}
           isDescending={isDescending}
           styles={homeStyles}
         /> */}
 
-        <View>
+        <React.Fragment>
           {status === appTypes.Status.SUCCESS &&
           transactions &&
           transactions.length === 0 ? (
@@ -399,9 +402,9 @@ export default function Home() {
           <Component.Filter data={transactions} />
           <Component.Export />
           <Component.SortOptions />
-        </View>
+        </React.Fragment>
       </ScrollView>
-      <Component.Search />
-    </>
+      <Component.Search containerBackgroundColor={colors.altBackground} />
+    </React.Fragment>
   );
 }

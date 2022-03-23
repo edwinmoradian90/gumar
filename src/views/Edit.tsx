@@ -210,7 +210,7 @@ function Edit() {
                 mode="date"
                 androidVariant="iosClone"
                 open={editTarget === appTypes.EditTarget.DATE}
-                date={selected.date}
+                date={dateObj}
                 onConfirm={(date: Date) => save(date)}
                 onCancel={close}
               />
@@ -244,7 +244,7 @@ function Edit() {
                 mode="time"
                 androidVariant="iosClone"
                 open={editTarget === appTypes.EditTarget.TIME}
-                date={selected.date}
+                date={dateObj}
                 onConfirm={(date: Date) => {
                   console.log(date);
                   save(date);

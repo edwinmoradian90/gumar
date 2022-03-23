@@ -23,7 +23,7 @@ export enum Mode {
   'VIEW' = 'view',
 }
 
-export enum PAGE {
+export enum Page {
   'HOME_SCREEN' = 'HomeScreen',
   'EDIT_SCREEN' = 'EditScreen',
   'SETTINGS_SCREEN' = 'SettingsScreen',
@@ -31,14 +31,19 @@ export enum PAGE {
   'STATS_SCREEN' = 'StatsScreen',
 }
 
+export enum NavigationInitiator {
+  SEARCH = 'search',
+}
+
 export type RootStackParamList = {
   HomeScreen: undefined;
   EditScreen: undefined;
   SettingsScreen: undefined;
   SettingScreen: undefined;
-  TransactionsScreen:
-    | {paymentMethod: transactionTypes.PaymentMethod}
-    | undefined;
+  TransactionsScreen?: {
+    paymentMethod?: transactionTypes.PaymentMethod;
+    navigationInitiator?: NavigationInitiator;
+  };
 };
 
 export type Navigation = NativeStackNavigationProp<RootStackParamList>;
