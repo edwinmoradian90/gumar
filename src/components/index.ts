@@ -16,6 +16,7 @@ import Popup from './Popup';
 import Search from './Search';
 import SpreadSheet from './SpreadSheet';
 import Toggle from './Toggle';
+import Toolbar from './Toolbar';
 import Transactions from './Transactions';
 
 export {
@@ -37,5 +38,6 @@ export {
   Search,
   SpreadSheet,
   Toggle,
+  Toolbar,
   Transactions,
 };

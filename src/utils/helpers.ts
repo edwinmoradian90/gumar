@@ -42,6 +42,16 @@ export function isObjectAny(obj: {[index: string]: any}): boolean {
   return true;
 }
 
+export function hasValueObject(
+  value: any,
+  obj: {[index: string]: any},
+): boolean {
+  console.log('OBJ ', obj);
+  if (obj === null || obj === undefined) return false;
+  if (Object.keys(obj).length === 0) return false;
+  return Object.values(obj).indexOf(value) > -1;
+}
+
 export function isObjectEmpty(obj: {[index: string]: any}): boolean {
   if (obj === null || obj === undefined) return true;
   if (Object.keys(obj).length === 0) return true;

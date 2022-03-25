@@ -23,7 +23,7 @@ import {
 } from '../types';
 import {colors, filter, helpers} from '../utils';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {useSelect} from '../hooks';
+import {useSelect, useTransactions} from '../hooks';
 
 function Transactions({
   paymentMethod,
@@ -54,10 +54,10 @@ function Transactions({
   const search = useSelector((state: storeTypes.RootState) => state.search);
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
   const {mode} = useSelector((state: storeTypes.RootState) => state.app);
+  const transactions2 = useTransactions({});
+  console.log(transactions2.length);
 
   const [showMore, setShowMore] = useState(false);
-  // fix type
-  const scrollRef: any = useRef(null);
 
   // add to redux
   const additionalLimit = 7;
@@ -98,17 +98,6 @@ function Transactions({
     // selectionObject.clear();
   }, []);
 
-  function setMenuState() {
-    const menus: {[index: string]: boolean} = {};
-    modifiedTransactions.forEach(
-      (transaction: transactionTypes.Transaction) =>
-        (menus[transaction.id] = false),
-    );
-    return menus;
-  }
-
-  const [showMenu, setShowMenu] = useState(setMenuState());
-
   // move to helpers
   function getIcon(paymentMethod: transactionTypes.PaymentMethod) {
     switch (paymentMethod) {
@@ -128,8 +117,6 @@ function Transactions({
   }
 
   function toggleShowMore() {
-    // TODO: fix later
-    if (showMore) scrollRef?.current?.scrollTo({y: 0, animated: true});
     setShowMore(!showMore);
   }
 
@@ -283,7 +270,7 @@ function Transactions({
   if (transactions.length === 0) return <Text>Nothing here...</Text>;
 
   return (
-    <ScrollView style={{paddingTop: startSpace}} ref={scrollRef}>
+    <ScrollView style={{paddingTop: startSpace}}>
       {modifiedTransactions.map(
         (transaction: transactionTypes.Transaction, index: number) => {
           const icon = getIcon(transaction.paymentMethod);

@@ -1,9 +1,10 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {ScrollView} from 'react-native';
-import {Appbar, Colors} from 'react-native-paper';
+import {Appbar, Colors, Divider} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import * as Component from '../components';
+import {useModeCheck} from '../hooks';
 import {actions} from '../redux';
 import {appTypes, modalTypes, snackbarTypes, storeTypes} from '../types';
 import {colors, helpers} from '../utils';
@@ -12,6 +13,7 @@ export default function Transactions() {
   const dispatch = useDispatch();
   const route = useRoute<appTypes.TransactionsScreenProp>();
   const navigation = useNavigation();
+  const {isSelectMode} = useModeCheck();
 
   const {isUsingFilter} = useSelector(
     (state: storeTypes.RootState) => state.filter,
@@ -54,33 +56,29 @@ export default function Transactions() {
         <Appbar.Content
           titleStyle={{color: colors.title}}
           title={isSearchResult ? 'Search results' : 'Transactions'}
-          subtitle={paymentMethod && helpers.capitalize(paymentMethod)}
-          subtitleStyle={{color: colors.muted, fontSize: 14}}
         />
-        <Appbar.Action
-          style={{
-            borderRadius: 5,
-          }}
-          icon="export"
-          color={colors.iconButtonColor}
-          onPress={() =>
-            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.EXPORT))
-          }
-        />
-        <Appbar.Action
-          style={{
-            backgroundColor: isUsingFilter
-              ? colors.secondary
-              : colors.background,
-            borderRadius: 5,
-          }}
-          icon="filter-variant"
-          color={isUsingFilter ? colors.white : colors.iconButtonColor}
-          onPress={() =>
-            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.FILTER))
-          }
-          onLongPress={handleFilterLongPress}
-        />
+        {/* <React.Fragment>
+          <Appbar.Action
+            icon="export"
+            color={colors.iconButtonColor}
+            onPress={() =>
+              dispatch(actions.modal.setVisible(modalTypes.ModalVisible.EXPORT))
+            }
+          />
+          <Appbar.Action
+            style={{
+              backgroundColor: isUsingFilter
+                ? colors.secondary
+                : colors.background,
+            }}
+            icon="filter-variant"
+            color={isUsingFilter ? colors.white : colors.iconButtonColor}
+            onPress={() =>
+              dispatch(actions.modal.setVisible(modalTypes.ModalVisible.FILTER))
+            }
+            onLongPress={handleFilterLongPress}
+          />
+        </React.Fragment> */}
         <Appbar.Action
           style={{
             borderRadius: 5,
@@ -90,10 +88,15 @@ export default function Transactions() {
           onPress={handleAdd}
         />
       </Appbar.Header>
+      <Component.Toolbar
+        spaceTop={90}
+        title={paymentMethod && helpers.capitalize(paymentMethod)}
+      />
+      <Divider />
       <ScrollView>
         <Component.Transactions
           paymentMethod={paymentMethod}
-          startSpace={isSearchResult ? 0 : 80}
+          startSpace={isSearchResult ? 0 : 0}
           isSearchResult={isSearchResult}
         />
       </ScrollView>

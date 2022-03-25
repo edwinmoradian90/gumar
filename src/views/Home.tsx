@@ -14,11 +14,12 @@ import {
   modalTypes,
   sortTypes,
   snackbarTypes,
+  selectTypes,
 } from '../types';
 import {colors, helpers} from '../utils';
 import {Appbar, Button, Card, Colors, IconButton} from 'react-native-paper';
 import useTotal from '../hooks/useTotal';
-import {useModeCheck} from '../hooks';
+import {useModeCheck, useSelect} from '../hooks';
 
 export default function Home() {
   const navigation = useNavigation<appTypes.Navigation>();
@@ -41,8 +42,9 @@ export default function Home() {
   const search = useSelector((state: storeTypes.RootState) => state.search);
 
   const {isSelectMode, isDefaultMode} = useModeCheck();
+  const {selectionObject} = useSelect();
 
-  function filter(item: any) {
+  function filter(item: any): boolean {
     if (!filterState.isUsingFilter) return true;
 
     if (filterState.name && filterState.name !== item.name) return false;
@@ -197,10 +199,22 @@ export default function Home() {
 
   // Used in select mode
   const SelectCardRight = () => {
+    const transactionSelection = selectionObject.get('transactions');
+    const isAnySelected = helpers.hasValueObject(
+      selectTypes.Status.CHECKED,
+      transactionSelection,
+    );
+    const color = isAnySelected ? colors.iconButtonColor : colors.muted;
+    console.log(isAnySelected, transactionSelection);
+
     return (
       <Card.Actions>
-        <IconButton icon="export" />
-        <IconButton icon="trash-can-outline" />
+        <IconButton
+          icon="export"
+          disabled={!isAnySelected}
+          onPress={() => {}}
+        />
+        <IconButton icon="trash-can-outline" disabled={!isAnySelected} />
         <IconButton icon="close" onPress={onCardHeaderPress} />
       </Card.Actions>
     );
