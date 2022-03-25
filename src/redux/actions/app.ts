@@ -1,5 +1,5 @@
 import {constants} from '..';
-import {appTypes} from '../../types';
+import {appTypes, storeTypes} from '../../types';
 
 export function setMode(mode: appTypes.Mode) {
   return {type: constants.app.SET_MODE, mode};

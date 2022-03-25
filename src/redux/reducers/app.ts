@@ -1,7 +1,7 @@
 import {constants} from '..';
 import {appTypes} from '../../types';
 
-const appInitialState = {
+const appInitialState: appTypes.State = {
   mode: appTypes.Mode.DEFAULT,
   editTarget: appTypes.EditTarget.NONE,
   status: appTypes.Status.SUCCESS,

@@ -6,6 +6,7 @@ import filter from './filter';
 import home from './home';
 import modal from './modal';
 import search from './search';
+import select from './select';
 import settings from './settings';
 import snackbar from './snackbar';
 import sort from './sort';
@@ -21,6 +22,7 @@ export {
   home,
   modal,
   search,
+  select,
   settings,
   snackbar,
   sort,

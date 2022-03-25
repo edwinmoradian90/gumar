@@ -1,8 +1,9 @@
 import moment from 'moment';
-import React, {useMemo, useRef, useState} from 'react';
-import {ScrollView, View} from 'react-native';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {Pressable, ScrollView, View} from 'react-native';
 import {
   Button,
+  Checkbox,
   Colors,
   Divider,
   IconButton,
@@ -15,12 +16,14 @@ import {actions} from '../redux';
 import {
   alertTypes,
   appTypes,
+  selectTypes,
   snackbarTypes,
   storeTypes,
   transactionTypes,
 } from '../types';
 import {colors, filter, helpers} from '../utils';
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {useSelect} from '../hooks';
 
 function Transactions({
   paymentMethod,
@@ -42,15 +45,16 @@ function Transactions({
 }) {
   const dispatch = useDispatch();
   const navigation = useNavigation<appTypes.Navigation>();
-  const route = useRoute();
+
+  const {selectionObject} = useSelect();
 
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
-
   const search = useSelector((state: storeTypes.RootState) => state.search);
-
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
+  const {mode} = useSelector((state: storeTypes.RootState) => state.app);
+
   const [showMore, setShowMore] = useState(false);
   // fix type
   const scrollRef: any = useRef(null);
@@ -59,7 +63,7 @@ function Transactions({
   const additionalLimit = 7;
 
   // TODO: make hook
-  const modifiedTransactions = useMemo(() => {
+  const modifiedTransactions: transactionTypes.Transaction[] = useMemo(() => {
     if (transactions.length === 0) return [];
 
     // TODO: extract out
@@ -80,6 +84,19 @@ function Transactions({
           transactions.length,
       );
   }, [transactions, limit, showMore, filter, sortBy]);
+
+  useEffect(() => {
+    const transactionSelection = helpers.arrayToMap(
+      modifiedTransactions,
+      'id',
+      selectTypes.Status.UNCHECKED,
+    );
+    const menuSelection = helpers.arrayToMap(modifiedTransactions, 'id', false);
+
+    selectionObject.set('transactions', transactionSelection);
+    selectionObject.set('menu', menuSelection);
+    // selectionObject.clear();
+  }, []);
 
   function setMenuState() {
     const menus: {[index: string]: boolean} = {};
@@ -117,7 +134,10 @@ function Transactions({
   }
 
   function handleView(transaction: transactionTypes.Transaction) {
-    setShowMenu({...showMenu, [transaction.id]: false});
+    const key = transaction.id;
+    const menuSelection = selectionObject.get('menu');
+
+    selectionObject.set('menu', {...menuSelection, [key]: false});
     dispatch(actions.transaction.select(transaction));
     navigation.navigate('EditScreen');
   }
@@ -158,10 +178,107 @@ function Transactions({
     dispatch(actions.alert.setVisible(alert));
   }
 
+  function enableSelectMode() {
+    if (mode !== appTypes.Mode.SELECT) {
+      const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
+
+      const snackbar: Partial<snackbarTypes.State> = {
+        message: 'Select mode enabled',
+        actionLabel: 'Dismiss',
+        actionOnpress: onDismiss,
+        onDismiss,
+      };
+
+      dispatch(actions.app.setMode(appTypes.Mode.SELECT));
+      dispatch(actions.snackbar.setVisible(snackbar));
+    }
+  }
+
   function handleDelete(selectedId: string) {
-    setShowMenu({...showMenu, [selectedId]: false});
+    const menuSelection = selectionObject.get('menu');
+
+    selectionObject.set('menu', {...menuSelection, [selectedId]: false});
     handleAlert(selectedId);
   }
+
+  // doesn't show menu as component
+  const RightMenu = ({
+    transaction,
+  }: {
+    transaction: transactionTypes.Transaction;
+  }) => {
+    const key = transaction.id;
+    const menuSelection = selectionObject.get('menu');
+    const visible = menuSelection[key];
+
+    const onDismiss = () => {
+      const data = {...menuSelection, [key]: false};
+      selectionObject.set('menu', data);
+    };
+
+    const onPress = () => {
+      const data = {...menuSelection, [key]: true};
+      selectionObject.set('menu', data);
+    };
+
+    console.log(selectionObject.get('menu'));
+
+    return (
+      <Menu
+        visible={visible}
+        onDismiss={onDismiss}
+        anchor={
+          <IconButton
+            style={{
+              padding: 0,
+              margin: 0,
+              marginTop: 2,
+            }}
+            onPress={onPress}
+            size={20}
+            color={colors.mutedIcon}
+            icon="dots-vertical"
+          />
+        }>
+        <Menu.Item
+          title="View"
+          icon="view-list-outline"
+          onPress={() => handleView(transaction)}
+        />
+        <Divider style={{marginHorizontal: 20, marginVertical: 10}} />
+        <Menu.Item
+          title="Delete"
+          icon="trash-can-outline"
+          titleStyle={{color: Colors.red500}}
+          onPress={() => handleDelete(transaction.id)}
+        />
+      </Menu>
+    );
+  };
+
+  const RightSelect = ({
+    transaction,
+  }: {
+    transaction: transactionTypes.Transaction;
+  }) => {
+    const key = transaction.id;
+    const transactionsObject = selectionObject.get('transactions');
+    const value =
+      transactionsObject[key] === selectTypes.Status.CHECKED
+        ? selectTypes.Status.UNCHECKED
+        : selectTypes.Status.CHECKED;
+
+    function onPress() {
+      selectionObject.set('transactions', {
+        ...transactionsObject,
+        [key]: value,
+      });
+    }
+
+    return (
+      <Checkbox.Android status={transactionsObject[key]} onPress={onPress} />
+    );
+  };
 
   if (transactions.length === 0) return <Text>Nothing here...</Text>;
 
@@ -174,11 +291,13 @@ function Transactions({
           const time = moment(transaction.date).format('hh:mm A');
 
           return (
-            <View
+            <Pressable
               style={{backgroundColor: colors.primary}}
-              key={`transaction-list-item__${index}`}>
+              key={`transaction-list-item__${index}`}
+              onLongPress={enableSelectMode}>
               <Divider inset={true} />
               <List.Item
+                key={`transaction-list-item__${index}`}
                 title={transaction.name}
                 titleStyle={{fontSize: 16, fontWeight: '300'}}
                 description={() => (
@@ -253,57 +372,74 @@ function Transactions({
                     size={20}
                   />
                 )}
-                right={() => (
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      flexDirection: 'row',
-                    }}>
-                    <Text
+                right={() => {
+                  const key = transaction.id;
+                  const menuSelection = selectionObject.get('menu');
+                  const visible = menuSelection[key];
+
+                  const onDismiss = () => {
+                    const data = {...menuSelection, [key]: false};
+                    selectionObject.set('menu', data);
+                  };
+
+                  const onPress = () => {
+                    const data = {...menuSelection, [key]: true};
+                    selectionObject.set('menu', data);
+                  };
+
+                  return (
+                    <View
                       style={{
-                        color: colors.text,
-                        fontSize: 16,
-                        fontWeight: '300',
-                      }}>{`${symbol}${transaction.amount}`}</Text>
-                    <Menu
-                      visible={showMenu[transaction.id]}
-                      onDismiss={() =>
-                        setShowMenu({...showMenu, [transaction.id]: false})
-                      }
-                      anchor={
-                        <IconButton
-                          style={{
-                            padding: 0,
-                            margin: 0,
-                            marginTop: 2,
-                          }}
-                          onPress={() =>
-                            setShowMenu({...showMenu, [transaction.id]: true})
-                          }
-                          size={20}
-                          color={colors.mutedIcon}
-                          icon="dots-vertical"
-                        />
-                      }>
-                      <Menu.Item
-                        title="View"
-                        icon="view-list-outline"
-                        onPress={() => handleView(transaction)}
-                      />
-                      <Divider
-                        style={{marginHorizontal: 20, marginVertical: 10}}
-                      />
-                      <Menu.Item
-                        title="Delete"
-                        icon="trash-can-outline"
-                        titleStyle={{color: Colors.red500}}
-                        onPress={() => handleDelete(transaction.id)}
-                      />
-                    </Menu>
-                  </View>
-                )}
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                      }}>
+                      <Text
+                        style={{
+                          color: colors.text,
+                          fontSize: 16,
+                          fontWeight: '300',
+                        }}>{`${symbol}${transaction.amount}`}</Text>
+                      {mode === appTypes.Mode.SELECT && (
+                        <RightSelect transaction={transaction} />
+                      )}
+                      {mode === appTypes.Mode.DEFAULT && (
+                        <Menu
+                          visible={visible}
+                          onDismiss={onDismiss}
+                          anchor={
+                            <IconButton
+                              style={{
+                                padding: 0,
+                                margin: 0,
+                                marginTop: 2,
+                              }}
+                              onPress={onPress}
+                              size={20}
+                              color={colors.mutedIcon}
+                              icon="dots-vertical"
+                            />
+                          }>
+                          <Menu.Item
+                            title="View"
+                            icon="view-list-outline"
+                            onPress={() => handleView(transaction)}
+                          />
+                          <Divider
+                            style={{marginHorizontal: 20, marginVertical: 10}}
+                          />
+                          <Menu.Item
+                            title="Delete"
+                            icon="trash-can-outline"
+                            titleStyle={{color: Colors.red500}}
+                            onPress={() => handleDelete(transaction.id)}
+                          />
+                        </Menu>
+                      )}
+                    </View>
+                  );
+                }}
               />
-            </View>
+            </Pressable>
           );
         },
       )}

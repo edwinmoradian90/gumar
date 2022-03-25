@@ -246,7 +246,6 @@ function Edit() {
                 open={editTarget === appTypes.EditTarget.TIME}
                 date={dateObj}
                 onConfirm={(date: Date) => {
-                  console.log(date);
                   save(date);
                 }}
                 onCancel={close}

@@ -36,37 +36,31 @@ export function humanReadableDate(date: Date) {
   return moment(date).format('MMM Do YYYY, h:mm A');
 }
 
-export function splitDate(date: Date) {
-  const hrDate = moment(date, 'DD/MM/YYYY');
-  const year = hrDate.format('Y');
-  const month = hrDate.format('MMMM');
-  const week = hrDate.format('W');
-  const day = hrDate.format('D');
-  const time = hrDate.format('h:m');
-
-  return {
-    year,
-    month,
-    week,
-    day,
-    time,
-  };
+export function isObjectAny(obj: {[index: string]: any}): boolean {
+  if (obj === null || obj === undefined) return false;
+  if (Object.keys(obj).length === 0) return false;
+  return true;
 }
 
-export const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+export function isObjectEmpty(obj: {[index: string]: any}): boolean {
+  if (obj === null || obj === undefined) return true;
+  if (Object.keys(obj).length === 0) return true;
+  return false;
+}
+
+export function isArrayAny(arr: unknown[]) {
+  return Array.isArray(arr) && arr.length > 0;
+}
+
+export function isArrayEmpty(arr: unknown[]) {
+  return Array.isArray(arr) && arr.length === 0;
+}
+
+export function arrayToMap(arr: unknown[], key: string, defaultValue: any) {
+  const obj: {[index: string]: any} = {};
+  arr.forEach((item: any) => (obj[item[key]] = defaultValue));
+  return obj;
+}
 
 export function findMinMax(
   array: any[],
@@ -76,7 +70,6 @@ export function findMinMax(
 
   if (key) {
     data = array.map((item: any) => parseInt(item[key]));
-    console.log(data);
   }
 
   let min = data[0] || 0;

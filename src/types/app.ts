@@ -18,9 +18,10 @@ export enum EditTarget {
 }
 
 export enum Mode {
-  'DEFAULT' = 'default',
-  'EDIT' = 'edit',
-  'VIEW' = 'view',
+  DEFAULT = 'default',
+  EDIT = 'edit',
+  VIEW = 'view',
+  SELECT = 'select',
 }
 
 export enum Page {
@@ -33,6 +34,12 @@ export enum Page {
 
 export enum NavigationInitiator {
   SEARCH = 'search',
+}
+
+export interface State {
+  mode: Mode;
+  editTarget: EditTarget;
+  status: Status;
 }
 
 export type RootStackParamList = {

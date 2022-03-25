@@ -13,7 +13,6 @@ export default function Layout({
 }) {
   const snackbar = useSelector((state: storeTypes.RootState) => state.snackbar);
   const alert = useSelector((state: storeTypes.RootState) => state.alert);
-  console.log(alert.visible, snackbar.visible);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={colors.primary} barStyle="dark-content" />

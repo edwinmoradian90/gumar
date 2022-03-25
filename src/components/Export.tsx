@@ -16,7 +16,6 @@ export default function Export() {
     (state: storeTypes.RootState) => state.modal,
   );
 
-  console.log(modalVisible, modalTypes.ModalVisible.EXPORT);
   return (
     <ReactNativeModal
       style={styles.modalContainer}

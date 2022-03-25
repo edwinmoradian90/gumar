@@ -5,6 +5,7 @@ import * as editTypes from './edit';
 import * as alertTypes from './alert';
 import * as modalTypes from './modal';
 import * as searchTypes from './search';
+import * as selectTypes from './select';
 import * as settingTypes from './settings';
 import * as snackbarTypes from './snackbar';
 import * as sortTypes from './sort';
@@ -22,6 +23,7 @@ export {
   editTypes,
   modalTypes,
   searchTypes,
+  selectTypes,
   settingTypes,
   snackbarTypes,
   sortTypes,

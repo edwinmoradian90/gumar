@@ -5,6 +5,7 @@ import * as currency from './currency';
 import * as filter from './filter';
 import * as modal from './modal';
 import * as search from './search';
+import * as select from './select';
 import * as setting from './settings';
 import * as snackbar from './snackbar';
 import * as sort from './sort';
@@ -19,6 +20,7 @@ export {
   filter,
   modal,
   search,
+  select,
   setting,
   snackbar,
   sort,

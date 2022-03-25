@@ -9,7 +9,7 @@ const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
   stateReconciler: autoMergeLevel2,
-  blackList: ['filter', 'snackbar', 'alert', 'search'],
+  blackList: ['filter', 'snackbar', 'alert', 'search', 'select'],
 };
 
 const persistedReducer = persistReducer(persistConfig, root);

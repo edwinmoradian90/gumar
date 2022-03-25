@@ -13,10 +13,12 @@ import {
   storeTypes,
   modalTypes,
   sortTypes,
+  snackbarTypes,
 } from '../types';
 import {colors, helpers} from '../utils';
-import {Appbar, Button, Card, Colors} from 'react-native-paper';
+import {Appbar, Button, Card, Colors, IconButton} from 'react-native-paper';
 import useTotal from '../hooks/useTotal';
+import {useModeCheck} from '../hooks';
 
 export default function Home() {
   const navigation = useNavigation<appTypes.Navigation>();
@@ -30,7 +32,6 @@ export default function Home() {
   const {transactions, status} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
-
   const filterState = useSelector(
     (state: storeTypes.RootState) => state.filter,
   );
@@ -39,10 +40,10 @@ export default function Home() {
   );
   const search = useSelector((state: storeTypes.RootState) => state.search);
 
+  const {isSelectMode, isDefaultMode} = useModeCheck();
+
   function filter(item: any) {
     if (!filterState.isUsingFilter) return true;
-
-    console.log(filterState);
 
     if (filterState.name && filterState.name !== item.name) return false;
     if (
@@ -134,7 +135,6 @@ export default function Home() {
     styles: any;
   }) {
     let Component;
-    console.log('RUNNING');
     switch (sortBy) {
       case sortTypes.SortBy.AMOUNT:
         Component = isDescending
@@ -178,6 +178,48 @@ export default function Home() {
         return 'cash';
     }
   }
+
+  function onCardHeaderPress() {
+    if (isSelectMode) {
+      const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
+
+      const snackbar: Partial<snackbarTypes.State> = {
+        message: 'Select mode disabled',
+        actionLabel: 'Dismiss',
+        actionOnpress: onDismiss,
+        onDismiss,
+      };
+
+      dispatch(actions.app.setMode(appTypes.Mode.DEFAULT));
+      dispatch(actions.snackbar.setVisible(snackbar));
+    }
+  }
+
+  // Used in select mode
+  const SelectCardRight = () => {
+    return (
+      <Card.Actions>
+        <IconButton icon="export" />
+        <IconButton icon="trash-can-outline" />
+        <IconButton icon="close" onPress={onCardHeaderPress} />
+      </Card.Actions>
+    );
+  };
+
+  const CardRight = () => {
+    return (
+      <Card.Actions>
+        <Button
+          labelStyle={{
+            color: colors.text,
+            fontSize: 11,
+          }}
+          onPress={() => navigation.navigate('TransactionsScreen')}>
+          VIEW ALL
+        </Button>
+      </Card.Actions>
+    );
+  };
 
   // clean up modals
   return (
@@ -325,20 +367,14 @@ export default function Home() {
                       fontWeight: '300',
                     }}
                     rightStyle={{marginTop: 3}}
-                    right={() => (
-                      <Card.Actions>
-                        <Button
-                          labelStyle={{
-                            color: colors.text,
-                            fontSize: 11,
-                          }}
-                          onPress={() =>
-                            navigation.navigate('TransactionsScreen')
-                          }>
-                          VIEW ALL
-                        </Button>
-                      </Card.Actions>
-                    )}
+                    right={() => {
+                      return (
+                        <React.Fragment>
+                          {isSelectMode && <SelectCardRight />}
+                          {isDefaultMode && <CardRight />}
+                        </React.Fragment>
+                      );
+                    }}
                   />
                   <Component.Transactions limit={3} />
                 </Card>
