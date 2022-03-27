@@ -4,7 +4,6 @@ import {Pressable, ScrollView, View} from 'react-native';
 import {
   Button,
   Checkbox,
-  Colors,
   Divider,
   IconButton,
   List,
@@ -23,14 +22,14 @@ import {
 } from '../types';
 import {colors, filter, helpers} from '../utils';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {useSelect, useTransactions} from '../hooks';
+import {useMode, useSelect, useTransactions} from '../hooks';
 
 function Transactions({
   paymentMethod,
   dateRangeFrom,
   dateRangeTo,
   sortBy,
-  limit,
+  limit = 0,
   startSpace = 0,
   isSearchResult = false,
 }: {
@@ -54,16 +53,26 @@ function Transactions({
   const search = useSelector((state: storeTypes.RootState) => state.search);
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
   const {mode} = useSelector((state: storeTypes.RootState) => state.app);
-  const transactions2 = useTransactions({});
-  console.log(transactions2.length);
+
+  const {isSelectMode, isDefaultMode} = useMode();
 
   const [showMore, setShowMore] = useState(false);
+  const [showMenu, setShowMenu] = useState(
+    helpers.arrayToMap(transactions, 'id', false),
+  );
 
   // add to redux
   const additionalLimit = 7;
 
   // TODO: make hook
+
   const modifiedTransactions: transactionTypes.Transaction[] = useMemo(() => {
+    const sliceEnd = !!limit
+      ? showMore
+        ? limit + additionalLimit
+        : limit
+      : transactions.length;
+
     if (transactions.length === 0) return [];
 
     // TODO: extract out
@@ -78,12 +87,10 @@ function Transactions({
         ]);
       })
       .sort(sortBy || helpers.compare.adate)
-      .slice(
-        0,
-        (limit && (showMore ? limit + additionalLimit : limit)) ||
-          transactions.length,
-      );
+      .slice(0, sliceEnd);
   }, [transactions, limit, showMore, filter, sortBy]);
+
+  console.log(modifiedTransactions);
 
   useEffect(() => {
     const transactionSelection = helpers.arrayToMap(
@@ -91,12 +98,9 @@ function Transactions({
       'id',
       selectTypes.Status.UNCHECKED,
     );
-    const menuSelection = helpers.arrayToMap(modifiedTransactions, 'id', false);
 
     selectionObject.set('transactions', transactionSelection);
-    selectionObject.set('menu', menuSelection);
-    // selectionObject.clear();
-  }, []);
+  }, [modifiedTransactions]);
 
   // move to helpers
   function getIcon(paymentMethod: transactionTypes.PaymentMethod) {
@@ -116,15 +120,8 @@ function Transactions({
     }
   }
 
-  function toggleShowMore() {
-    setShowMore(!showMore);
-  }
-
   function handleView(transaction: transactionTypes.Transaction) {
-    const key = transaction.id;
-    const menuSelection = selectionObject.get('menu');
-
-    selectionObject.set('menu', {...menuSelection, [key]: false});
+    setShowMenu({...showMenu, [transaction.id]: false});
     dispatch(actions.transaction.select(transaction));
     navigation.navigate('EditScreen');
   }
@@ -182,11 +179,16 @@ function Transactions({
   }
 
   function handleDelete(selectedId: string) {
-    const menuSelection = selectionObject.get('menu');
-
-    selectionObject.set('menu', {...menuSelection, [selectedId]: false});
+    setShowMenu({...showMenu, [selectedId]: false});
     handleAlert(selectedId);
   }
+  const onMenuDismiss = (transactionId: string) => {
+    setShowMenu({...showMenu, [transactionId]: false});
+  };
+
+  const onMenuPress = (transactionId: string) => {
+    setShowMenu({...showMenu, [transactionId]: true});
+  };
 
   // doesn't show menu as component
   const RightMenu = ({
@@ -194,39 +196,8 @@ function Transactions({
   }: {
     transaction: transactionTypes.Transaction;
   }) => {
-    const key = transaction.id;
-    const menuSelection = selectionObject.get('menu');
-    const visible = menuSelection[key];
-
-    const onDismiss = () => {
-      const data = {...menuSelection, [key]: false};
-      selectionObject.set('menu', data);
-    };
-
-    const onPress = () => {
-      const data = {...menuSelection, [key]: true};
-      selectionObject.set('menu', data);
-    };
-
-    console.log(selectionObject.get('menu'));
-
     return (
-      <Menu
-        visible={visible}
-        onDismiss={onDismiss}
-        anchor={
-          <IconButton
-            style={{
-              padding: 0,
-              margin: 0,
-              marginTop: 2,
-            }}
-            onPress={onPress}
-            size={20}
-            color={colors.mutedIcon}
-            icon="dots-vertical"
-          />
-        }>
+      <React.Fragment>
         <Menu.Item
           title="View"
           icon="view-list-outline"
@@ -236,10 +207,10 @@ function Transactions({
         <Menu.Item
           title="Delete"
           icon="trash-can-outline"
-          titleStyle={{color: Colors.red500}}
+          titleStyle={{color: colors.danger}}
           onPress={() => handleDelete(transaction.id)}
         />
-      </Menu>
+      </React.Fragment>
     );
   };
 
@@ -282,9 +253,8 @@ function Transactions({
               style={{backgroundColor: colors.primary}}
               key={`transaction-list-item__${index}`}
               onLongPress={enableSelectMode}>
-              <Divider inset={true} />
+              {index > 0 && <Divider inset={true} />}
               <List.Item
-                key={`transaction-list-item__${index}`}
                 title={transaction.name}
                 titleStyle={{fontSize: 16, fontWeight: '300'}}
                 description={() => (
@@ -359,81 +329,50 @@ function Transactions({
                     size={20}
                   />
                 )}
-                right={() => {
-                  const key = transaction.id;
-                  const menuSelection = selectionObject.get('menu');
-                  const visible = menuSelection[key];
-
-                  const onDismiss = () => {
-                    const data = {...menuSelection, [key]: false};
-                    selectionObject.set('menu', data);
-                  };
-
-                  const onPress = () => {
-                    const data = {...menuSelection, [key]: true};
-                    selectionObject.set('menu', data);
-                  };
-
-                  return (
-                    <View
+                right={() => (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                    }}>
+                    <Text
                       style={{
-                        alignItems: 'center',
-                        flexDirection: 'row',
-                      }}>
-                      <Text
-                        style={{
-                          color: colors.text,
-                          fontSize: 16,
-                          fontWeight: '300',
-                        }}>{`${symbol}${transaction.amount}`}</Text>
-                      {mode === appTypes.Mode.SELECT && (
-                        <RightSelect transaction={transaction} />
-                      )}
-                      {mode === appTypes.Mode.DEFAULT && (
-                        <Menu
-                          visible={visible}
-                          onDismiss={onDismiss}
-                          anchor={
-                            <IconButton
-                              style={{
-                                padding: 0,
-                                margin: 0,
-                                marginTop: 2,
-                              }}
-                              onPress={onPress}
-                              size={20}
-                              color={colors.mutedIcon}
-                              icon="dots-vertical"
-                            />
-                          }>
-                          <Menu.Item
-                            title="View"
-                            icon="view-list-outline"
-                            onPress={() => handleView(transaction)}
+                        color: colors.text,
+                        fontSize: 16,
+                        fontWeight: '300',
+                      }}>{`${symbol}${transaction.amount}`}</Text>
+                    {isSelectMode && <RightSelect transaction={transaction} />}
+                    {isDefaultMode && (
+                      <Menu
+                        visible={showMenu[transaction.id]}
+                        onDismiss={() => onMenuDismiss(transaction.id)}
+                        anchor={
+                          <IconButton
+                            style={{
+                              padding: 0,
+                              margin: 0,
+                              marginTop: 2,
+                            }}
+                            onPress={() => onMenuPress(transaction.id)}
+                            size={20}
+                            color={colors.mutedIcon}
+                            icon="dots-vertical"
                           />
-                          <Divider
-                            style={{marginHorizontal: 20, marginVertical: 10}}
-                          />
-                          <Menu.Item
-                            title="Delete"
-                            icon="trash-can-outline"
-                            titleStyle={{color: Colors.red500}}
-                            onPress={() => handleDelete(transaction.id)}
-                          />
-                        </Menu>
-                      )}
-                    </View>
-                  );
-                }}
+                        }>
+                        <RightMenu transaction={transaction} />
+                      </Menu>
+                    )}
+                  </View>
+                )}
               />
             </Pressable>
           );
         },
       )}
-      {limit && limit > 0 && limit < transactions.length && (
+      {!!limit && limit > 0 && limit < transactions.length && (
         <Button
-          labelStyle={{fontSize: 12, color: colors.secondary}}
-          onPress={toggleShowMore}>
+          labelStyle={{color: colors.secondary, fontSize: 12}}
+          onPress={() => setShowMore(!showMore)}>
           {showMore ? 'Show less' : 'Show more'}
         </Button>
       )}

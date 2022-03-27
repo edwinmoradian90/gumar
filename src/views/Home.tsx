@@ -19,7 +19,7 @@ import {
 import {colors, helpers} from '../utils';
 import {Appbar, Button, Card, Colors, IconButton} from 'react-native-paper';
 import useTotal from '../hooks/useTotal';
-import {useModeCheck, useSelect} from '../hooks';
+import {useMode, useSelect} from '../hooks';
 
 export default function Home() {
   const navigation = useNavigation<appTypes.Navigation>();
@@ -41,7 +41,7 @@ export default function Home() {
   );
   const search = useSelector((state: storeTypes.RootState) => state.search);
 
-  const {isSelectMode, isDefaultMode} = useModeCheck();
+  const {isSelectMode, isDefaultMode} = useMode();
   const {selectionObject} = useSelect();
 
   function filter(item: any): boolean {

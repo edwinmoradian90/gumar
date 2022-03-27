@@ -1,11 +1,11 @@
 import {useMemo} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {actions} from '../redux';
 import {appTypes, storeTypes} from '../types';
 import {helpers} from '../utils';
 
-export default function useModeCheck(): {
-  [index: string]: boolean;
-} {
+export default function useMode(): any {
+  const dispatch = useDispatch();
   const app = useSelector((state: storeTypes.RootState) => state.app);
 
   const modes = useMemo(() => {
@@ -17,5 +17,9 @@ export default function useModeCheck(): {
     return modes;
   }, [app.mode]);
 
-  return modes;
+  function setMode(mode: appTypes.Mode) {
+    dispatch(actions.app.setMode(mode));
+  }
+
+  return {currentMode: app.mode, setMode, ...modes};
 }

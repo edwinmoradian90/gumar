@@ -11,7 +11,15 @@ export default function useSelect() {
   function getSelectionObjectProperty(
     name: string,
   ): selectTypes.SelectionObject {
-    return oselection[name];
+    return oselection[name] || {};
+  }
+
+  function setAllSelectionObjectProperty(name: string, value: any = false) {
+    const updated: selectTypes.SelectionObject = {};
+    Object.keys(oselection[name]).forEach(
+      (key: string) => (updated[key] = value),
+    );
+    dispatch(actions.select.oselection.set(name, updated));
   }
 
   function clearSelectionObject() {
@@ -37,6 +45,7 @@ export default function useSelect() {
   const selectionObject = {
     get: getSelectionObjectProperty,
     set: setSelectionObject,
+    setAll: setAllSelectionObjectProperty,
     clear: clearSelectionObject,
     data: oselection,
   };
