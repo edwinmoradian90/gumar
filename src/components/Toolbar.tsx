@@ -1,8 +1,8 @@
 import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
-import {Appbar, Menu} from 'react-native-paper';
+import {Appbar, Divider, Menu} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
-import {useMode, useSelect, useSort} from '../hooks';
+import {useFilter, useMode, useSelect, useSort} from '../hooks';
 import {actions} from '../redux';
 import {
   alertTypes,
@@ -24,6 +24,7 @@ export default function Toolbar({
   const {selectionObject} = useSelect();
   const dispatch = useDispatch();
   const sort = useSort();
+  const filter = useFilter();
 
   const [allSelected, setAllSelected] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -126,7 +127,12 @@ export default function Toolbar({
         />
       </View>
       <Appbar.Action size={22} icon="export" />
-      <Appbar.Action size={22} icon="filter-variant" />
+      <Appbar.Action
+        color={filter.isEnabled() ? colors.secondary : colors.iconButtonColor}
+        size={22}
+        icon="filter-variant"
+        onPress={filter.show}
+      />
       <Menu
         visible={showSortMenu}
         anchor={

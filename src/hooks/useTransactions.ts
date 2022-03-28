@@ -1,59 +1,74 @@
 import {useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {actions, constants} from '../redux';
+import {actions} from '../redux';
 import {storeTypes, transactionTypes} from '../types';
 import {filter, helpers} from '../utils';
+import {useFilter, useSearch, useSort} from '.';
 
-export default function useTransactions({
-  paymentMethod,
-  dateRangeFrom,
-  dateRangeTo,
-  sortBy,
-  limit = 0,
-  extendedLimit = 0,
-  startSpace = 0,
-  isSearchResult = false,
-  showMore = false,
-}: {
-  paymentMethod?: transactionTypes.PaymentMethod;
-  dateRangeFrom?: string;
-  dateRangeTo?: string;
-  sortBy?: (a: any, b: any) => -1 | 1 | 0;
+// move to types
+interface UseTransactionsProps {
   limit?: number;
-  extendedLimit?: number;
-  startSpace?: number;
+  additionalLimit?: number;
   isSearchResult?: boolean;
   showMore?: boolean;
-}): transactionTypes.Transaction[] {
+}
+
+export default function useTransactions(
+  props?: UseTransactionsProps,
+): transactionTypes.Transaction[] {
+  const {
+    limit = 0,
+    additionalLimit = 7,
+    isSearchResult = false,
+    showMore = false,
+  } = props || {};
   const dispatch = useDispatch();
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
-  const search = useSelector((state: storeTypes.RootState) => state.search);
+
+  const filterState = useFilter();
+  const sort = useSort();
+  const search = useSearch();
 
   const modifiedTransactions: transactionTypes.Transaction[] = useMemo(() => {
-    console.log('RUNNING');
-    if (transactions.length === 0) return [];
+    const sliceEnd = !!limit
+      ? showMore
+        ? limit + additionalLimit
+        : limit
+      : transactions.length;
 
+    if (transactions.length === 0) return [];
     // TODO: extract out
-    if (search.results.length > 0 && isSearchResult)
-      return search.results.sort(sortBy || helpers.compare.adate);
+    if (search.data.results.length > 0 && isSearchResult)
+      return search.data.results.sort(sort.comparator || helpers.compare.adate);
 
     return transactions
       .filter((transaction: transactionTypes.Transaction) => {
         return filter.apply([
-          filter.conditions.paymentMethod(transaction, paymentMethod),
-          filter.conditions.dateRange(transaction, dateRangeFrom, dateRangeTo),
+          filter.conditions.paymentMethod(
+            transaction,
+            filterState.data.paymentMethod,
+          ),
+          filter.conditions.dateRange(
+            transaction,
+            filterState.data.dateRangeFrom,
+            filterState.data.dateRangeTo,
+          ),
         ]);
       })
-      .sort(sortBy || helpers.compare.adate)
-      .slice(
-        0,
-        (limit && (showMore ? limit + extendedLimit : limit)) ||
-          transactions.length,
-      );
-  }, [transactions, limit, showMore, filter, sortBy]);
-
+      .sort(sort.comparator || helpers.compare.adate)
+      .slice(0, sliceEnd);
+  }, [
+    transactions,
+    limit,
+    showMore,
+    filter,
+    sort.comparator,
+    filterState.data,
+    search.data.results,
+  ]);
+  // write transaction functions
   function removeMany(transactionIds: string[]) {
     dispatch(actions.transaction.removeMany(transactionIds));
   }

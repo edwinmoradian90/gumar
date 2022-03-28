@@ -17,27 +17,22 @@ import {
   appTypes,
   selectTypes,
   snackbarTypes,
-  sortTypes,
   storeTypes,
   transactionTypes,
 } from '../types';
-import {colors, filter, helpers} from '../utils';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {useMode, useSelect, useSort, useTransactions} from '../hooks';
+import {colors, helpers} from '../utils';
+import {useNavigation} from '@react-navigation/native';
+import {useMode, useSelect, useTransactions} from '../hooks';
 
 function Transactions({
-  paymentMethod,
-  dateRangeFrom,
-  dateRangeTo,
   limit = 0,
+  additionalLimit = 7,
   startSpace = 0,
   isSearchResult = false,
 }: {
   //   filter?: (transaction: transactionTypes.Transaction) => boolean;
-  paymentMethod?: transactionTypes.PaymentMethod;
-  dateRangeFrom?: string;
-  dateRangeTo?: string;
   limit?: number;
+  additionalLimit?: number;
   startSpace?: number;
   isSearchResult?: boolean;
 }) {
@@ -45,50 +40,20 @@ function Transactions({
   const navigation = useNavigation<appTypes.Navigation>();
 
   const {selectionObject} = useSelect();
-  const sort = useSort();
 
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
-  const search = useSelector((state: storeTypes.RootState) => state.search);
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
   const {mode} = useSelector((state: storeTypes.RootState) => state.app);
 
   const {isSelectMode, isDefaultMode} = useMode();
+  const modifiedTransactions = useTransactions({isSearchResult, limit});
 
   const [showMore, setShowMore] = useState(false);
   const [showMenu, setShowMenu] = useState(
     helpers.arrayToMap(transactions, 'id', false),
   );
-
-  // add to redux
-  const additionalLimit = 7;
-
-  // TODO: make hook
-
-  const modifiedTransactions: transactionTypes.Transaction[] = useMemo(() => {
-    const sliceEnd = !!limit
-      ? showMore
-        ? limit + additionalLimit
-        : limit
-      : transactions.length;
-
-    if (transactions.length === 0) return [];
-
-    // TODO: extract out
-    if (search.results.length > 0 && isSearchResult)
-      return search.results.sort(sort.comparator || helpers.compare.adate);
-
-    return transactions
-      .filter((transaction: transactionTypes.Transaction) => {
-        return filter.apply([
-          filter.conditions.paymentMethod(transaction, paymentMethod),
-          filter.conditions.dateRange(transaction, dateRangeFrom, dateRangeTo),
-        ]);
-      })
-      .sort(sort.comparator || helpers.compare.adate)
-      .slice(0, sliceEnd);
-  }, [transactions, limit, showMore, filter, sort.comparator]);
 
   useEffect(() => {
     const transactionSelection = helpers.arrayToMap(

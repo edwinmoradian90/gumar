@@ -1,6 +1,4 @@
-import {transactionTypes} from '.';
-
-export interface InitialState {
+export interface State {
   isUsingFilter: boolean;
   isDescending: boolean;
   name: string;

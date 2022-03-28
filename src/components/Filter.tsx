@@ -224,7 +224,7 @@ export default function Filter({data}: {data: any}) {
                 mode="date"
                 modal
                 open={toggleDateRange.from}
-                date={dateRange.from || date}
+                date={new Date(dateRange.from) || date}
                 onConfirm={(date: Date) => {
                   setDateRange({...dateRange, from: date});
                   setToggleDateRange({from: false, to: false});

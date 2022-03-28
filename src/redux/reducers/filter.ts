@@ -1,7 +1,7 @@
 import {constants} from '..';
-import {filterTypes, transactionTypes} from '../../types';
+import {filterTypes} from '../../types';
 
-export const initialState: filterTypes.InitialState = {
+export const initialState: filterTypes.State = {
   isUsingFilter: false,
   isDescending: false,
   name: '',
