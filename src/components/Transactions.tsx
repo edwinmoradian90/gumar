@@ -17,18 +17,18 @@ import {
   appTypes,
   selectTypes,
   snackbarTypes,
+  sortTypes,
   storeTypes,
   transactionTypes,
 } from '../types';
 import {colors, filter, helpers} from '../utils';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {useMode, useSelect, useTransactions} from '../hooks';
+import {useMode, useSelect, useSort, useTransactions} from '../hooks';
 
 function Transactions({
   paymentMethod,
   dateRangeFrom,
   dateRangeTo,
-  sortBy,
   limit = 0,
   startSpace = 0,
   isSearchResult = false,
@@ -37,7 +37,6 @@ function Transactions({
   paymentMethod?: transactionTypes.PaymentMethod;
   dateRangeFrom?: string;
   dateRangeTo?: string;
-  sortBy?: (a: any, b: any) => -1 | 1 | 0;
   limit?: number;
   startSpace?: number;
   isSearchResult?: boolean;
@@ -46,6 +45,7 @@ function Transactions({
   const navigation = useNavigation<appTypes.Navigation>();
 
   const {selectionObject} = useSelect();
+  const sort = useSort();
 
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
@@ -77,7 +77,7 @@ function Transactions({
 
     // TODO: extract out
     if (search.results.length > 0 && isSearchResult)
-      return search.results.sort(sortBy || helpers.compare.adate);
+      return search.results.sort(sort.comparator || helpers.compare.adate);
 
     return transactions
       .filter((transaction: transactionTypes.Transaction) => {
@@ -86,11 +86,9 @@ function Transactions({
           filter.conditions.dateRange(transaction, dateRangeFrom, dateRangeTo),
         ]);
       })
-      .sort(sortBy || helpers.compare.adate)
+      .sort(sort.comparator || helpers.compare.adate)
       .slice(0, sliceEnd);
-  }, [transactions, limit, showMore, filter, sortBy]);
-
-  console.log(modifiedTransactions);
+  }, [transactions, limit, showMore, filter, sort.comparator]);
 
   useEffect(() => {
     const transactionSelection = helpers.arrayToMap(

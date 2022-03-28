@@ -205,7 +205,6 @@ export default function Home() {
       transactionSelection,
     );
     const color = isAnySelected ? colors.iconButtonColor : colors.muted;
-    console.log(isAnySelected, transactionSelection);
 
     return (
       <Card.Actions>

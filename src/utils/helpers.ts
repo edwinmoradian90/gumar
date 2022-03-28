@@ -46,7 +46,6 @@ export function hasValueObject(
   value: any,
   obj: {[index: string]: any},
 ): boolean {
-  console.log('OBJ ', obj);
   if (obj === null || obj === undefined) return false;
   if (Object.keys(obj).length === 0) return false;
   return Object.values(obj).indexOf(value) > -1;
@@ -70,6 +69,10 @@ export function arrayToMap(arr: unknown[], key: string, defaultValue: any) {
   const obj: {[index: string]: any} = {};
   arr.forEach((item: any) => (obj[item[key]] = defaultValue));
   return obj;
+}
+
+export function keyFilter(obj: {[index: string]: any}, value: any) {
+  return Object.keys(obj).filter((key: string) => obj[key] === value);
 }
 
 export function findMinMax(

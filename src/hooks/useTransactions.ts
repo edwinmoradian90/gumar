@@ -1,5 +1,6 @@
 import {useMemo} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {actions, constants} from '../redux';
 import {storeTypes, transactionTypes} from '../types';
 import {filter, helpers} from '../utils';
 
@@ -24,6 +25,7 @@ export default function useTransactions({
   isSearchResult?: boolean;
   showMore?: boolean;
 }): transactionTypes.Transaction[] {
+  const dispatch = useDispatch();
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
@@ -51,6 +53,10 @@ export default function useTransactions({
           transactions.length,
       );
   }, [transactions, limit, showMore, filter, sortBy]);
+
+  function removeMany(transactionIds: string[]) {
+    dispatch(actions.transaction.removeMany(transactionIds));
+  }
 
   return modifiedTransactions;
 }

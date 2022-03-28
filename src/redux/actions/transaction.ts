@@ -2,15 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AnyAction} from 'redux';
 import {STORE} from '../../constants/shared';
 import {ThunkAction} from 'redux-thunk';
-import {Alert} from 'react-native';
-import {modalTypes, storeTypes, transactionTypes} from '../../types';
+import {storeTypes, transactionTypes} from '../../types';
 import {actions, constants} from '..';
-
-function parseTransactions(
-  transaction: string | null,
-): transactionTypes.Transaction[] | [] {
-  return typeof transaction === 'string' ? JSON.parse(transaction) : [];
-}
 
 export function get(): ThunkAction<
   void,
@@ -113,6 +106,23 @@ export function remove(
   };
 }
 
+export function removeMany(
+  transactionIds: string[],
+): ThunkAction<void, storeTypes.RootState, unknown, AnyAction> {
+  return (dispatch, getState) => {
+    const {transactions} = getState().transaction;
+    const updated = transactions.filter(
+      (transaction: transactionTypes.Transaction) =>
+        transactionIds.indexOf(transaction.id) < 0,
+    );
+
+    dispatch({
+      type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
+      transactions: updated,
+    });
+  };
+}
+
 export function removeAll(): ThunkAction<
   void,
   storeTypes.RootState,
@@ -124,7 +134,7 @@ export function removeAll(): ThunkAction<
       dispatch({type: constants.transaction.ACTION_TRANSACTION});
       dispatch({
         type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
-        transaction: [],
+        transactions: [],
       });
     } catch (error) {
       console.error(error);
