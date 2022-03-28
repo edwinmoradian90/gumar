@@ -23,8 +23,8 @@ export default function useSort() {
     switch (sortBy) {
       case sortTypes.SortBy.AMOUNT:
         iconName = isDescending
-          ? 'sort-alphabetical-descending'
-          : 'sort-alphabetical-ascending';
+          ? 'sort-numeric-descending'
+          : 'sort-numeric-ascending';
         break;
       case sortTypes.SortBy.DATE:
         iconName = isDescending
@@ -33,8 +33,8 @@ export default function useSort() {
         break;
       case sortTypes.SortBy.NAME:
         iconName = isDescending
-          ? 'sort-numeric-descending'
-          : 'sort-numeric-ascending';
+          ? 'sort-alphabetical-descending'
+          : 'sort-alphabetical-ascending';
         break;
       default:
         iconName = isDescending
