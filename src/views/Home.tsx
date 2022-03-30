@@ -19,7 +19,7 @@ import {
 import {colors, helpers} from '../utils';
 import {Appbar, Button, Card, Colors, IconButton} from 'react-native-paper';
 import useTotal from '../hooks/useTotal';
-import {useMode, useSelect} from '../hooks';
+import {useFilter, useMode, useSelect} from '../hooks';
 
 export default function Home() {
   const navigation = useNavigation<appTypes.Navigation>();
@@ -33,153 +33,11 @@ export default function Home() {
   const {transactions, status} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
-  const filterState = useSelector(
-    (state: storeTypes.RootState) => state.filter,
-  );
-  const {sortBy, isDescending} = useSelector(
-    (state: storeTypes.RootState) => state.sort,
-  );
   const search = useSelector((state: storeTypes.RootState) => state.search);
+  const filter = useFilter();
 
   const {isSelectMode, isDefaultMode} = useMode();
   const {selectionObject} = useSelect();
-
-  function filter(item: any): boolean {
-    if (!filterState.isUsingFilter) return true;
-
-    if (filterState.name && filterState.name !== item.name) return false;
-    if (
-      filterState.paymentMethods.length > 0 &&
-      filterState.paymentMethods.indexOf(item.paymentMethod) < 0
-    ) {
-      return false;
-    }
-    if (
-      filterState.installments.length > 0 &&
-      filterState.installments.indexOf(item.installment) < 0
-    ) {
-      return false;
-    }
-    if (
-      filterState.paymentIntervals.length > 0 &&
-      filterState.paymentIntervals.indexOf(item.paymentInterval) < 0
-    ) {
-      return false;
-    }
-
-    if (
-      filterState.amountRangeFrom > 0 &&
-      parseInt(item.amount) < parseInt(filterState.amountRangeFrom)
-    ) {
-      return false;
-    }
-
-    if (
-      filterState.amountRangeTo > 0 &&
-      parseInt(item.amount) > parseInt(filterState.amountRangeTo)
-    ) {
-      return false;
-    }
-
-    if (
-      filterState.dateRangeFrom &&
-      moment(filterState.dateRangeFrom).isAfter(item.date)
-    ) {
-      return false;
-    }
-
-    if (
-      filterState.dateRangeTo &&
-      moment(filterState.dateRange).isBefore(item.date)
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
-  const sortedTransactions = useMemo(() => {
-    let compare;
-    switch (sortBy) {
-      case sortTypes.SortBy.DATE:
-        compare = isDescending ? helpers.compare.adate : helpers.compare.ddate;
-        break;
-      case sortTypes.SortBy.AMOUNT:
-        compare = isDescending
-          ? helpers.compare.aamount
-          : helpers.compare.damount;
-        break;
-      case sortTypes.SortBy.NAME:
-        compare = isDescending ? helpers.compare.aname : helpers.compare.dname;
-        break;
-      default:
-        break;
-    }
-    return [...transactions].sort(compare);
-  }, [transactions, isDescending, sortBy]);
-
-  const sortButtonMap: {[index: string]: any} = {
-    aamount: <Component.Buttons.AAmountSort />,
-    damount: <Component.Buttons.DAmountSort />,
-    aname: <Component.Buttons.ANameSort />,
-    dname: <Component.Buttons.DNameSort />,
-    adate: <Component.Buttons.ADateSort />,
-    ddate: <Component.Buttons.DDateSort />,
-  };
-
-  function SortButton({
-    sortBy,
-    isDescending,
-    styles,
-  }: {
-    sortBy: sortTypes.SortBy;
-    isDescending: boolean;
-    styles: any;
-  }) {
-    let Component;
-    switch (sortBy) {
-      case sortTypes.SortBy.AMOUNT:
-        Component = isDescending
-          ? sortButtonMap.aamount
-          : sortButtonMap.damount;
-        break;
-      case sortTypes.SortBy.NAME:
-        Component = isDescending ? sortButtonMap.aname : sortButtonMap.dname;
-        break;
-      case sortTypes.SortBy.DATE:
-        Component = isDescending ? sortButtonMap.adate : sortButtonMap.ddate;
-        break;
-      default:
-        Component = sortButtonMap.adate;
-        break;
-    }
-
-    return React.cloneElement(Component, {
-      onPress: () => dispatch(actions.sort.setIsDescending(!isDescending)),
-      onLongPress: () =>
-        dispatch(
-          actions.modal.setVisible(modalTypes.ModalVisible.SORT_OPTIONS),
-        ),
-      styles,
-    });
-  }
-
-  function getIcon(paymentMethod: transactionTypes.PaymentMethod) {
-    switch (paymentMethod) {
-      case transactionTypes.PaymentMethod.CASH:
-        return 'cash';
-      case transactionTypes.PaymentMethod.CREDIT:
-        return 'credit-card-outline';
-      case transactionTypes.PaymentMethod.DEBIT:
-        return 'bank-outline';
-      case transactionTypes.PaymentMethod.CHECK:
-        return 'checkbook';
-      case transactionTypes.PaymentMethod.OTHER:
-        return 'hand-coin-outline';
-      default:
-        return 'cash';
-    }
-  }
 
   function onCardHeaderPress() {
     if (isSelectMode) {
@@ -245,12 +103,7 @@ export default function Home() {
             dispatch(actions.modal.setVisible(modalTypes.ModalVisible.EXPORT))
           }
         />
-        <Appbar.Action
-          icon="filter-variant"
-          onPress={() =>
-            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.FILTER))
-          }
-        />
+        <Component.AppbarActions.FilterButton />
         <Appbar.Action
           icon="plus"
           onPress={() =>
@@ -261,12 +114,6 @@ export default function Home() {
       <ScrollView
         scrollEnabled={!search.isFocused}
         style={{flex: 1, backgroundColor: Colors.grey100}}>
-        {/* <SortButton
-          sortBy={sortBy}
-          isDescending={isDescending}
-          styles={homeStyles}
-        /> */}
-
         <React.Fragment>
           {status === appTypes.Status.SUCCESS &&
           transactions &&

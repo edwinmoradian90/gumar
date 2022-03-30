@@ -45,10 +45,12 @@ export default function useTransactions(
 
     return transactions
       .filter((transaction: transactionTypes.Transaction) => {
+        console.log(filterState.data.paymentMethods);
+        if (!filterState.isEnabled) return true;
         return filter.apply([
           filter.conditions.paymentMethod(
             transaction,
-            filterState.data.paymentMethod,
+            filterState.data.paymentMethods,
           ),
           filter.conditions.dateRange(
             transaction,

@@ -1,6 +1,7 @@
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
+import * as Component from '../components';
 import {View} from 'react-native';
-import {Appbar, Divider, Menu} from 'react-native-paper';
+import {Appbar, Menu} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import {useFilter, useMode, useSelect, useSort} from '../hooks';
 import {actions} from '../redux';
@@ -20,7 +21,7 @@ export default function Toolbar({
   title?: string;
   startSpace?: number;
 }) {
-  const {setMode, isSelectMode, isDefaultMode} = useMode();
+  const {setMode, isSelectMode} = useMode();
   const {selectionObject} = useSelect();
   const dispatch = useDispatch();
   const sort = useSort();
@@ -127,12 +128,7 @@ export default function Toolbar({
         />
       </View>
       <Appbar.Action size={22} icon="export" />
-      <Appbar.Action
-        color={filter.isEnabled() ? colors.secondary : colors.iconButtonColor}
-        size={22}
-        icon="filter-variant"
-        onPress={filter.show}
-      />
+      <Component.AppbarActions.FilterButton />
       <Menu
         visible={showSortMenu}
         anchor={

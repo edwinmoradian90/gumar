@@ -1,45 +1,36 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import ReactNativeModal from 'react-native-modal';
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  Text,
-  TextInput,
-  Pressable,
-  Button,
-} from 'react-native';
-import {Header} from '.';
-import {useDispatch, useSelector} from 'react-redux';
-import {actions} from '../redux';
-import {Picker} from '@react-native-picker/picker';
-import {
-  modalTypes,
-  snackbarTypes,
-  storeTypes,
-  transactionTypes,
-} from '../types';
+import {ScrollView, View, StyleSheet, Text, Pressable} from 'react-native';
+import {selectTypes, transactionTypes} from '../types';
 import {colors, helpers} from '../utils';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
-import CheckBox from '@react-native-community/checkbox';
-import {RootState} from '../types/store';
+import {
+  Appbar,
+  Button,
+  Checkbox,
+  TextInput,
+  Subheading,
+  Divider,
+  IconButton,
+} from 'react-native-paper';
+import {useFilter, useModal, useSnackbar} from '../hooks';
 
 export default function Filter({data}: {data: any}) {
   const date = new Date();
-  const dispatch = useDispatch();
+
+  const filter = useFilter();
+  const modal = useModal();
+  const snackbar = useSnackbar();
+
   const {min, max} = useMemo(() => helpers.findMinMax(data, 'amount'), [data]);
-  const {modalVisible} = useSelector(
-    (state: storeTypes.RootState) => state.modal,
-  );
-  const filterState = useSelector((state: RootState) => state.filter);
   const [amountRange, setAmountRange] = useState({
     from: min,
     to: max,
   });
   const [dateRange, setDateRange] = useState({
-    from: filterState.dateRangeFrom,
-    to: filterState.dateRangeTo,
+    from: filter.data.dateRangeFrom,
+    to: filter.data.dateRangeTo,
   });
   const [toggleDateRange, setToggleDateRange] = useState({
     from: false,
@@ -48,57 +39,53 @@ export default function Filter({data}: {data: any}) {
   const [name, setName] = useState('');
 
   function initialInstallmentState() {
-    const installments: {[index: string]: boolean} = {};
+    const installments: {[index: string]: selectTypes.Status} = {};
     const values = Object.values(transactionTypes.Installment);
     values.forEach((value: string) => {
-      installments[value] = filterState.installments.indexOf(value) > -1;
+      installments[value] = selectTypes.Status.UNCHECKED;
     });
     return installments;
   }
 
-  function initialPaymentMethodState() {
-    const paymentMethods: {[index: string]: boolean} = {};
-    const values = Object.values(transactionTypes.PaymentMethod);
-    values.forEach(
-      (value: string) =>
-        (paymentMethods[value] =
-          filterState.paymentMethods.indexOf(value) > -1),
-    );
+  const initialPaymentMethodState: {[index: string]: selectTypes.Status} =
+    useMemo(() => {
+      const paymentMethods: {[index: string]: selectTypes.Status} = {};
+      const values = Object.values(transactionTypes.PaymentMethod);
+      values.forEach(
+        (value: string) =>
+          (paymentMethods[value] =
+            filter.data.paymentMethods.indexOf(paymentMethods[value]) > -1
+              ? selectTypes.Status.CHECKED
+              : selectTypes.Status.UNCHECKED),
+      );
 
-    return paymentMethods;
-  }
+      return paymentMethods;
+    }, [filter.data.paymentMethods]);
 
   const [installments, setInstallments] = useState(initialInstallmentState());
   const [paymentMethods, setPaymentMethods] = useState(
-    initialPaymentMethodState(),
+    initialPaymentMethodState,
   );
 
   function handleResetFilter() {
-    dispatch(actions.filter.clear());
+    filter.reset();
   }
 
   function handleSnackbar() {
-    const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
-
-    const snackbar: Partial<snackbarTypes.State> = {
-      message: 'Filter applied.',
-      actionLabel: 'Dismiss',
-      actionOnpress: onDismiss,
-      onDismiss,
-    };
-
-    dispatch(actions.snackbar.setVisible(snackbar));
+    const sb = snackbar.create('Filter applied.');
+    snackbar.show(sb);
   }
 
   function handleSubmit() {
     const selectedPaymentMethods = Object.keys(paymentMethods).filter(
-      (key: string) => paymentMethods[key],
+      (key: string) => paymentMethods[key] === selectTypes.Status.CHECKED,
     );
+
     const selectedInstallments = Object.keys(installments).filter(
       (key: string) => installments[key],
     );
 
-    const filter = {
+    filter.update({
       isUsingFilter: true,
       name: name,
       paymentMethods: selectedPaymentMethods,
@@ -107,13 +94,16 @@ export default function Filter({data}: {data: any}) {
       amountRangeTo: amountRange.to,
       dateRangeFrom: dateRange.from,
       dateRangeTo: dateRange.to,
-    };
+    });
 
-    dispatch(actions.filter.create(filter));
-    dispatch(actions.modal.setNotVisible());
+    modal.hide();
 
     handleSnackbar();
   }
+
+  useEffect(() => {
+    if (!filter.isEnabled) setPaymentMethods(initialPaymentMethodState);
+  }, [filter.isEnabled, filter.data.paymentMethods]);
 
   const InstallmentOption = ({name, type}: {name: string; type: string}) => {
     return (
@@ -124,10 +114,14 @@ export default function Filter({data}: {data: any}) {
           justifyContent: 'space-between',
         }}>
         <Text>{name}</Text>
-        <CheckBox
-          value={installments[type]}
-          onValueChange={(isChecked: boolean) => {
-            setInstallments({...installments, [type]: isChecked});
+        <Checkbox
+          status={installments[type]}
+          onPress={() => {
+            const value =
+              installments[type] === selectTypes.Status.CHECKED
+                ? selectTypes.Status.UNCHECKED
+                : selectTypes.Status.CHECKED;
+            setInstallments({...installments, [type]: value});
           }}
         />
       </View>
@@ -143,10 +137,16 @@ export default function Filter({data}: {data: any}) {
           justifyContent: 'space-between',
         }}>
         <Text>{name}</Text>
-        <CheckBox
-          value={paymentMethods[type]}
-          onValueChange={(isChecked: boolean) => {
-            setPaymentMethods({...paymentMethods, [type]: isChecked});
+        <Checkbox
+          status={paymentMethods[type]}
+          onPress={() => {
+            const value =
+              paymentMethods[type] === selectTypes.Status.CHECKED
+                ? selectTypes.Status.UNCHECKED
+                : selectTypes.Status.CHECKED;
+
+            setPaymentMethods({...paymentMethods, [type]: value});
+            console.log(paymentMethods);
           }}
         />
       </View>
@@ -160,64 +160,89 @@ export default function Filter({data}: {data: any}) {
   return (
     <ReactNativeModal
       style={styles.modalContainer}
-      isVisible={modalVisible === modalTypes.ModalVisible.FILTER}
-      swipeDirection={['down']}
-      onBackdropPress={() => dispatch(actions.modal.setNotVisible())}
-      onSwipeComplete={() => dispatch(actions.modal.setNotVisible())}>
+      isVisible={modal.isVisible}
+      onBackdropPress={() => modal.hide()}
+      onSwipeComplete={() => modal.hide()}>
+      <Appbar.Header
+        style={{
+          backgroundColor: colors.background,
+          elevation: 0,
+          ...styles.header,
+        }}
+        dark={false}>
+        <Appbar.Content title="Filter" />
+        <Appbar.Action icon="close" onPress={() => modal.hide()} />
+      </Appbar.Header>
       <ScrollView style={styles.modalView}>
-        <Header title="Filter" left={['title']} right={['close']} />
-        <Pressable onPress={handleResetFilter}>
-          <Text>Reset filter</Text>
-        </Pressable>
-        <View style={styles.contentContainer}>
-          <Text>Filter</Text>
-          <View>
-            <Text>Name</Text>
+        <View>
+          <View style={{paddingBottom: 20}}>
+            <Subheading style={{paddingBottom: 10}}>Name</Subheading>
             <TextInput
-              placeholder="Transaction name"
+              style={{backgroundColor: colors.background}}
+              label="Transaction name"
+              mode="outlined"
+              activeOutlineColor={colors.secondary}
               onChangeText={(name: string) => setName(name)}
             />
           </View>
-          <View>
-            <Text>Amount Range</Text>
-            <View>
-              <Text>From</Text>
-              <TextInput
-                keyboardType="numeric"
-                placeholder="Starting amount"
-                defaultValue={amountRange.from}
-                onChangeText={(newAmount: string) =>
-                  setAmountRange({
-                    ...amountRange,
-                    from: newAmount,
-                  })
-                }
-              />
-              <Text>To</Text>
-              <TextInput
-                keyboardType="numeric"
-                placeholder="Ending amount"
-                defaultValue={amountRange.to}
-                onChangeText={(newAmount: string) =>
-                  setAmountRange({...amountRange, to: newAmount})
-                }
-              />
+          <Divider
+            style={{backgroundColor: colors.muted, marginVertical: 20}}
+          />
+          <View style={{paddingBottom: 20}}>
+            <Subheading style={{paddingBottom: 10}}>Amount Range</Subheading>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{width: '45%'}}>
+                <Text>From</Text>
+                <TextInput
+                  style={{backgroundColor: colors.background}}
+                  keyboardType="numeric"
+                  placeholder="Starting amount"
+                  activeUnderlineColor={colors.secondary}
+                  defaultValue={amountRange.from}
+                  onChangeText={(newAmount: string) =>
+                    setAmountRange({
+                      ...amountRange,
+                      from: newAmount,
+                    })
+                  }
+                />
+              </View>
+              <View style={{width: '45%'}}>
+                <Text>To</Text>
+                <TextInput
+                  style={{backgroundColor: colors.background}}
+                  keyboardType="numeric"
+                  placeholder="Ending amount"
+                  activeUnderlineColor={colors.secondary}
+                  defaultValue={amountRange.to}
+                  onChangeText={(newAmount: string) =>
+                    setAmountRange({...amountRange, to: newAmount})
+                  }
+                />
+              </View>
             </View>
           </View>
+          <Divider
+            style={{backgroundColor: colors.muted, marginVertical: 20}}
+          />
           <View>
-            <Text>Date Range</Text>
-            <View>
-              <Text>From</Text>
-              <Pressable
-                onPress={() =>
-                  setToggleDateRange({...toggleDateRange, from: true})
-                }>
-                <Text>Select start date</Text>
-              </Pressable>
-              <Text>
-                {moment(dateRange.from).format('MMMM DD, YYYY') ||
-                  'Not selected'}
-              </Text>
+            <Subheading style={{paddingBottom: 10}}>Date Range</Subheading>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View>
+                <Text>From</Text>
+                <Pressable
+                  onPress={() =>
+                    setToggleDateRange({...toggleDateRange, from: true})
+                  }>
+                  <Text>Select start date</Text>
+                </Pressable>
+                <Text>
+                  {moment(dateRange.from).format('MMMM DD, YYYY') ||
+                    'Not selected'}
+                </Text>
+              </View>
               <DatePicker
                 title="Select start date"
                 androidVariant="iosClone"
@@ -231,35 +256,41 @@ export default function Filter({data}: {data: any}) {
                 }}
                 onCancel={() => setToggleDateRange({from: false, to: false})}
               />
-              <Text>To</Text>
-              <Pressable
-                onPress={() =>
-                  setToggleDateRange({...toggleDateRange, to: true})
-                }>
-                <Text>Select end date</Text>
-              </Pressable>
-              <Text>
-                {moment(dateRange.to).format('MMMM DD, YYYY') || 'Not selected'}
-              </Text>
-              <DatePicker
-                modal
-                title="Select end date"
-                androidVariant="iosClone"
-                mode="date"
-                open={toggleDateRange.to}
-                date={dateRange.to || date}
-                onConfirm={(date: Date) => {
-                  setDateRange({...dateRange, to: date});
-                  setToggleDateRange({from: false, to: false});
-                }}
-                onCancel={() =>
-                  setToggleDateRange({...toggleDateRange, to: false})
-                }
-              />
+              <View>
+                <Text>To</Text>
+                <Pressable
+                  onPress={() =>
+                    setToggleDateRange({...toggleDateRange, to: true})
+                  }>
+                  <Text>Select end date</Text>
+                </Pressable>
+                <Text>
+                  {moment(dateRange.to).format('MMMM DD, YYYY') ||
+                    'Not selected'}
+                </Text>
+                <DatePicker
+                  modal
+                  title="Select end date"
+                  androidVariant="iosClone"
+                  mode="date"
+                  open={toggleDateRange.to}
+                  date={dateRange.to || date}
+                  onConfirm={(date: Date) => {
+                    setDateRange({...dateRange, to: date});
+                    setToggleDateRange({from: false, to: false});
+                  }}
+                  onCancel={() =>
+                    setToggleDateRange({...toggleDateRange, to: false})
+                  }
+                />
+              </View>
             </View>
           </View>
+          <Divider
+            style={{backgroundColor: colors.muted, marginVertical: 20}}
+          />
           <View>
-            <Text>Payment method</Text>
+            <Subheading style={{paddingBottom: 10}}>Payment method</Subheading>
             {Object.keys(paymentMethods).map((key: string, index: number) => {
               const name = helpers.capitalize(key);
               return (
@@ -271,8 +302,11 @@ export default function Filter({data}: {data: any}) {
               );
             })}
           </View>
+          <Divider
+            style={{backgroundColor: colors.muted, marginVertical: 20}}
+          />
           <View>
-            <Text>Installment</Text>
+            <Subheading style={{paddingBottom: 10}}>Installment</Subheading>
             {Object.keys(installments).map((key: string, index: number) => {
               const name = helpers.capitalize(key);
               return (
@@ -285,7 +319,23 @@ export default function Filter({data}: {data: any}) {
             })}
           </View>
         </View>
-        <Button title="Apply" onPress={handleSubmit} />
+        <Divider style={{backgroundColor: colors.muted, marginVertical: 20}} />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingTop: 20,
+            paddingBottom: 60,
+          }}>
+          <Button labelStyle={{color: colors.secondary}} onPress={handleSubmit}>
+            Apply
+          </Button>
+          <Button
+            labelStyle={{color: colors.secondary}}
+            onPress={handleResetFilter}>
+            Reset filter
+          </Button>
+        </View>
       </ScrollView>
     </ReactNativeModal>
   );
@@ -293,15 +343,14 @@ export default function Filter({data}: {data: any}) {
 
 const styles = StyleSheet.create({
   modalContainer: {
+    flex: 1,
     margin: 0,
     marginTop: 20,
   },
   modalView: {
     backgroundColor: colors.primary,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    flex: 1,
     padding: 20,
   },
+  header: {},
   contentContainer: {},
 });

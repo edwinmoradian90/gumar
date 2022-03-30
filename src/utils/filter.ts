@@ -12,11 +12,12 @@ export function apply(filters: {(): boolean}[], opts?: any): boolean {
 
 function paymentMethod(
   transaction: transactionTypes.Transaction,
-  paymentMethod?: transactionTypes.PaymentMethod,
+  paymentMethods?: transactionTypes.PaymentMethod,
 ) {
   return () => {
-    if (!paymentMethod) return true;
-    return transaction.paymentMethod === paymentMethod;
+    console.log('DEBIT ', transaction.paymentMethod, paymentMethods);
+    if (!paymentMethods) return true;
+    return paymentMethods.indexOf(transaction.paymentMethod) > -1;
   };
 }
 

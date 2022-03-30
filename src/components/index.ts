@@ -1,4 +1,5 @@
 import Alert from './Alert';
+import * as AppbarActions from './AppbarActions';
 import * as Buttons from './Buttons';
 import Card from './Card';
 import Category from './Category';
@@ -21,6 +22,7 @@ import Transactions from './Transactions';
 
 export {
   Alert,
+  AppbarActions,
   Buttons,
   Card,
   Category,

@@ -6,7 +6,9 @@ export default function useFilter() {
   const dispatch = useDispatch();
   const filter = useSelector((state: storeTypes.RootState) => state.filter);
 
-  function update(filter: filterTypes.State) {
+  const isEnabled = filter.isUsingFilter;
+
+  function update(filter: Partial<filterTypes.State>) {
     dispatch(actions.filter.update(filter));
   }
 
@@ -28,12 +30,13 @@ export default function useFilter() {
     dispatch(actions.modal.setNotVisible());
   }
 
-  function reset() {
+  function hideAndReset() {
+    dispatch(actions.modal.setNotVisible());
     dispatch(actions.filter.clear());
   }
 
-  function isEnabled() {
-    return filter.isUsingFilter;
+  function reset() {
+    dispatch(actions.filter.clear());
   }
 
   return {
@@ -42,6 +45,7 @@ export default function useFilter() {
     disable,
     show,
     hide,
+    hideAndReset,
     reset,
     isEnabled,
     data: filter,

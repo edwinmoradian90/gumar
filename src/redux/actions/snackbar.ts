@@ -1,8 +1,8 @@
 import {constants} from '..';
 import {snackbarTypes} from '../../types';
 
-export function setVisible(snackBar: Partial<snackbarTypes.State>) {
-  return {type: constants.snackbar.SET_VISIBLE, ...snackBar};
+export function setVisible(snackbar: Partial<snackbarTypes.State>) {
+  return {type: constants.snackbar.SET_VISIBLE, ...snackbar};
 }
 
 export function setNotVisible() {
