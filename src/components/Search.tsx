@@ -7,7 +7,7 @@ import {Divider, IconButton, List, Searchbar, Text} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
 import {appTypes, storeTypes, transactionTypes} from '../types';
-import {colors, helpers} from '../utils';
+import {colors, filter, helpers} from '../utils';
 
 // TODO: work on case where query has no match
 // currently it returns all of the transactions
@@ -167,8 +167,7 @@ export default function Search({
   const filteredData = useMemo(() => {
     if (transactions.length === 0) return [];
     return transactions.filter((transaction: transactionTypes.Transaction) => {
-      const regex = new RegExp(query.toLowerCase().replace(/\s+/g, ''));
-      return transaction.name.toLowerCase().replace(/\s+/g, '').match(regex);
+      return filter.conditions.isMatch(transaction.name, query);
     });
   }, [query]);
 

@@ -68,7 +68,18 @@ export default function Filter({data}: {data: any}) {
   );
 
   function handleResetFilter() {
+    const from = filter.data.rangeAmountFrom || min;
+    const to = filter.data.rangeAmountTo || max;
+
     filter.reset();
+
+    setPaymentMethods(initialPaymentMethodState);
+    setAmountRange({from, to});
+    setDateRange({
+      from: filter.data.dateRangeFrom,
+      to: filter.data.dateRangeTo,
+    });
+    setName(filter.data.name);
   }
 
   function handleSnackbar() {
@@ -85,13 +96,15 @@ export default function Filter({data}: {data: any}) {
       (key: string) => installments[key],
     );
 
+    const amountRangeTo = amountRange.to || max;
+
     filter.update({
       isUsingFilter: true,
       name: name,
       paymentMethods: selectedPaymentMethods,
       installments: selectedInstallments,
       amountRangeFrom: amountRange.from,
-      amountRangeTo: amountRange.to,
+      amountRangeTo: amountRangeTo,
       dateRangeFrom: dateRange.from,
       dateRangeTo: dateRange.to,
     });
@@ -102,7 +115,7 @@ export default function Filter({data}: {data: any}) {
   }
 
   useEffect(() => {
-    if (!filter.isEnabled) setPaymentMethods(initialPaymentMethodState);
+    if (!filter.isEnabled) handleResetFilter();
   }, [filter.isEnabled, filter.data.paymentMethods]);
 
   const InstallmentOption = ({name, type}: {name: string; type: string}) => {
@@ -166,7 +179,11 @@ export default function Filter({data}: {data: any}) {
       <Appbar.Header
         style={{
           backgroundColor: colors.background,
-          elevation: 0,
+          shadowColor: '#000',
+          shadowOffset: {width: 1, height: 1},
+          shadowOpacity: 0.4,
+          shadowRadius: 3,
+          elevation: 5,
           ...styles.header,
         }}
         dark={false}>
@@ -179,8 +196,9 @@ export default function Filter({data}: {data: any}) {
             <Subheading style={{paddingBottom: 10}}>Name</Subheading>
             <TextInput
               style={{backgroundColor: colors.background}}
-              label="Transaction name"
+              label={'Transaction name'}
               mode="outlined"
+              value={name}
               activeOutlineColor={colors.secondary}
               onChangeText={(name: string) => setName(name)}
             />
@@ -197,9 +215,9 @@ export default function Filter({data}: {data: any}) {
                 <TextInput
                   style={{backgroundColor: colors.background}}
                   keyboardType="numeric"
-                  placeholder="Starting amount"
                   activeUnderlineColor={colors.secondary}
-                  defaultValue={amountRange.from}
+                  placeholder={amountRange.from}
+                  value={filter.data.amountRangeFrom}
                   onChangeText={(newAmount: string) =>
                     setAmountRange({
                       ...amountRange,
@@ -213,9 +231,9 @@ export default function Filter({data}: {data: any}) {
                 <TextInput
                   style={{backgroundColor: colors.background}}
                   keyboardType="numeric"
-                  placeholder="Ending amount"
                   activeUnderlineColor={colors.secondary}
-                  defaultValue={amountRange.to}
+                  placeholder={amountRange.to}
+                  value={filter.data.amountRangeTo}
                   onChangeText={(newAmount: string) =>
                     setAmountRange({...amountRange, to: newAmount})
                   }
@@ -249,7 +267,7 @@ export default function Filter({data}: {data: any}) {
                 mode="date"
                 modal
                 open={toggleDateRange.from}
-                date={new Date(dateRange.from) || date}
+                date={dateRange.from || date}
                 onConfirm={(date: Date) => {
                   setDateRange({...dateRange, from: date});
                   setToggleDateRange({from: false, to: false});
@@ -320,23 +338,34 @@ export default function Filter({data}: {data: any}) {
           </View>
         </View>
         <Divider style={{backgroundColor: colors.muted, marginVertical: 20}} />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingTop: 20,
-            paddingBottom: 60,
-          }}>
-          <Button labelStyle={{color: colors.secondary}} onPress={handleSubmit}>
-            Apply
-          </Button>
-          <Button
-            labelStyle={{color: colors.secondary}}
-            onPress={handleResetFilter}>
-            Reset filter
-          </Button>
-        </View>
       </ScrollView>
+      <View
+        style={{
+          shadowRadius: 2,
+          shadowOffset: {
+            width: 0,
+            height: -3,
+          },
+          shadowColor: '#000000',
+          elevation: 4,
+          backgroundColor: colors.background,
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          paddingVertical: 10,
+        }}>
+        <Button
+          labelStyle={{color: colors.secondary}}
+          onPress={handleResetFilter}>
+          Reset filter
+        </Button>
+        <Button
+          mode="contained"
+          style={{marginRight: 20}}
+          labelStyle={{color: colors.white}}
+          onPress={handleSubmit}>
+          Apply
+        </Button>
+      </View>
     </ReactNativeModal>
   );
 }

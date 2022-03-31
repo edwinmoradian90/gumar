@@ -98,13 +98,6 @@ export default function Home() {
       <Appbar.Header style={{backgroundColor: colors.primary}} dark={false}>
         <Appbar.Content title="Overview" />
         <Appbar.Action
-          icon="export"
-          onPress={() =>
-            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.EXPORT))
-          }
-        />
-        <Component.AppbarActions.FilterButton />
-        <Appbar.Action
           icon="plus"
           onPress={() =>
             dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD))
@@ -236,7 +229,7 @@ export default function Home() {
                       );
                     }}
                   />
-                  <Component.Transactions limit={3} />
+                  <Component.Transactions limit={3} ignoreFilter={true} />
                 </Card>
                 <Card style={{paddingBottom: 16, marginBottom: 30}}>
                   <Card.Title

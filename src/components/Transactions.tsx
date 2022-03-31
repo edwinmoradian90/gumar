@@ -29,12 +29,14 @@ function Transactions({
   additionalLimit = 7,
   startSpace = 0,
   isSearchResult = false,
+  ignoreFilter = false,
 }: {
   //   filter?: (transaction: transactionTypes.Transaction) => boolean;
   limit?: number;
   additionalLimit?: number;
   startSpace?: number;
   isSearchResult?: boolean;
+  ignoreFilter?: boolean;
 }) {
   const dispatch = useDispatch();
   const navigation = useNavigation<appTypes.Navigation>();
@@ -48,7 +50,11 @@ function Transactions({
   const {mode} = useSelector((state: storeTypes.RootState) => state.app);
 
   const {isSelectMode, isDefaultMode} = useMode();
-  const modifiedTransactions = useTransactions({isSearchResult, limit});
+  const modifiedTransactions = useTransactions({
+    isSearchResult,
+    limit,
+    ignoreFilter,
+  });
 
   const [showMore, setShowMore] = useState(false);
   const [showMenu, setShowMenu] = useState(

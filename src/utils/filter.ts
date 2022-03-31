@@ -10,13 +10,17 @@ export function apply(filters: {(): boolean}[], opts?: any): boolean {
   return filters.length === filterArrLen;
 }
 
+function isMatch(string: string, match: string): RegExpMatchArray | null {
+  const regex = new RegExp(match.toLowerCase().replace(/\s+/g, ''));
+  return string.toLowerCase().replace(/\s+/g, '').match(regex);
+}
+
 function paymentMethod(
   transaction: transactionTypes.Transaction,
-  paymentMethods?: transactionTypes.PaymentMethod,
+  paymentMethods: transactionTypes.PaymentMethod,
 ) {
   return () => {
-    console.log('DEBIT ', transaction.paymentMethod, paymentMethods);
-    if (!paymentMethods) return true;
+    if (!paymentMethods || paymentMethods.length === 0) return true;
     return paymentMethods.indexOf(transaction.paymentMethod) > -1;
   };
 }
@@ -35,4 +39,37 @@ function dateRange(
   };
 }
 
-export const conditions = {paymentMethod, dateRange};
+function amountRange(
+  transaction: transactionTypes.Transaction,
+  amountRangeFrom: string,
+  amountRangeTo: string,
+) {
+  return () => {
+    if (!amountRangeFrom) return true;
+
+    const amountInt = parseInt(transaction.amount);
+    const amountRangeFromInt = parseInt(amountRangeFrom);
+    const amountRangeToInt = parseInt(amountRangeTo);
+
+    return amountInt >= amountRangeFromInt && amountInt <= amountRangeToInt;
+  };
+}
+
+function name(
+  transaction: transactionTypes.Transaction,
+  name: string,
+): () => boolean {
+  return () => {
+    if (!name) return true;
+    const match = isMatch(transaction.name, name) as RegExpMatchArray;
+    return match && match.length > 0;
+  };
+}
+
+export const conditions = {
+  paymentMethod,
+  amountRange,
+  dateRange,
+  name,
+  isMatch,
+};

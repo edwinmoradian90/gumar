@@ -11,6 +11,7 @@ interface UseTransactionsProps {
   additionalLimit?: number;
   isSearchResult?: boolean;
   showMore?: boolean;
+  ignoreFilter?: boolean;
 }
 
 export default function useTransactions(
@@ -21,6 +22,7 @@ export default function useTransactions(
     additionalLimit = 7,
     isSearchResult = false,
     showMore = false,
+    ignoreFilter = false,
   } = props || {};
   const dispatch = useDispatch();
   const {transactions} = useSelector(
@@ -32,22 +34,30 @@ export default function useTransactions(
   const search = useSearch();
 
   const modifiedTransactions: transactionTypes.Transaction[] = useMemo(() => {
+    if (transactions.length === 0) return [];
+
     const sliceEnd = !!limit
       ? showMore
         ? limit + additionalLimit
         : limit
       : transactions.length;
 
-    if (transactions.length === 0) return [];
     // TODO: extract out
     if (search.data.results.length > 0 && isSearchResult)
       return search.data.results.sort(sort.comparator || helpers.compare.adate);
 
     return transactions
       .filter((transaction: transactionTypes.Transaction) => {
-        console.log(filterState.data.paymentMethods);
+        if (ignoreFilter) return true;
         if (!filterState.isEnabled) return true;
+
         return filter.apply([
+          filter.conditions.name(transaction, filterState.data.name),
+          filter.conditions.amountRange(
+            transaction,
+            filterState.data.amountRangeFrom,
+            filterState.data.amountRangeTo,
+          ),
           filter.conditions.paymentMethod(
             transaction,
             filterState.data.paymentMethods,
