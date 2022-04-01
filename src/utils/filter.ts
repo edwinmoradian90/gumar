@@ -17,7 +17,7 @@ function isMatch(string: string, match: string): RegExpMatchArray | null {
 
 function paymentMethod(
   transaction: transactionTypes.Transaction,
-  paymentMethods: transactionTypes.PaymentMethod,
+  paymentMethods: transactionTypes.PaymentMethod[],
 ) {
   return () => {
     if (!paymentMethods || paymentMethods.length === 0) return true;
@@ -55,6 +55,16 @@ function amountRange(
   };
 }
 
+function category(
+  transaction: transactionTypes.Transaction,
+  category?: transactionTypes.PaymentMethod,
+): () => boolean {
+  return () => {
+    if (!category) return true;
+    return transaction.paymentMethod === category;
+  };
+}
+
 function name(
   transaction: transactionTypes.Transaction,
   name: string,
@@ -67,6 +77,7 @@ function name(
 }
 
 export const conditions = {
+  category,
   paymentMethod,
   amountRange,
   dateRange,

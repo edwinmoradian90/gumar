@@ -1,3 +1,4 @@
+import ExportButton from './ExportButton';
 import FilterButton from './FilterButton';
 
-export {FilterButton};
+export {ExportButton, FilterButton};

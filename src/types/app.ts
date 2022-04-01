@@ -48,6 +48,7 @@ export type RootStackParamList = {
   SettingsScreen: undefined;
   SettingScreen: undefined;
   TransactionsScreen?: {
+    category?: transactionTypes.PaymentMethod;
     paymentMethod?: transactionTypes.PaymentMethod;
     navigationInitiator?: NavigationInitiator;
   };

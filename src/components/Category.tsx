@@ -13,56 +13,52 @@ import {
 import {useSelector} from 'react-redux';
 import {appTypes, storeTypes, transactionTypes} from '../types';
 import {colors, helpers} from '../utils';
+import {useTransactions} from '../hooks';
 
 export default function Category({
+  category,
   title,
-  paymentMethod,
   icon,
   iconColor,
 }: {
+  category: transactionTypes.PaymentMethod;
   title: string;
-  paymentMethod: transactionTypes.PaymentMethod;
   icon: string;
   iconColor?: string;
 }) {
   const navigation = useNavigation<appTypes.Navigation>();
   const [showMenu, setShowMenu] = useState(false);
-  const {transactions} = useSelector(
-    (state: storeTypes.RootState) => state.transaction,
-  );
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
+
+  const modifiedTransactions = useTransactions({category});
 
   const {total, lastUpdated} = useMemo(() => {
     let total = 0;
     let lastUpdated = null;
 
-    const filtered =
-      transactions.length > 0 &&
-      transactions.filter(
-        (transaction: transactionTypes.Transaction) =>
-          transaction.paymentMethod === paymentMethod,
-      );
-
-    filtered.length > 0 &&
-      filtered
+    modifiedTransactions.length > 0 &&
+      modifiedTransactions
         .sort(helpers.compare.adate)
         .forEach(
           (transaction: transactionTypes.Transaction) =>
             (total += parseInt(transaction.amount)),
         );
 
-    lastUpdated = filtered.length > 0 ? filtered[0].date : lastUpdated;
+    lastUpdated =
+      modifiedTransactions.length > 0
+        ? modifiedTransactions[0].date
+        : lastUpdated;
 
     return {total, lastUpdated};
-  }, [transactions]);
+  }, [modifiedTransactions]);
 
   const description = useMemo(() => {
     return `Updated ${moment(lastUpdated).fromNow()}`;
-  }, [transactions]);
+  }, [modifiedTransactions]);
 
   function handleView() {
     setShowMenu(false);
-    navigation.navigate('TransactionsScreen', {paymentMethod});
+    navigation.navigate('TransactionsScreen', {category});
   }
 
   function handleDelete() {}

@@ -127,7 +127,7 @@ export default function Toolbar({
           onLongPress={selectModeLongPress}
         />
       </View>
-      <Appbar.Action size={22} icon="export" />
+      <Component.AppbarActions.ExportButton />
       <Component.AppbarActions.FilterButton />
       <Menu
         visible={showSortMenu}

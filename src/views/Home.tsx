@@ -12,7 +12,6 @@ import {
   transactionTypes,
   storeTypes,
   modalTypes,
-  sortTypes,
   snackbarTypes,
   selectTypes,
 } from '../types';
@@ -260,27 +259,27 @@ export default function Home() {
                   />
                   <Component.Category
                     title="Cash"
-                    paymentMethod={transactionTypes.PaymentMethod.CASH}
+                    category={transactionTypes.PaymentMethod.CASH}
                     icon="cash"
                   />
                   <Component.Category
                     title="Credit"
-                    paymentMethod={transactionTypes.PaymentMethod.CREDIT}
+                    category={transactionTypes.PaymentMethod.CREDIT}
                     icon="credit-card-outline"
                   />
                   <Component.Category
                     title="Debit"
-                    paymentMethod={transactionTypes.PaymentMethod.DEBIT}
+                    category={transactionTypes.PaymentMethod.DEBIT}
                     icon="bank-outline"
                   />
                   <Component.Category
                     title="Check"
-                    paymentMethod={transactionTypes.PaymentMethod.CHECK}
+                    category={transactionTypes.PaymentMethod.CHECK}
                     icon="checkbook"
                   />
                   <Component.Category
                     title="Other"
-                    paymentMethod={transactionTypes.PaymentMethod.OTHER}
+                    category={transactionTypes.PaymentMethod.OTHER}
                     icon="hand-coin-outline"
                   />
                 </Card>
@@ -288,8 +287,8 @@ export default function Home() {
             </View>
           )}
           <Component.NewTransaction />
-          <Component.Filter data={transactions} />
           <Component.Export />
+          <Component.Filter data={transactions} />
           <Component.SortOptions />
         </React.Fragment>
       </ScrollView>

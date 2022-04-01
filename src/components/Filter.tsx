@@ -12,7 +12,6 @@ import {
   TextInput,
   Subheading,
   Divider,
-  IconButton,
 } from 'react-native-paper';
 import {useFilter, useModal, useSnackbar} from '../hooks';
 
@@ -173,9 +172,10 @@ export default function Filter({data}: {data: any}) {
   return (
     <ReactNativeModal
       style={styles.modalContainer}
-      isVisible={modal.isVisible}
-      onBackdropPress={() => modal.hide()}
-      onSwipeComplete={() => modal.hide()}>
+      isVisible={modal.isFilterModal}
+      swipeDirection={['down']}
+      onBackdropPress={modal.hide}
+      onSwipeComplete={modal.hide}>
       <Appbar.Header
         style={{
           backgroundColor: colors.background,

@@ -25,13 +25,14 @@ import {useNavigation} from '@react-navigation/native';
 import {useMode, useSelect, useTransactions} from '../hooks';
 
 function Transactions({
+  category,
   limit = 0,
   additionalLimit = 7,
   startSpace = 0,
   isSearchResult = false,
   ignoreFilter = false,
 }: {
-  //   filter?: (transaction: transactionTypes.Transaction) => boolean;
+  category?: transactionTypes.PaymentMethod;
   limit?: number;
   additionalLimit?: number;
   startSpace?: number;
@@ -54,6 +55,7 @@ function Transactions({
     isSearchResult,
     limit,
     ignoreFilter,
+    category,
   });
 
   const [showMore, setShowMore] = useState(false);
