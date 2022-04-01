@@ -76,11 +76,22 @@ function name(
   };
 }
 
+function selected(
+  transaction: transactionTypes.Transaction,
+  selected: string[],
+): () => boolean {
+  return () => {
+    if (selected.length === 0) return true;
+    return selected.indexOf(transaction.id) > -1;
+  };
+}
+
 export const conditions = {
   category,
   paymentMethod,
   amountRange,
   dateRange,
   name,
+  selected,
   isMatch,
 };

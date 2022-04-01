@@ -13,6 +13,7 @@ interface UseTransactionsProps {
   showMore?: boolean;
   ignoreFilter?: boolean;
   category?: transactionTypes.PaymentMethod;
+  selected?: string[];
 }
 
 export default function useTransactions(
@@ -24,6 +25,7 @@ export default function useTransactions(
     isSearchResult = false,
     showMore = false,
     ignoreFilter = false,
+    selected = [],
     category,
   } = props || {};
   const dispatch = useDispatch();
@@ -72,6 +74,7 @@ export default function useTransactions(
             filterState.data.dateRangeFrom,
             filterState.data.dateRangeTo,
           ),
+          filter.conditions.selected(transaction, selected),
         ]);
       })
       .sort(sort.comparator || helpers.compare.adate)

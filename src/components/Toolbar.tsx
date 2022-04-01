@@ -127,8 +127,6 @@ export default function Toolbar({
           onLongPress={selectModeLongPress}
         />
       </View>
-      <Component.AppbarActions.ExportButton />
-      <Component.AppbarActions.FilterButton />
       <Menu
         visible={showSortMenu}
         anchor={
@@ -157,6 +155,8 @@ export default function Toolbar({
           onPress={() => handleMenuItemSelect(sortTypes.SortBy.DATE)}
         />
       </Menu>
+      <Component.AppbarActions.FilterButton />
+      <Component.AppbarActions.ExportButton />
       <Appbar.Action
         size={22}
         icon="trash-can-outline"

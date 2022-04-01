@@ -23,8 +23,6 @@ export default function useModal(): any {
     return modals;
   }, [modal.modalVisible]);
 
-  console.log(modals);
-
   function show(modal: modalTypes.ModalVisible) {
     dispatch(actions.modal.setVisible(modal));
   }
