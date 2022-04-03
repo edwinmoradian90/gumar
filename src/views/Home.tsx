@@ -220,14 +220,7 @@ export default function Home() {
                       fontWeight: '300',
                     }}
                     rightStyle={{marginTop: 3}}
-                    right={() => {
-                      return (
-                        <React.Fragment>
-                          {isSelectMode && <SelectCardRight />}
-                          {isDefaultMode && <CardRight />}
-                        </React.Fragment>
-                      );
-                    }}
+                    right={() => <CardRight />}
                   />
                   <Component.Transactions limit={3} ignoreFilter={true} />
                 </Card>

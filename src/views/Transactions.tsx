@@ -53,6 +53,7 @@ export default function Transactions() {
           category={category}
           startSpace={0}
           isSearchResult={isSearchResult}
+          hasSelectMode={true}
         />
       </ScrollView>
       <Component.Search

@@ -31,6 +31,7 @@ function Transactions({
   startSpace = 0,
   isSearchResult = false,
   ignoreFilter = false,
+  hasSelectMode = false,
 }: {
   category?: transactionTypes.PaymentMethod;
   limit?: number;
@@ -38,6 +39,7 @@ function Transactions({
   startSpace?: number;
   isSearchResult?: boolean;
   ignoreFilter?: boolean;
+  hasSelectMode?: boolean;
 }) {
   const dispatch = useDispatch();
   const navigation = useNavigation<appTypes.Navigation>();
@@ -50,7 +52,7 @@ function Transactions({
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
   const {mode} = useSelector((state: storeTypes.RootState) => state.app);
 
-  const {isSelectMode, isDefaultMode} = useMode();
+  const {isSelectMode, isDefaultMode, setMode} = useMode();
   const modifiedTransactions = useTransactions({
     isSearchResult,
     limit,
@@ -209,6 +211,14 @@ function Transactions({
     );
   };
 
+  useEffect(() => {
+    // mode clean up
+    return () => {
+      setMode(appTypes.Mode.DEFAULT);
+      selectionObject.setAll('transactions', selectTypes.Status.UNCHECKED);
+    };
+  }, []);
+
   if (transactions.length === 0) return <Text>Nothing here...</Text>;
 
   return (
@@ -312,8 +322,9 @@ function Transactions({
                         fontSize: 16,
                         fontWeight: '300',
                       }}>{`${symbol}${transaction.amount}`}</Text>
-                    {isSelectMode && <RightSelect transaction={transaction} />}
-                    {isDefaultMode && (
+                    {hasSelectMode && isSelectMode ? (
+                      <RightSelect transaction={transaction} />
+                    ) : (
                       <Menu
                         visible={showMenu[transaction.id]}
                         onDismiss={() => onMenuDismiss(transaction.id)}
