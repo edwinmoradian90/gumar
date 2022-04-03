@@ -9,6 +9,7 @@ import useSelect from './useSelect';
 import useSearch from './useSearch';
 import useSnackbar from './useSnackbar';
 import useSort from './useSort';
+import useSpreadSheet from './useSpreadSheet';
 import useTotal from './useTotal';
 import useTransactions from './useTransactions';
 
@@ -24,6 +25,7 @@ export {
   useSearch,
   useSnackbar,
   useSort,
+  useSpreadSheet,
   useTotal,
   useTransactions,
 };

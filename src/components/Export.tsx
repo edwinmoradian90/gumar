@@ -5,7 +5,6 @@ import {colors} from '../utils';
 import {useAccount, useModal} from '../hooks';
 import {Appbar, Subheading} from 'react-native-paper';
 import * as Component from '../components';
-import {Subheader} from 'react-native-paper/lib/typescript/components/List/List';
 
 export default function Export() {
   const modal = useModal();
@@ -28,7 +27,9 @@ export default function Export() {
         <View style={styles.modalContent}>
           {account.isLoggedIn ? (
             <React.Fragment>
-              <Subheading>Spread Sheet</Subheading>
+              <Subheading style={{paddingVertical: 10}}>
+                Spread Sheet Information
+              </Subheading>
               <Component.SpreadSheet />
             </React.Fragment>
           ) : (
@@ -52,7 +53,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    flex: 1,
     paddingVertical: 20,
   },
   modalContent: {

@@ -1,5 +1,6 @@
 import {AnyAction} from 'redux';
 import {ThunkAction} from 'redux-thunk';
+import {constants} from '..';
 import config from '../../settings/config';
 import {spreadSheetTypes, storeTypes, transactionTypes} from '../../types';
 import {

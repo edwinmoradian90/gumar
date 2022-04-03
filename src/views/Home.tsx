@@ -61,6 +61,7 @@ export default function Home() {
       selectTypes.Status.CHECKED,
       transactionSelection,
     );
+
     const color = isAnySelected ? colors.iconButtonColor : colors.muted;
 
     return (

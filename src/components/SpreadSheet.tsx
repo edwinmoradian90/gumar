@@ -1,17 +1,28 @@
-import React, {useRef} from 'react';
-import {Pressable, Text, View} from 'react-native';
-import {Button, TextInput} from 'react-native-paper';
+import React, {useEffect, useRef, useState} from 'react';
+import {View} from 'react-native';
+import {ActivityIndicator, Button, Text, TextInput} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
-import {useSelect, useTransactions} from '../hooks';
-import {actions} from '../redux';
-import {selectTypes, spreadSheetTypes, storeTypes} from '../types';
+import {
+  useModal,
+  useMode,
+  useSelect,
+  useSnackbar,
+  useSpreadSheet,
+  useTransactions,
+} from '../hooks';
+import {appTypes, selectTypes, spreadSheetTypes, storeTypes} from '../types';
 import {colors} from '../utils';
 
 export default function SpreadSheet() {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+  const [submitted, setSubmitted] = useState(false);
   const {accessToken} = useSelector(
     (state: storeTypes.RootState) => state.account,
   );
+  const spreadsheets = useSpreadSheet();
+  const modal = useModal();
+  const mode = useMode();
+  const snackbar = useSnackbar();
   const {selectionObject} = useSelect();
 
   const transactions = useTransactions({
@@ -43,20 +54,40 @@ export default function SpreadSheet() {
   }
 
   function handleCreate() {
-    dispatch(
-      actions.spreadSheet.create(
-        accessToken,
-        spreadSheet.current,
-        transactions,
-      ),
-    );
-    clearInputs();
+    setSubmitted(true);
+    spreadsheets.create(accessToken, spreadSheet.current, transactions);
   }
 
   function handleClear() {
-    dispatch(actions.spreadSheet.clear());
+    spreadsheets.clear();
+    // dispatch(actions.spreadSheet.clear());
     clearInputs();
   }
+
+  function handleSnackbar() {
+    const s = snackbar.create(
+      `Spread sheet ${spreadSheet.current.title} created`,
+    );
+    snackbar.show(s);
+  }
+
+  function resetSelect() {
+    mode.setMode(appTypes.Mode.DEFAULT);
+    selectionObject.setAll('transactions', selectTypes.Status.UNCHECKED);
+  }
+
+  function onSuccess() {
+    resetSelect();
+    modal.hide();
+    handleSnackbar();
+    setSubmitted(false);
+  }
+
+  console.log(spreadsheets.isSuccessStatus);
+
+  useEffect(() => {
+    if (submitted && spreadsheets.isSuccessStatus) onSuccess();
+  }, [submitted, spreadsheets.isSuccessStatus]);
 
   return (
     <View>
@@ -76,14 +107,16 @@ export default function SpreadSheet() {
           justifyContent: 'flex-end',
           marginTop: 20,
         }}>
-        <Button color={colors.secondary} onPress={handleClear}>
+        {/* <Button color={colors.secondary} onPress={handleClear}>
           Clear
-        </Button>
-        <Button
-          mode="contained"
+        </Button> */}
+        <ActivityIndicator
+          size="small"
           color={colors.secondary}
-          onPress={handleCreate}>
-          Create
+          animating={spreadsheets.isLoadingStatus}
+        />
+        <Button color={colors.secondary} onPress={handleCreate}>
+          {spreadsheets.isLoadingStatus ? 'Creating...' : 'Create'}
         </Button>
       </View>
     </View>
