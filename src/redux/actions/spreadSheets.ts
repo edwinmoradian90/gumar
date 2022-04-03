@@ -1,6 +1,6 @@
+import moment from 'moment';
 import {AnyAction} from 'redux';
 import {ThunkAction} from 'redux-thunk';
-import {constants} from '..';
 import config from '../../settings/config';
 import {spreadSheetTypes, storeTypes, transactionTypes} from '../../types';
 import {
@@ -15,14 +15,14 @@ async function setSheetValues(
   transactions: transactionTypes.Transaction[],
 ) {
   const batchUpdateUrl = `${config.sheets.url}/${spreadSheetId}/values:batchUpdate`;
-  const range = `A1:C${transactions.length + 1}`;
-  const categories = ['Name', 'Amount', 'Date'];
+  const range = `A1:D${transactions.length + 1}`;
+  const categories = ['Name', 'Amount', 'Date', 'Time'];
   const transactionValues = transactions.map(
-    (transaction: transactionTypes.Transaction) => [
-      transaction.name,
-      transaction.amount,
-      transaction.date,
-    ],
+    (transaction: transactionTypes.Transaction) => {
+      const date = moment(transaction.date).format('MMMM DD YYYY');
+      const time = moment(transaction.date).format('hh:mm A');
+      return [transaction.name, transaction.amount, date, time];
+    },
   );
   const values = [categories, ...transactionValues];
   const body = {

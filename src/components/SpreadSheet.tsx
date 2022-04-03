@@ -1,7 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
-import {ActivityIndicator, Button, Text, TextInput} from 'react-native-paper';
-import {useDispatch, useSelector} from 'react-redux';
+import {ActivityIndicator, Button, TextInput} from 'react-native-paper';
+import {useSelector} from 'react-redux';
 import {
   useModal,
   useMode,
@@ -14,8 +14,8 @@ import {appTypes, selectTypes, spreadSheetTypes, storeTypes} from '../types';
 import {colors} from '../utils';
 
 export default function SpreadSheet() {
-  // const dispatch = useDispatch();
   const [submitted, setSubmitted] = useState(false);
+  const [title, setTitle] = useState('');
   const {accessToken} = useSelector(
     (state: storeTypes.RootState) => state.account,
   );
@@ -32,42 +32,13 @@ export default function SpreadSheet() {
     ),
   });
 
-  const initialSpreadSheetData = {
-    title: '',
-    from: '',
-    to: '',
-    separator: spreadSheetTypes.Separator.MONTHS,
-    numberOfDays: 0,
-  };
-
-  const spreadSheet = useRef<Omit<spreadSheetTypes.SpreadSheet, 'id'>>(
-    initialSpreadSheetData,
-  );
-
-  function setData(content: string, key: string) {
-    spreadSheet.current[key] = content;
-    console.log(spreadSheet);
-  }
-
-  function clearInputs() {
-    spreadSheet.current = initialSpreadSheetData;
-  }
-
   function handleCreate() {
     setSubmitted(true);
-    spreadsheets.create(accessToken, spreadSheet.current, transactions);
-  }
-
-  function handleClear() {
-    spreadsheets.clear();
-    // dispatch(actions.spreadSheet.clear());
-    clearInputs();
+    spreadsheets.create(accessToken, {title}, transactions);
   }
 
   function handleSnackbar() {
-    const s = snackbar.create(
-      `Spread sheet ${spreadSheet.current.title} created`,
-    );
+    const s = snackbar.create(`Spread sheet ${title} created`);
     snackbar.show(s);
   }
 
@@ -96,10 +67,8 @@ export default function SpreadSheet() {
         label="Title"
         mode="outlined"
         activeOutlineColor={colors.secondary}
-        onChangeText={content => setData(content, 'title')}
-        defaultValue={
-          spreadSheet.current.title as spreadSheetTypes.SpreadSheet['title']
-        }
+        onChangeText={content => setTitle(content)}
+        defaultValue={title as spreadSheetTypes.SpreadSheet['title']}
       />
       <View
         style={{

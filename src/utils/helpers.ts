@@ -72,6 +72,7 @@ export function arrayToMap(arr: unknown[], key: string, defaultValue: any) {
 }
 
 export function keyFilter(obj: {[index: string]: any}, value: any) {
+  if (!obj) return [];
   return Object.keys(obj).filter((key: string) => obj[key] === value);
 }
 
