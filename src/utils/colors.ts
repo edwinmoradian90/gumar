@@ -17,6 +17,7 @@ export const primary = '#ffffff';
 export const primaryHighlight = highlightColor(primary, -20);
 export const secondaryHighlight = highlightColor(secondary, -20);
 export const muted = Colors.grey500;
+export const mutedSoft = '#f8f8f8';
 export const gray = '#f6f6f6';
 export const white = '#ffffff';
 export const hightlightWhite = highlightColor(white, 20);

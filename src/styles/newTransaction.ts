@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {primary, secondary, white} from '../utils/colors';
+import {colors} from '../utils';
 
 const newTransactionStyles = StyleSheet.create({
   modalContainer: {
@@ -7,37 +7,35 @@ const newTransactionStyles = StyleSheet.create({
     margin: 0,
   },
   modalView: {
-    backgroundColor: white,
+    backgroundColor: colors.white,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
+    paddingTop: 20,
   },
   container: {
-    padding: 30,
+    padding: 20,
   },
   header: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingBottom: 10,
+    backgroundColor: colors.white,
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
   },
   button: {
-    borderRadius: 5,
-    padding: 10,
+    marginLeft: 'auto',
+    color: colors.secondary,
   },
   closeButton: {
     padding: 5,
   },
   buttonSubmit: {
     marginTop: 10,
-    backgroundColor: secondary,
+    backgroundColor: colors.secondary,
   },
   buttonNewTransaction: {
     alignItems: 'center',
-    backgroundColor: secondary,
+    backgroundColor: colors.secondary,
     borderRadius: 70,
     display: 'flex',
     justifyContent: 'center',
@@ -48,12 +46,11 @@ const newTransactionStyles = StyleSheet.create({
     width: 70,
   },
   input: {
-    borderBottomColor: secondary,
-    borderBottomWidth: 1,
-    marginBottom: 16,
+    backgroundColor: colors.mutedSoft,
+    marginBottom: 20,
   },
   textStyle: {
-    color: 'white',
+    color: colors.white,
     fontWeight: 'bold',
     textAlign: 'center',
   },
