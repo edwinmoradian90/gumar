@@ -35,17 +35,12 @@ export function login(): ThunkAction<
       });
       Alert.alert('Successfully logged in.');
     } catch (error: any) {
-      // update error type
       dispatch({type: GOOGLE_AUTH_FAILURE, isLoggedIn, error});
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-        // Alert.alert('User cancelled the login flow !');
       } else if (error.code === statusCodes.IN_PROGRESS) {
         Alert.alert('Signin in progress');
-        // operation (f.e. sign in) is in progress already
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         Alert.alert('Google play services not available or outdated !');
-        // play services not available or outdated
       } else {
         console.log(error);
       }
