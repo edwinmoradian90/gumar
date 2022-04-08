@@ -104,7 +104,7 @@ function Transactions({
     const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
 
     const snackbar: Partial<snackbarTypes.State> = {
-      message: 'Transaction deleted.',
+      message: 'Transaction deleted',
       actionLabel: 'Dismiss',
       actionOnpress: onDismiss,
       onDismiss,

@@ -5,13 +5,14 @@ import {Snackbar} from 'react-native-paper';
 import {useSelector} from 'react-redux';
 import {storeTypes, transactionTypes} from '../types';
 import {colors, _} from '../utils';
-import {useTransactions, useTransactionsFilter} from '../hooks';
+import {useSnackbar, useTransactions, useTransactionsFilter} from '../hooks';
 
 export default function Layout({
   children,
 }: {
   children: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
 }) {
+  const sb = useSnackbar();
   const snackbar = useSelector((state: storeTypes.RootState) => state.snackbar);
   const alert = useSelector((state: storeTypes.RootState) => state.alert);
   const {createManualFilter} = useTransactionsFilter();
@@ -36,16 +37,23 @@ export default function Layout({
 
   useEffect(() => {
     const subCheck = setInterval(() => {
+      let updateCount = 0;
       Object.values(recentSubscriptions).forEach(
         (subscription: transactionTypes.Transaction) => {
-          console.log(
-            'auto pop ',
-            _.transactions.shouldAutoPopulate(subscription),
-          );
           if (!_.transactions.shouldAutoPopulate(subscription)) return;
+          updateCount++;
           transactions.autoCreateSubscriptionTransaction(subscription);
         },
       );
+
+      if (updateCount > 0) {
+        const snackbarData = sb.create(
+          `Automatically updated ${updateCount} ${
+            updateCount === 1 ? 'subscription' : 'subscriptions'
+          }`,
+        );
+        sb.show(snackbarData);
+      }
     }, 5000);
     return () => clearInterval(subCheck);
   }, [transactions.modifiedTransactions]);
