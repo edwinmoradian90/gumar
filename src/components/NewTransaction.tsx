@@ -1,24 +1,18 @@
 import React, {useState} from 'react';
 import ReactNativeModal from 'react-native-modal';
-import uuid from 'react-native-uuid';
 import * as Component from '../components';
-import {View, Pressable, Text} from 'react-native';
-import {Button, Colors, Subheading, TextInput} from 'react-native-paper';
+import {View} from 'react-native';
+import {Button, Subheading, TextInput} from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
 import {style} from '../styles';
-import {
-  appTypes,
-  modalTypes,
-  snackbarTypes,
-  storeTypes,
-  transactionTypes,
-} from '../types';
+import {appTypes, modalTypes, storeTypes, transactionTypes} from '../types';
 import {useNavigation} from '@react-navigation/native';
-import {colors, helpers} from '../utils';
+import {colors} from '../utils';
 import {Appbar} from 'react-native-paper';
 import newTransactionStyles from '../styles/newTransaction';
+import {useModal, useSnackbar, useTransactions} from '../hooks';
 
 export default function NewTransaction() {
   const dispatch = useDispatch();
@@ -26,48 +20,54 @@ export default function NewTransaction() {
   const {modalVisible} = useSelector(
     (state: storeTypes.RootState) => state.modal,
   );
+  const transactions = useTransactions();
+  const snackbar = useSnackbar();
+  const modal = useModal();
 
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState(
     transactionTypes.PaymentMethod.CASH,
   );
+  const [installment, setInstallment] = useState(
+    transactionTypes.Installment.SINGLE,
+  );
+
+  function handleSnackbar(transactionId: string) {
+    const snackbarTitle = `Created transaction`;
+    const snackbarActionLabel = `View`;
+    const snackbarActionOnPress = () => {
+      snackbar.hide();
+      transactions.select(transactionId);
+      navigation.navigate('EditScreen');
+    };
+
+    const s = snackbar.create(
+      snackbarTitle,
+      snackbarActionLabel,
+      snackbarActionOnPress,
+    );
+    snackbar.show(s);
+  }
+
+  function resetState() {
+    setName('');
+    setAmount('');
+    setPaymentMethod(transactionTypes.PaymentMethod.CASH);
+    setInstallment(transactionTypes.Installment.SINGLE);
+  }
 
   function onSubmit() {
-    try {
-      const id = uuid.v4() as string;
-      const date = new Date();
-      const newTransaction: transactionTypes.Transaction = {
-        id,
-        name,
-        amount,
-        date,
-        paymentMethod,
-      };
+    const {transactionId} = transactions.create(
+      name,
+      amount,
+      paymentMethod,
+      installment,
+    );
 
-      dispatch(actions.transaction.append(newTransaction));
-      dispatch(actions.modal.setNotVisible());
-
-      const actionOnpress = () => {
-        dispatch(actions.transaction.select(newTransaction));
-        dispatch(actions.snackbar.setNotVisible());
-        navigation.navigate('EditScreen');
-      };
-      const snackbar: Partial<snackbarTypes.State> = {
-        visible: true,
-        message: `Transaction added to "${helpers.capitalize(paymentMethod)}"`,
-        onDismiss: () => dispatch(actions.snackbar.setNotVisible()),
-        actionLabel: 'View',
-        actionOnpress,
-      };
-
-      dispatch(actions.snackbar.setVisible(snackbar));
-
-      setName('');
-      setAmount('');
-    } catch (error) {
-      console.error(error);
-    }
+    modal.hide();
+    handleSnackbar(transactionId);
+    resetState();
   }
 
   return (
@@ -130,6 +130,46 @@ export default function NewTransaction() {
             <Picker.Item
               label="Other"
               value={transactionTypes.PaymentMethod.OTHER}
+            />
+          </Picker>
+          <Subheading>Installment type</Subheading>
+          <Picker
+            style={style.newTransaction.input}
+            selectedValue={installment || transactionTypes.Installment.SINGLE}
+            onValueChange={(itemValue: transactionTypes.Installment) =>
+              setInstallment(itemValue)
+            }>
+            <Picker.Item
+              label="Single"
+              value={transactionTypes.Installment.SINGLE}
+            />
+            <Picker.Item
+              label="Daily"
+              value={transactionTypes.Installment.DAILY}
+            />
+            <Picker.Item
+              label="Weekly"
+              value={transactionTypes.Installment.WEEKLY}
+            />
+            <Picker.Item
+              label="Biweekly"
+              value={transactionTypes.Installment.BIWEEKLY}
+            />
+            <Picker.Item
+              label="Monthly"
+              value={transactionTypes.Installment.MONTHLY}
+            />
+            <Picker.Item
+              label="Semiannually"
+              value={transactionTypes.Installment.SEMI_ANNUALLY}
+            />
+            <Picker.Item
+              label="Annually"
+              value={transactionTypes.Installment.ANNUALLY}
+            />
+            <Picker.Item
+              label="Other"
+              value={transactionTypes.Installment.OTHER}
             />
           </Picker>
           <Button labelStyle={newTransactionStyles.button} onPress={onSubmit}>

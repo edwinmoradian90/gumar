@@ -1,4 +1,5 @@
 import React, {useRef} from 'react';
+import uuid from 'react-native-uuid';
 import {ScrollView, View} from 'react-native';
 import {Headline, Text, TextInput} from 'react-native-paper';
 import DatePicker from 'react-native-date-picker';
@@ -16,7 +17,7 @@ import {style} from '../styles';
 import {Picker} from '@react-native-picker/picker';
 import {Appbar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
-import {colors} from '../utils';
+import {colors, _} from '../utils';
 import moment from 'moment';
 import getSymbolFromCurrency from 'currency-symbol-map';
 
@@ -85,7 +86,6 @@ function Edit() {
   // Picker closes on rerender so we save change to ref to avoid rerender
   function onPressWithRef(newEditTarget: appTypes.EditTarget) {
     return () => {
-      console.log('new edit target', editTarget, newEditTarget);
       if (editTargetRef.current !== newEditTarget) {
         editTargetRef.current = newEditTarget;
       }
@@ -127,7 +127,22 @@ function Edit() {
         ? appTypes.EditTarget.DATE
         : editTarget;
 
-    const updatedTransaction = {...selected, [key]: data};
+    let updatedTransaction = {...selected, [key]: data};
+    const isSubscription = _.transactions.isSubscription(updatedTransaction);
+    const hasSubscriptionId =
+      _.transactions.hasSubscriptionId(updatedTransaction);
+
+    // refactor later
+    if (isSubscription) {
+      if (!hasSubscriptionId) {
+        const subscriptionId = uuid.v4();
+        updatedTransaction = {...updatedTransaction, subscriptionId};
+      }
+    } else {
+      if (hasSubscriptionId) {
+        updatedTransaction = {...updatedTransaction, subscriptionId: null};
+      }
+    }
 
     close();
 
@@ -143,7 +158,7 @@ function Edit() {
         left={() => <List.Icon icon="draw-pen" />}
         title="Name"
         description={() => (
-          <>
+          <React.Fragment>
             {editTarget === appTypes.EditTarget.NAME ? (
               <TextInput
                 autoFocus
@@ -151,12 +166,12 @@ function Edit() {
                 onChangeText={(content: string) => setContent(content)}
                 placeholder="Name"
                 defaultValue={selected.name}
-                onEndEditing={() => save(content.current)}
+                onEndEditing={() => save(content.current || selected.name)}
               />
             ) : (
               <Text>{selected.name}</Text>
             )}
-          </>
+          </React.Fragment>
         )}
         onPress={onPress(appTypes.EditTarget.NAME)}
       />
@@ -169,7 +184,7 @@ function Edit() {
         left={() => <List.Icon icon="cash-multiple" />}
         title="Amount"
         description={() => (
-          <>
+          <React.Fragment>
             {editTarget === appTypes.EditTarget.AMOUNT ? (
               <TextInput
                 autoFocus
@@ -178,7 +193,7 @@ function Edit() {
                 onChangeText={(content: string) => setContent(content)}
                 placeholder="Amount"
                 defaultValue={content.current}
-                onEndEditing={() => save(content.current)}
+                onEndEditing={() => save(content.current || selected.amount)}
               />
             ) : (
               <Text>
@@ -186,7 +201,7 @@ function Edit() {
                 {selected.amount}
               </Text>
             )}
-          </>
+          </React.Fragment>
         )}
         onPress={onPress(appTypes.EditTarget.AMOUNT)}
       />
@@ -271,7 +286,7 @@ function Edit() {
         )}
         title="Payment method"
         description={() => (
-          <>
+          <React.Fragment>
             <Picker
               style={{height: 60}}
               onFocus={onPressWithRef(appTypes.EditTarget.PAYMENT_METHOD)}
@@ -300,7 +315,62 @@ function Edit() {
                 label="Other"
               />
             </Picker>
-          </>
+          </React.Fragment>
+        )}
+      />
+    );
+  };
+
+  const InstallmentSection = () => {
+    return (
+      <List.Item
+        left={() => (
+          <List.Icon color={colors.iconButtonColor} icon="timetable" />
+        )}
+        title="Installment"
+        description={() => (
+          <React.Fragment>
+            <Picker
+              style={{height: 60}}
+              onFocus={onPressWithRef(appTypes.EditTarget.INSTALLMENT)}
+              selectedValue={selected.installment}
+              onValueChange={(installment: transactionTypes.Installment) =>
+                saveWithRef(installment)
+              }>
+              <Picker.Item
+                label="Single"
+                value={transactionTypes.Installment.SINGLE}
+              />
+              <Picker.Item
+                label="Daily"
+                value={transactionTypes.Installment.DAILY}
+              />
+              <Picker.Item
+                label="Weekly"
+                value={transactionTypes.Installment.WEEKLY}
+              />
+              <Picker.Item
+                label="Biweekly"
+                value={transactionTypes.Installment.BIWEEKLY}
+              />
+              <Picker.Item
+                label="Monthly"
+                value={transactionTypes.Installment.MONTHLY}
+              />
+              <Picker.Item
+                label="Quarterly"
+                value={transactionTypes.Installment.QUARTERLY}
+              />
+              <Picker.Item
+                label="Semiannually"
+                value={transactionTypes.Installment.SEMI_ANNUALLY}
+              />
+              <Picker.Item
+                label="Annually"
+                value={transactionTypes.Installment.ANNUALLY}
+              />
+            </Picker>
+          </React.Fragment>
         )}
       />
     );
@@ -339,6 +409,7 @@ function Edit() {
             <DateSection />
             <TimeSection />
             <PaymentMethodSection />
+            <InstallmentSection />
           </React.Fragment>
         )}
       </ScrollView>

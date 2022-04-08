@@ -10,8 +10,10 @@ import useSearch from './useSearch';
 import useSnackbar from './useSnackbar';
 import useSort from './useSort';
 import useSpreadSheet from './useSpreadSheet';
+import useSubscriptions from './useSubscriptions';
 import useTotal from './useTotal';
 import useTransactions from './useTransactions';
+import useTransactionsFilter from './useTransactionsFilter';
 
 export {
   useAccount,
@@ -26,6 +28,8 @@ export {
   useSnackbar,
   useSort,
   useSpreadSheet,
+  useSubscriptions,
   useTotal,
   useTransactions,
+  useTransactionsFilter,
 };

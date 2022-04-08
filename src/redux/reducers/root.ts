@@ -13,6 +13,7 @@ import {
   snackbar,
   sort,
   spreadSheets,
+  subscriptions,
   transaction,
 } from '.';
 
@@ -30,6 +31,7 @@ const root = combineReducers({
   snackbar,
   sort,
   spreadSheets,
+  subscriptions,
   transaction,
 });
 export default root;

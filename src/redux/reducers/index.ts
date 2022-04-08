@@ -11,6 +11,7 @@ import settings from './settings';
 import snackbar from './snackbar';
 import sort from './sort';
 import spreadSheets from './spreadSheets';
+import subscriptions from './subscriptions';
 import transaction from './transaction';
 
 export {
@@ -27,5 +28,6 @@ export {
   snackbar,
   sort,
   spreadSheets,
+  subscriptions,
   transaction,
 };

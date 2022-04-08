@@ -25,6 +25,16 @@ function paymentMethod(
   };
 }
 
+function installment(
+  transaction: transactionTypes.Transaction,
+  installments: transactionTypes.Installment[],
+): () => boolean {
+  return () => {
+    if (!installments || installments.length === 0) return true;
+    return installments.indexOf(transaction.installment) > -1;
+  };
+}
+
 function dateRange(
   transaction: transactionTypes.Transaction,
   dateRangeFrom?: string,
@@ -89,6 +99,7 @@ function selected(
 export const conditions = {
   category,
   paymentMethod,
+  installment,
   amountRange,
   dateRange,
   name,

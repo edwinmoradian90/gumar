@@ -10,6 +10,7 @@ import * as setting from './settings';
 import * as snackbar from './snackbar';
 import * as sort from './sort';
 import * as spreadSheet from './spreadSheets';
+import * as subscriptions from './subscriptions';
 import * as transaction from './transaction';
 
 export {
@@ -25,5 +26,6 @@ export {
   snackbar,
   sort,
   spreadSheet,
+  subscriptions,
   transaction,
 };

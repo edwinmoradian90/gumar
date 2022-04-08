@@ -35,6 +35,8 @@ export default function Home() {
   const search = useSelector((state: storeTypes.RootState) => state.search);
   const filter = useFilter();
 
+  console.log(search);
+
   const {isSelectMode, isDefaultMode} = useMode();
   const {selectionObject} = useSelect();
 
@@ -55,28 +57,6 @@ export default function Home() {
   }
 
   // Used in select mode
-  const SelectCardRight = () => {
-    const transactionSelection = selectionObject.get('transactions');
-    const isAnySelected = helpers.hasValueObject(
-      selectTypes.Status.CHECKED,
-      transactionSelection,
-    );
-
-    const color = isAnySelected ? colors.iconButtonColor : colors.muted;
-
-    return (
-      <Card.Actions>
-        <IconButton
-          icon="export"
-          disabled={!isAnySelected}
-          onPress={() => {}}
-        />
-        <IconButton icon="trash-can-outline" disabled={!isAnySelected} />
-        <IconButton icon="close" onPress={onCardHeaderPress} />
-      </Card.Actions>
-    );
-  };
-
   const CardRight = () => {
     return (
       <Card.Actions>

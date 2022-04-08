@@ -12,6 +12,7 @@ export enum EditTarget {
   NAME = 'name',
   AMOUNT = 'amount',
   PAYMENT_METHOD = 'paymentMethod',
+  INSTALLMENT = 'installment',
   DATE = 'date',
   TIME = 'time',
   NONE = 'none',
@@ -25,11 +26,11 @@ export enum Mode {
 }
 
 export enum Page {
-  'HOME_SCREEN' = 'HomeScreen',
-  'EDIT_SCREEN' = 'EditScreen',
-  'SETTINGS_SCREEN' = 'SettingsScreen',
-  'SETTING_SCREEN' = 'SettingScreen',
-  'STATS_SCREEN' = 'StatsScreen',
+  HOME_SCREEN = 'HomeScreen',
+  EDIT_SCREEN = 'EditScreen',
+  SETTINGS_SCREEN = 'SettingsScreen',
+  SETTING_SCREEN = 'SettingScreen',
+  STATS_SCREEN = 'StatsScreen',
 }
 
 export enum NavigationInitiator {

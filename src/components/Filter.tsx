@@ -158,7 +158,6 @@ export default function Filter({data}: {data: any}) {
                 : selectTypes.Status.CHECKED;
 
             setPaymentMethods({...paymentMethods, [type]: value});
-            console.log(paymentMethods);
           }}
         />
       </View>
@@ -173,7 +172,6 @@ export default function Filter({data}: {data: any}) {
     <ReactNativeModal
       style={styles.modalContainer}
       isVisible={modal.isFilterModal}
-      swipeDirection={['down']}
       onBackdropPress={modal.hide}
       onSwipeComplete={modal.hide}>
       <Appbar.Header

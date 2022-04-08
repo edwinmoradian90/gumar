@@ -1,29 +1,31 @@
+import uuid from 'react-native-uuid';
 import {useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
 import {storeTypes, transactionTypes} from '../types';
-import {filter, helpers} from '../utils';
+import {filter, helpers, _} from '../utils';
 import {useFilter, useSearch, useSort} from '.';
 
 // move to types
+
 interface UseTransactionsProps {
   limit?: number;
   additionalLimit?: number;
   isSearchResult?: boolean;
   showMore?: boolean;
+  manualFilter?: (transaction: transactionTypes.Transaction) => boolean;
   ignoreFilter?: boolean;
   category?: transactionTypes.PaymentMethod;
   selected?: string[];
 }
 
-export default function useTransactions(
-  props?: UseTransactionsProps,
-): transactionTypes.Transaction[] {
+export default function useTransactions(props?: UseTransactionsProps) {
   const {
     limit = 0,
     additionalLimit = 7,
     isSearchResult = false,
     showMore = false,
+    manualFilter,
     ignoreFilter = false,
     selected = [],
     category,
@@ -38,6 +40,7 @@ export default function useTransactions(
   const search = useSearch();
 
   const modifiedTransactions: transactionTypes.Transaction[] = useMemo(() => {
+    console.log('T length ', transactions.length);
     if (transactions.length === 0) return [];
 
     const sliceEnd = !!limit
@@ -48,14 +51,22 @@ export default function useTransactions(
 
     // TODO: extract out
     if (search.data.results.length > 0 && isSearchResult) {
-      console.log(search.data.results);
       return search.data.results.sort(sort.comparator || helpers.compare.adate);
     }
 
     return transactions
       .filter((transaction: transactionTypes.Transaction) => {
-        if (ignoreFilter) return true;
-        // if (!filterState.isEnabled) return true;
+        if (ignoreFilter) {
+          if (manualFilter !== null && manualFilter !== undefined) {
+            return manualFilter(transaction);
+          }
+
+          return true;
+        }
+
+        if (manualFilter !== null && manualFilter !== undefined) {
+          return manualFilter(transaction);
+        }
 
         return filter.apply([
           filter.conditions.category(transaction, category),
@@ -68,6 +79,10 @@ export default function useTransactions(
           filter.conditions.paymentMethod(
             transaction,
             filterState.data.paymentMethods,
+          ),
+          filter.conditions.installment(
+            transaction,
+            filterState.data.installments,
           ),
           filter.conditions.dateRange(
             transaction,
@@ -87,13 +102,94 @@ export default function useTransactions(
     sort.comparator,
     filterState.data,
     search.data.results,
+    manualFilter,
   ]);
 
-  console.log(modifiedTransactions.length);
   // write transaction functions
   function removeMany(transactionIds: string[]) {
     dispatch(actions.transaction.removeMany(transactionIds));
   }
 
-  return modifiedTransactions;
+  function isSubscription(installment: transactionTypes.Installment) {
+    return installment !== transactionTypes.Installment.SINGLE;
+  }
+
+  function removeSubscription(transactionId: string) {
+    const updatedTransactions = transactions.map(
+      (transaction: transactionTypes.Transaction) => {
+        if (transaction.id !== transactionId) return transaction;
+        return {...transaction, subscriptionId: null};
+      },
+    );
+
+    dispatch(actions.transaction.patch(updatedTransactions));
+  }
+
+  function create(
+    name: string,
+    amount: string,
+    paymentMethod: transactionTypes.PaymentMethod,
+    installment: transactionTypes.Installment,
+  ) {
+    const id = uuid.v4() as string;
+    const subscriptionId = isSubscription(installment)
+      ? (uuid.v4() as string)
+      : null;
+    const date = new Date();
+
+    dispatch(
+      actions.transaction.append({
+        name,
+        amount,
+        paymentMethod,
+        installment,
+        subscriptionId,
+        id,
+        date,
+      }),
+    );
+
+    return {transactionId: id};
+  }
+
+  function select(transaction: string | transactionTypes.Transaction) {
+    let selected: transactionTypes.Transaction;
+
+    if (typeof transaction === 'string') {
+      selected = transactions.filter(
+        (t: transactionTypes.Transaction) => t.id === transaction,
+      )[0];
+    } else {
+      selected = transaction;
+    }
+
+    dispatch(actions.transaction.select(selected));
+  }
+
+  function remove(id: string) {
+    dispatch(actions.transaction.remove(id));
+  }
+
+  function autoCreateSubscriptionTransaction(
+    transaction: transactionTypes.Transaction,
+  ) {
+    const id = uuid.v4() as string;
+    const date = _.transactions.getUpdatedSubscriptionDate(transaction);
+    const updated = {...transaction, id, date};
+
+    dispatch(actions.transaction.append(updated));
+
+    return {transactionId: id};
+  }
+
+  return {
+    transactions,
+    modifiedTransactions,
+    create,
+    select,
+    remove,
+    isSubscription,
+    removeSubscription,
+    autoCreateSubscriptionTransaction,
+  };
 }

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {transactionTypes} from '../types';
 
 export function highlightColor(col: string, amt: number) {
   let usePound = false;

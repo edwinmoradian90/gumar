@@ -7,20 +7,28 @@ export enum PaymentMethod {
 }
 
 export enum PaymentInterval {
-  'DAILY' = 'daily',
-  'WEEKLY' = 'weekly',
-  'BIWEEKLY' = 'biweekly',
-  'MONTHLY' = 'monthly',
-  'SEMI_ANNUALLY' = 'semiAnnually',
-  'ANNUALLY' = 'annually',
-  'OTHER' = 'other',
-  'NONE' = 'none',
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  BIWEEKLY = 'biweekly',
+  MONTHLY = 'monthly',
+  QUARTERLY = 'quarterly',
+  SEMI_ANNUALLY = 'semiAnnually',
+  ANNUALLY = 'annually',
+  OTHER = 'other',
+  NONE = 'none',
 }
 
 export enum Installment {
-  'SINGLE' = 'single',
-  'RECURRING' = 'recurring',
-  'OTHER' = 'other',
+  SINGLE = 'single',
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  BIWEEKLY = 'biweekly',
+  MONTHLY = 'monthly',
+  QUARTERLY = 'quarterly',
+  SEMI_ANNUALLY = 'semiAnnually',
+  ANNUALLY = 'annually',
+  NONE = 'none',
+  OTHER = 'other',
 }
 
 export interface InitialState {
@@ -31,10 +39,12 @@ export interface InitialState {
 }
 
 export interface Transaction {
-  [index: string]: string | Date | PaymentMethod;
+  [index: string]: string | Date | PaymentMethod | null;
   id: string;
   name: string;
   amount: string;
   paymentMethod: PaymentMethod;
+  installment: Installment;
+  subscriptionId: string | null;
   date: Date;
 }

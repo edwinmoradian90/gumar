@@ -54,8 +54,6 @@ export default function SpreadSheet() {
     setSubmitted(false);
   }
 
-  console.log(spreadsheets.isSuccessStatus);
-
   useEffect(() => {
     if (submitted && spreadsheets.isSuccessStatus) onSuccess();
   }, [submitted, spreadsheets.isSuccessStatus]);

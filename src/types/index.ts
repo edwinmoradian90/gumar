@@ -11,6 +11,7 @@ import * as snackbarTypes from './snackbar';
 import * as sortTypes from './sort';
 import * as spreadSheetTypes from './spreadSheets';
 import * as storeTypes from './store';
+import * as subscriptionTypes from './subscriptions';
 import * as transactionTypes from './transaction';
 import * as filterTypes from './filter';
 
@@ -29,6 +30,7 @@ export {
   sortTypes,
   spreadSheetTypes,
   storeTypes,
+  subscriptionTypes,
   transactionTypes,
   filterTypes,
 };

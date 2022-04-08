@@ -84,6 +84,13 @@ export function update(
   };
 }
 
+export function patch(updatedTransactions: transactionTypes.Transaction[]) {
+  return {
+    type: constants.transaction.ACTION_TRANSACTION_SUCCESS,
+    transactions: updatedTransactions,
+  };
+}
+
 export function remove(
   selectedId: string,
 ): ThunkAction<void, storeTypes.RootState, unknown, AnyAction> {

@@ -30,14 +30,14 @@ export default function Category({
   const [showMenu, setShowMenu] = useState(false);
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
 
-  const modifiedTransactions = useTransactions({category});
+  const transactions = useTransactions({category});
 
   const {total, lastUpdated} = useMemo(() => {
     let total = 0;
     let lastUpdated = null;
 
-    modifiedTransactions.length > 0 &&
-      modifiedTransactions
+    transactions.modifiedTransactions.length > 0 &&
+      transactions.modifiedTransactions
         .sort(helpers.compare.adate)
         .forEach(
           (transaction: transactionTypes.Transaction) =>
@@ -45,16 +45,16 @@ export default function Category({
         );
 
     lastUpdated =
-      modifiedTransactions.length > 0
-        ? modifiedTransactions[0].date
+      transactions.modifiedTransactions.length > 0
+        ? transactions.modifiedTransactions[0].date
         : lastUpdated;
 
     return {total, lastUpdated};
-  }, [modifiedTransactions]);
+  }, [transactions.modifiedTransactions]);
 
   const description = useMemo(() => {
     return `Updated ${moment(lastUpdated).fromNow()}`;
-  }, [modifiedTransactions]);
+  }, [transactions.modifiedTransactions]);
 
   function handleView() {
     setShowMenu(false);

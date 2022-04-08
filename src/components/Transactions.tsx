@@ -53,27 +53,28 @@ function Transactions({
   const {mode} = useSelector((state: storeTypes.RootState) => state.app);
 
   const {isSelectMode, isDefaultMode, setMode} = useMode();
-  const modifiedTransactions = useTransactions({
-    isSearchResult,
-    limit,
-    ignoreFilter,
-    category,
-  });
 
   const [showMore, setShowMore] = useState(false);
   const [showMenu, setShowMenu] = useState(
     helpers.arrayToMap(transactions, 'id', false),
   );
+  const txns = useTransactions({
+    isSearchResult,
+    limit,
+    ignoreFilter,
+    category,
+    showMore,
+  });
 
   useEffect(() => {
     const transactionSelection = helpers.arrayToMap(
-      modifiedTransactions,
+      txns.modifiedTransactions,
       'id',
       selectTypes.Status.UNCHECKED,
     );
 
     selectionObject.set('transactions', transactionSelection);
-  }, [modifiedTransactions]);
+  }, [txns.modifiedTransactions]);
 
   // move to helpers
   function getIcon(paymentMethod: transactionTypes.PaymentMethod) {
@@ -114,7 +115,7 @@ function Transactions({
 
   function handleAlert(selectedId: string) {
     const onConfirm = () => {
-      if (modifiedTransactions.length === 1) navigation.goBack();
+      if (txns.modifiedTransactions.length === 1) navigation.goBack();
       dispatch(actions.alert.setNotVisible());
       dispatch(actions.transaction.remove(selectedId));
       handleSnackbar();
@@ -223,7 +224,7 @@ function Transactions({
 
   return (
     <ScrollView style={{paddingTop: startSpace}}>
-      {modifiedTransactions.map(
+      {txns.modifiedTransactions.map(
         (transaction: transactionTypes.Transaction, index: number) => {
           const icon = getIcon(transaction.paymentMethod);
           const date = moment(transaction.date).format('MMMM DD YYYY');
@@ -297,18 +298,31 @@ function Transactions({
                   </React.Fragment>
                 )}
                 left={() => (
-                  <IconButton
+                  <View
                     style={{
-                      backgroundColor: colors.secondary,
-                      borderRadius: 5,
-                      marginTop: 14,
-                      marginLeft: 14,
-                      marginRight: 10,
-                    }}
-                    color={colors.iconColor}
-                    icon={icon}
-                    size={20}
-                  />
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                    }}>
+                    <IconButton
+                      style={{
+                        backgroundColor: colors.secondary,
+                        borderRadius: 5,
+                        marginHorizontal: 14,
+                        marginTop: 12,
+                      }}
+                      color={colors.iconColor}
+                      icon={icon}
+                      size={20}
+                    />
+                    {txns.isSubscription(transaction.installment) && (
+                      <IconButton
+                        style={{margin: 0}}
+                        size={18}
+                        color={colors.iconButtonColor}
+                        icon="repeat-variant"
+                      />
+                    )}
+                  </View>
                 )}
                 right={() => (
                   <View

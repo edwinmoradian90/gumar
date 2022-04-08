@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useEffect, useMemo} from 'react';
 import * as Component from '../components';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 import {Snackbar} from 'react-native-paper';
 import {useSelector} from 'react-redux';
-import {storeTypes} from '../types';
-import {colors} from '../utils';
+import {storeTypes, transactionTypes} from '../types';
+import {colors, _} from '../utils';
+import {useTransactions, useTransactionsFilter} from '../hooks';
 
 export default function Layout({
   children,
@@ -13,6 +14,42 @@ export default function Layout({
 }) {
   const snackbar = useSelector((state: storeTypes.RootState) => state.snackbar);
   const alert = useSelector((state: storeTypes.RootState) => state.alert);
+  const {createManualFilter} = useTransactionsFilter();
+
+  const manualFilter = createManualFilter(
+    (transaction: transactionTypes.Transaction) =>
+      transaction.installment !== transactionTypes.Installment.SINGLE,
+  );
+
+  const transactions = useTransactions({ignoreFilter: true, manualFilter});
+
+  const recentSubscriptions = useMemo(() => {
+    const subscriptions = _.transactions.getSubscriptions(
+      transactions.modifiedTransactions,
+    );
+    if (subscriptions.length === 0) return {};
+    const recentSubscriptions =
+      _.transactions.recentSubscriptionMap(subscriptions);
+
+    return recentSubscriptions;
+  }, [transactions.modifiedTransactions]);
+
+  useEffect(() => {
+    const subCheck = setInterval(() => {
+      Object.values(recentSubscriptions).forEach(
+        (subscription: transactionTypes.Transaction) => {
+          console.log(
+            'auto pop ',
+            _.transactions.shouldAutoPopulate(subscription),
+          );
+          if (!_.transactions.shouldAutoPopulate(subscription)) return;
+          transactions.autoCreateSubscriptionTransaction(subscription);
+        },
+      );
+    }, 5000);
+    return () => clearInterval(subCheck);
+  }, [transactions.modifiedTransactions]);
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={colors.primary} barStyle="dark-content" />

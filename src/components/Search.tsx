@@ -1,7 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import moment from 'moment';
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Dimensions, Pressable, ScrollView, View} from 'react-native';
 import {Divider, IconButton, List, Searchbar, Text} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
@@ -25,10 +25,12 @@ export default function Search({
     (state: storeTypes.RootState) => state.transaction,
   );
 
+  const [isFocused, setIsFocused] = useState(false);
+
   const {name} = useSelector((state: storeTypes.RootState) => state.currency);
-  const {query, isFocused} = useSelector(
-    (state: storeTypes.RootState) => state.search,
-  );
+  const {query} = useSelector((state: storeTypes.RootState) => state.search);
+
+  console.log('FOCUS ', isFocused);
 
   // fix type
   const searchbarRef = useRef() as any;
@@ -43,7 +45,7 @@ export default function Search({
   }
 
   function onBlur() {
-    if (query !== '') return null;
+    // if (query !== '') return null;
     dispatch(actions.search.clear());
   }
 
@@ -59,6 +61,7 @@ export default function Search({
   }
 
   function onSubmitEditing() {
+    console.log('SUBMIT');
     dispatch(
       actions.search.update({
         query: '',
@@ -163,7 +166,6 @@ export default function Search({
     );
   };
 
-  // TODO: debounce
   const filteredData = useMemo(() => {
     if (transactions.length === 0) return [];
     return transactions.filter((transaction: transactionTypes.Transaction) => {
@@ -196,7 +198,7 @@ export default function Search({
         onSubmitEditing={onSubmitEditing}
         onIconPress={onSubmitEditing}
       />
-      <Results filteredData={filteredData} />
+      {/* <Results filteredData={filteredData} /> */}
     </View>
   );
 }
