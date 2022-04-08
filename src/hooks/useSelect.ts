@@ -6,9 +6,14 @@ import {helpers} from '../utils';
 
 export default function useSelect() {
   const dispatch = useDispatch();
+
   const {selected, aselection, oselection} = useSelector(
     (state: storeTypes.RootState) => state.select,
   );
+
+  function isChecked(name: string, key: string) {
+    return oselection[name][key] === selectTypes.Status.CHECKED;
+  }
 
   function getSelectionObjectProperty(
     name: string,
@@ -64,6 +69,7 @@ export default function useSelect() {
     clear: clearSelectionObject,
     data: oselection,
     hasAnySelected: hasAnySelected,
+    isChecked,
   };
 
   return {selectionArray, selectionObject, selected};

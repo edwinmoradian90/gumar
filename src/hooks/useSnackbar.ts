@@ -30,6 +30,15 @@ export default function useSnackbar() {
     dispatch(actions.snackbar.setVisible(snackbar));
   }
 
+  function createAndShow(
+    message: string,
+    actionLabel: string = 'Dismiss',
+    actionOnpress: () => void = dismiss,
+    onDismiss: () => void = dismiss,
+  ) {
+    show(create(message, actionLabel, actionOnpress, onDismiss));
+  }
+
   function hide() {
     dispatch(actions.snackbar.setNotVisible());
   }
@@ -37,6 +46,7 @@ export default function useSnackbar() {
   return {
     create,
     show,
+    createAndShow,
     hide,
     isVisible,
   };

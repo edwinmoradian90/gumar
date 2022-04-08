@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Pressable, ScrollView, View} from 'react-native';
 import {
   Button,
@@ -12,17 +12,16 @@ import {
 } from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
-import {
-  alertTypes,
-  appTypes,
-  selectTypes,
-  snackbarTypes,
-  storeTypes,
-  transactionTypes,
-} from '../types';
+import {appTypes, selectTypes, storeTypes, transactionTypes} from '../types';
 import {colors, helpers} from '../utils';
 import {useNavigation} from '@react-navigation/native';
-import {useMode, useSelect, useTransactions} from '../hooks';
+import {
+  useAlert,
+  useMode,
+  useSelect,
+  useSnackbar,
+  useTransactions,
+} from '../hooks';
 
 function Transactions({
   category,
@@ -43,21 +42,21 @@ function Transactions({
 }) {
   const dispatch = useDispatch();
   const navigation = useNavigation<appTypes.Navigation>();
-
+  const snackbar = useSnackbar();
+  const alert = useAlert();
+  const mode = useMode();
   const {selectionObject} = useSelect();
 
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
-  const {mode} = useSelector((state: storeTypes.RootState) => state.app);
-
-  const {isSelectMode, isDefaultMode, setMode} = useMode();
 
   const [showMore, setShowMore] = useState(false);
   const [showMenu, setShowMenu] = useState(
     helpers.arrayToMap(transactions, 'id', false),
   );
+
   const txns = useTransactions({
     isSearchResult,
     limit,
@@ -68,13 +67,13 @@ function Transactions({
 
   useEffect(() => {
     const transactionSelection = helpers.arrayToMap(
-      txns.modifiedTransactions,
+      txns.modified,
       'id',
       selectTypes.Status.UNCHECKED,
     );
 
     selectionObject.set('transactions', transactionSelection);
-  }, [txns.modifiedTransactions]);
+  }, [txns.modified]);
 
   // move to helpers
   function getIcon(paymentMethod: transactionTypes.PaymentMethod) {
@@ -100,61 +99,33 @@ function Transactions({
     navigation.navigate('EditScreen');
   }
 
-  function handleSnackbar() {
-    const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
-
-    const snackbar: Partial<snackbarTypes.State> = {
-      message: 'Transaction deleted',
-      actionLabel: 'Dismiss',
-      actionOnpress: onDismiss,
-      onDismiss,
-    };
-
-    dispatch(actions.snackbar.setVisible(snackbar));
-  }
-
-  function handleAlert(selectedId: string) {
+  function handleAlert(selected: transactionTypes.Transaction) {
     const onConfirm = () => {
-      if (txns.modifiedTransactions.length === 1) navigation.goBack();
-      dispatch(actions.alert.setNotVisible());
-      dispatch(actions.transaction.remove(selectedId));
-      handleSnackbar();
+      if (txns.modified.length === 1) navigation.goBack();
+      alert.hide();
+      txns.remove(selected.id);
+      snackbar.createAndShow('Transaction deleted');
     };
 
-    const onDismiss = () => dispatch(actions.alert.setNotVisible());
-
-    const alert: Partial<alertTypes.State> = {
-      title: 'Are you sure?',
-      body: 'This action is irreversible. Delete transaction?',
-      confirm: 'Delete',
-      deny: 'Cancel',
-      onDeny: onDismiss,
+    alert.createAndShow(
+      'Are you sure?',
+      'This action is irreversible. Delete transaction?',
+      'Delete',
+      'Cancel',
       onConfirm,
-      onDismiss,
-    };
-
-    dispatch(actions.alert.setVisible(alert));
+    );
   }
 
   function enableSelectMode() {
-    if (mode !== appTypes.Mode.SELECT) {
-      const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
-
-      const snackbar: Partial<snackbarTypes.State> = {
-        message: 'Select mode enabled',
-        actionLabel: 'Dismiss',
-        actionOnpress: onDismiss,
-        onDismiss,
-      };
-
-      dispatch(actions.app.setMode(appTypes.Mode.SELECT));
-      dispatch(actions.snackbar.setVisible(snackbar));
+    if (mode.isSelectMode) {
+      mode.setMode(appTypes.Mode.SELECT);
+      snackbar.createAndShow('Select mode enabled');
     }
   }
 
-  function handleDelete(selectedId: string) {
-    setShowMenu({...showMenu, [selectedId]: false});
-    handleAlert(selectedId);
+  function handleDelete(selected: transactionTypes.Transaction) {
+    setShowMenu({...showMenu, [selected.id]: false});
+    handleAlert(selected);
   }
   const onMenuDismiss = (transactionId: string) => {
     setShowMenu({...showMenu, [transactionId]: false});
@@ -164,7 +135,6 @@ function Transactions({
     setShowMenu({...showMenu, [transactionId]: true});
   };
 
-  // doesn't show menu as component
   const RightMenu = ({
     transaction,
   }: {
@@ -182,7 +152,7 @@ function Transactions({
           title="Delete"
           icon="trash-can-outline"
           titleStyle={{color: colors.danger}}
-          onPress={() => handleDelete(transaction.id)}
+          onPress={() => handleDelete(transaction)}
         />
       </React.Fragment>
     );
@@ -195,10 +165,9 @@ function Transactions({
   }) => {
     const key = transaction.id;
     const transactionsObject = selectionObject.get('transactions');
-    const value =
-      transactionsObject[key] === selectTypes.Status.CHECKED
-        ? selectTypes.Status.UNCHECKED
-        : selectTypes.Status.CHECKED;
+    const value = transactionsObject.isChecked('transactions', key)
+      ? selectTypes.Status.UNCHECKED
+      : selectTypes.Status.CHECKED;
 
     function onPress() {
       selectionObject.set('transactions', {
@@ -215,7 +184,8 @@ function Transactions({
   useEffect(() => {
     // mode clean up
     return () => {
-      setMode(appTypes.Mode.DEFAULT);
+      setShowMore(false);
+      mode.setMode(appTypes.Mode.DEFAULT);
       selectionObject.setAll('transactions', selectTypes.Status.UNCHECKED);
     };
   }, []);
@@ -224,7 +194,7 @@ function Transactions({
 
   return (
     <ScrollView style={{paddingTop: startSpace}}>
-      {txns.modifiedTransactions.map(
+      {txns.modified.map(
         (transaction: transactionTypes.Transaction, index: number) => {
           const icon = getIcon(transaction.paymentMethod);
           const date = moment(transaction.date).format('MMMM DD YYYY');
@@ -336,7 +306,7 @@ function Transactions({
                         fontSize: 16,
                         fontWeight: '300',
                       }}>{`${symbol}${transaction.amount}`}</Text>
-                    {hasSelectMode && isSelectMode ? (
+                    {hasSelectMode && mode.isSelectMode ? (
                       <RightSelect transaction={transaction} />
                     ) : (
                       <Menu
@@ -367,6 +337,7 @@ function Transactions({
       )}
       {!!limit && limit > 0 && limit < transactions.length && (
         <Button
+          style={{marginHorizontal: 20}}
           labelStyle={{color: colors.secondary, fontSize: 12}}
           onPress={() => setShowMore(!showMore)}>
           {showMore ? 'Show less' : 'Show more'}

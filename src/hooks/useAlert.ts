@@ -41,6 +41,18 @@ export default function useAlert() {
     dispatch(actions.alert.setVisible(alert));
   }
 
+  function createAndShow(
+    title: string,
+    body: string,
+    confirm: string = 'Okay',
+    deny: string = 'Cancel',
+    onConfirm: () => void = confirmAlert,
+    onDismiss: () => void = dismissAlert,
+    onDeny: () => void = denyAlert,
+  ) {
+    show(create(title, body, confirm, deny, onConfirm, onDismiss, onDeny));
+  }
+
   function hide() {
     dispatch(actions.alert.setNotVisible());
   }
@@ -48,6 +60,7 @@ export default function useAlert() {
   return {
     create,
     show,
+    createAndShow,
     hide,
   };
 }

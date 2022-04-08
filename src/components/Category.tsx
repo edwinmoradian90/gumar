@@ -36,8 +36,8 @@ export default function Category({
     let total = 0;
     let lastUpdated = null;
 
-    transactions.modifiedTransactions.length > 0 &&
-      transactions.modifiedTransactions
+    transactions.modified.length > 0 &&
+      transactions.modified
         .sort(helpers.compare.adate)
         .forEach(
           (transaction: transactionTypes.Transaction) =>
@@ -45,16 +45,16 @@ export default function Category({
         );
 
     lastUpdated =
-      transactions.modifiedTransactions.length > 0
-        ? transactions.modifiedTransactions[0].date
+      transactions.modified.length > 0
+        ? transactions.modified[0].date
         : lastUpdated;
 
     return {total, lastUpdated};
-  }, [transactions.modifiedTransactions]);
+  }, [transactions.modified]);
 
   const description = useMemo(() => {
     return `Updated ${moment(lastUpdated).fromNow()}`;
-  }, [transactions.modifiedTransactions]);
+  }, [transactions.modified]);
 
   function handleView() {
     setShowMenu(false);

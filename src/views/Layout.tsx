@@ -26,14 +26,14 @@ export default function Layout({
 
   const recentSubscriptions = useMemo(() => {
     const subscriptions = _.transactions.getSubscriptions(
-      transactions.modifiedTransactions,
+      transactions.modified,
     );
     if (subscriptions.length === 0) return {};
     const recentSubscriptions =
       _.transactions.recentSubscriptionMap(subscriptions);
 
     return recentSubscriptions;
-  }, [transactions.modifiedTransactions]);
+  }, [transactions.modified]);
 
   useEffect(() => {
     const subCheck = setInterval(() => {
@@ -54,9 +54,9 @@ export default function Layout({
         );
         sb.show(snackbarData);
       }
-    }, 5000);
+    }, 60 * 1000);
     return () => clearInterval(subCheck);
-  }, [transactions.modifiedTransactions]);
+  }, [transactions.modified]);
 
   return (
     <SafeAreaView style={styles.container}>

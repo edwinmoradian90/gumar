@@ -1,5 +1,5 @@
 import uuid from 'react-native-uuid';
-import {useMemo} from 'react';
+import {SetStateAction, useMemo, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
 import {storeTypes, transactionTypes} from '../types';
@@ -20,6 +20,9 @@ interface UseTransactionsProps {
 }
 
 export default function useTransactions(props?: UseTransactionsProps) {
+  const [manualProps, setManualProps] =
+    useState<SetStateAction<UseTransactionsProps | null>>(null);
+
   const {
     limit = 0,
     additionalLimit = 7,
@@ -29,7 +32,8 @@ export default function useTransactions(props?: UseTransactionsProps) {
     ignoreFilter = false,
     selected = [],
     category,
-  } = props || {};
+  } = props || (manualProps as UseTransactionsProps) || {};
+
   const dispatch = useDispatch();
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
@@ -125,6 +129,14 @@ export default function useTransactions(props?: UseTransactionsProps) {
     dispatch(actions.transaction.patch(updatedTransactions));
   }
 
+  function setProps(props: UseTransactionsProps) {
+    setManualProps(props);
+  }
+
+  function clearProps() {
+    setManualProps(null);
+  }
+
   function create(
     name: string,
     amount: string,
@@ -183,11 +195,13 @@ export default function useTransactions(props?: UseTransactionsProps) {
   }
 
   return {
-    transactions,
-    modifiedTransactions,
+    all: transactions,
+    modified: modifiedTransactions,
     create,
     select,
     remove,
+    setProps,
+    clearProps,
     isSubscription,
     removeSubscription,
     autoCreateSubscriptionTransaction,

@@ -33,28 +33,6 @@ export default function Home() {
     (state: storeTypes.RootState) => state.transaction,
   );
   const search = useSelector((state: storeTypes.RootState) => state.search);
-  const filter = useFilter();
-
-  console.log(search);
-
-  const {isSelectMode, isDefaultMode} = useMode();
-  const {selectionObject} = useSelect();
-
-  function onCardHeaderPress() {
-    if (isSelectMode) {
-      const onDismiss = () => dispatch(actions.snackbar.setNotVisible());
-
-      const snackbar: Partial<snackbarTypes.State> = {
-        message: 'Select mode disabled',
-        actionLabel: 'Dismiss',
-        actionOnpress: onDismiss,
-        onDismiss,
-      };
-
-      dispatch(actions.app.setMode(appTypes.Mode.DEFAULT));
-      dispatch(actions.snackbar.setVisible(snackbar));
-    }
-  }
 
   // Used in select mode
   const CardRight = () => {
