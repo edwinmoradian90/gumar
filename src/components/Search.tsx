@@ -30,8 +30,6 @@ export default function Search({
   const {name} = useSelector((state: storeTypes.RootState) => state.currency);
   const {query} = useSelector((state: storeTypes.RootState) => state.search);
 
-  console.log('FOCUS ', isFocused);
-
   // fix type
   const searchbarRef = useRef() as any;
 
@@ -61,7 +59,6 @@ export default function Search({
   }
 
   function onSubmitEditing() {
-    console.log('SUBMIT');
     dispatch(
       actions.search.update({
         query: '',

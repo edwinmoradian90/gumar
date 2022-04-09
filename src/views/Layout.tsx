@@ -62,6 +62,10 @@ export default function Layout({
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={colors.primary} barStyle="dark-content" />
       {children}
+      <Component.NewTransaction />
+      <Component.Export />
+      <Component.SortOptions />
+      {/* <Component.Filter data={transactions.all} /> */}
       <Snackbar
         duration={5000}
         visible={snackbar.visible}

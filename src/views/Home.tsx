@@ -21,7 +21,7 @@ import useTotal from '../hooks/useTotal';
 import {useFilter, useMode, useSelect} from '../hooks';
 
 export default function Home() {
-  const navigation = useNavigation<appTypes.Navigation>();
+  const navigation = useNavigation<any>();
   const dispatch = useDispatch();
   const [total, symbol] = useTotal();
   const [totalMonth] = useTotal({
@@ -43,7 +43,9 @@ export default function Home() {
             color: colors.text,
             fontSize: 11,
           }}
-          onPress={() => navigation.navigate('TransactionsScreen')}>
+          onPress={() =>
+            navigation.navigate('Transactions', {screen: 'TransactionsScreen'})
+          }>
           VIEW ALL
         </Button>
       </Card.Actions>
@@ -238,10 +240,6 @@ export default function Home() {
               </View>
             </View>
           )}
-          <Component.NewTransaction />
-          <Component.Export />
-          <Component.Filter data={transactions} />
-          <Component.SortOptions />
         </React.Fragment>
       </ScrollView>
       <Component.Search containerBackgroundColor={colors.altBackground} />

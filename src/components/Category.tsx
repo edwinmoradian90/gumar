@@ -26,7 +26,7 @@ export default function Category({
   icon: string;
   iconColor?: string;
 }) {
-  const navigation = useNavigation<appTypes.Navigation>();
+  const navigation = useNavigation<any>();
   const [showMenu, setShowMenu] = useState(false);
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
 
@@ -58,7 +58,10 @@ export default function Category({
 
   function handleView() {
     setShowMenu(false);
-    navigation.navigate('TransactionsScreen', {category});
+    navigation.navigate('Transactions', {
+      screen: 'TransactionsScreen',
+      params: {category},
+    });
   }
 
   function handleDelete() {}

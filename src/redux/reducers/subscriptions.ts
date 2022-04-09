@@ -6,14 +6,29 @@ const initialState: subscriptionTypes.State = {
 };
 
 export default function subscriptionReducer(state = initialState, action: any) {
-  const {type} = action || {};
+  const {type, data} = action || {};
+
   switch (type) {
+    case constants.subscriptions.UPDATE:
+      return {
+        ...state,
+        data,
+      };
     case constants.subscriptions.CREATE:
-      return state;
+      return {
+        ...state,
+        data,
+      };
     case constants.subscriptions.REMOVE:
-      return state;
+      return {
+        ...state,
+        data,
+      };
     case constants.subscriptions.REMOVE_ALL:
-      return state;
+      return {
+        ...state,
+        data: [],
+      };
     default:
       return state;
   }

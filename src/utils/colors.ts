@@ -27,3 +27,5 @@ export const iconButtonColor = black;
 export const danger = Colors.red500;
 export const overlay = 'rgba(0, 0, 0, 0.2)';
 export const transparent = 'transparent';
+export const success = Colors.green700;
+export const darkGray = Colors.grey600;

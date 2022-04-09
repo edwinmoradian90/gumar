@@ -13,7 +13,7 @@ import {
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
 import {appTypes, selectTypes, storeTypes, transactionTypes} from '../types';
-import {colors, helpers} from '../utils';
+import {colors, helpers, _} from '../utils';
 import {useNavigation} from '@react-navigation/native';
 import {
   useAlert,
@@ -67,13 +67,13 @@ function Transactions({
 
   useEffect(() => {
     const transactionSelection = helpers.arrayToMap(
-      txns.modified,
+      transactions,
       'id',
       selectTypes.Status.UNCHECKED,
     );
 
     selectionObject.set('transactions', transactionSelection);
-  }, [txns.modified]);
+  }, [transactions]);
 
   // move to helpers
   function getIcon(paymentMethod: transactionTypes.PaymentMethod) {
@@ -107,13 +107,15 @@ function Transactions({
       snackbar.createAndShow('Transaction deleted');
     };
 
-    alert.createAndShow(
-      'Are you sure?',
-      'This action is irreversible. Delete transaction?',
-      'Delete',
-      'Cancel',
-      onConfirm,
-    );
+    const isSubscription = _.transactions.isSubscription({
+      transaction: selected,
+    });
+
+    const body = isSubscription
+      ? 'Deleting this transaction is irreversible and will result in a "freeze" of the subscription. Delete transaction?'
+      : 'This action is irreversible. Delete transaction?';
+
+    alert.createAndShow('Are you sure?', body, 'Delete', 'Cancel', onConfirm);
   }
 
   function enableSelectMode() {
@@ -165,7 +167,7 @@ function Transactions({
   }) => {
     const key = transaction.id;
     const transactionsObject = selectionObject.get('transactions');
-    const value = transactionsObject.isChecked('transactions', key)
+    const value = selectionObject.isChecked('transactions', key)
       ? selectTypes.Status.UNCHECKED
       : selectTypes.Status.CHECKED;
 
@@ -193,7 +195,7 @@ function Transactions({
   if (transactions.length === 0) return <Text>Nothing here...</Text>;
 
   return (
-    <ScrollView style={{paddingTop: startSpace}}>
+    <View style={{paddingTop: startSpace}}>
       {txns.modified.map(
         (transaction: transactionTypes.Transaction, index: number) => {
           const icon = getIcon(transaction.paymentMethod);
@@ -343,7 +345,7 @@ function Transactions({
           {showMore ? 'Show less' : 'Show more'}
         </Button>
       )}
-    </ScrollView>
+    </View>
   );
 }
 

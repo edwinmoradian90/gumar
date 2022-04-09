@@ -16,6 +16,7 @@ import NewTransaction from './NewTransaction';
 import Popup from './Popup';
 import Search from './Search';
 import SpreadSheet from './SpreadSheet';
+import Subscriptions from './Subscriptions';
 import Toggle from './Toggle';
 import Toolbar from './Toolbar';
 import Transactions from './Transactions';
@@ -39,6 +40,7 @@ export {
   Popup,
   Search,
   SpreadSheet,
+  Subscriptions,
   Toggle,
   Toolbar,
   Transactions,

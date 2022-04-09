@@ -53,6 +53,7 @@ export type RootStackParamList = {
     paymentMethod?: transactionTypes.PaymentMethod;
     navigationInitiator?: NavigationInitiator;
   };
+  Transactions: undefined;
 };
 
 export type Navigation = NativeStackNavigationProp<RootStackParamList>;

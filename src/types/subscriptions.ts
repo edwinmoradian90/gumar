@@ -4,7 +4,9 @@ export interface Subscription {
   id: string;
   frozen: boolean;
   paymentInterval: transactionTypes.Installment;
-  date: Date;
+  recent: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface State {

@@ -5,6 +5,7 @@ import {actions} from '../redux';
 import {storeTypes, transactionTypes} from '../types';
 import {filter, helpers, _} from '../utils';
 import {useFilter, useSearch, useSort} from '.';
+import useSubscriptions from './useSubscriptions';
 
 // move to types
 
@@ -20,9 +21,6 @@ interface UseTransactionsProps {
 }
 
 export default function useTransactions(props?: UseTransactionsProps) {
-  const [manualProps, setManualProps] =
-    useState<SetStateAction<UseTransactionsProps | null>>(null);
-
   const {
     limit = 0,
     additionalLimit = 7,
@@ -32,19 +30,19 @@ export default function useTransactions(props?: UseTransactionsProps) {
     ignoreFilter = false,
     selected = [],
     category,
-  } = props || (manualProps as UseTransactionsProps) || {};
+  } = props || {};
 
   const dispatch = useDispatch();
+  const filterState = useFilter();
+  const sort = useSort();
+  const search = useSearch();
+  const subscriptions = useSubscriptions();
+
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
 
-  const filterState = useFilter();
-  const sort = useSort();
-  const search = useSearch();
-
   const modifiedTransactions: transactionTypes.Transaction[] = useMemo(() => {
-    console.log('T length ', transactions.length);
     if (transactions.length === 0) return [];
 
     const sliceEnd = !!limit
@@ -107,6 +105,7 @@ export default function useTransactions(props?: UseTransactionsProps) {
     filterState.data,
     search.data.results,
     manualFilter,
+    category,
   ]);
 
   // write transaction functions
@@ -129,14 +128,6 @@ export default function useTransactions(props?: UseTransactionsProps) {
     dispatch(actions.transaction.patch(updatedTransactions));
   }
 
-  function setProps(props: UseTransactionsProps) {
-    setManualProps(props);
-  }
-
-  function clearProps() {
-    setManualProps(null);
-  }
-
   function create(
     name: string,
     amount: string,
@@ -144,10 +135,13 @@ export default function useTransactions(props?: UseTransactionsProps) {
     installment: transactionTypes.Installment,
   ) {
     const id = uuid.v4() as string;
-    const subscriptionId = isSubscription(installment)
-      ? (uuid.v4() as string)
-      : null;
+    let subscriptionId = null;
     const date = new Date();
+
+    if (_.transactions.isSubscription({installment})) {
+      const subscription = subscriptions.create(installment);
+      subscriptionId = subscription.id;
+    }
 
     dispatch(
       actions.transaction.append({
@@ -161,7 +155,7 @@ export default function useTransactions(props?: UseTransactionsProps) {
       }),
     );
 
-    return {transactionId: id};
+    return {transactionId: id, subscriptionId};
   }
 
   function select(transaction: string | transactionTypes.Transaction) {
@@ -179,6 +173,14 @@ export default function useTransactions(props?: UseTransactionsProps) {
   }
 
   function remove(id: string) {
+    const t = transactions.filter(
+      (t: transactionTypes.Transaction) => t.id === id,
+    )[0];
+
+    if (_.transactions.isSubscription(t)) {
+      subscriptions.freeze(t.subscriptionId);
+    }
+
     dispatch(actions.transaction.remove(id));
   }
 
@@ -200,8 +202,6 @@ export default function useTransactions(props?: UseTransactionsProps) {
     create,
     select,
     remove,
-    setProps,
-    clearProps,
     isSubscription,
     removeSubscription,
     autoCreateSubscriptionTransaction,

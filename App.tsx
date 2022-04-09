@@ -7,6 +7,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as View from './src/views';
 import {colors} from './src/utils';
 import {appTypes} from './src/types';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 export default function App() {
   const [isSplash, setIsSplash] = useState(true);
@@ -21,7 +22,8 @@ export default function App() {
   const Tab = createMaterialBottomTabNavigator();
   const HomeStack = createNativeStackNavigator();
   const SettingsStack = createNativeStackNavigator();
-  const StatsStack = createNativeStackNavigator();
+  const SubscriptionsStack = createNativeStackNavigator();
+  const TransactionsStack = createNativeStackNavigator();
 
   function createScreen(
     Component:
@@ -41,19 +43,14 @@ export default function App() {
   const EditScreen = createScreen(View.Edit);
   const SettingsScreen = createScreen(View.Settings.Settings);
   const SettingScreen = createScreen(View.Settings.Setting);
-  const TransactionsScreen: React.FC<appTypes.TransactionsScreenProp> =
-    createScreen(View.Transactions);
-  const StatsScreen = createScreen(View.Stats);
+  const TransactionsScreen = createScreen(View.Transactions);
+  const SubscriptionsScreen = createScreen(View.Subscriptions);
 
   function HomeScreenStack() {
     return (
       <HomeStack.Navigator screenOptions={{headerShown: false}}>
         <HomeStack.Screen name="HomeScreen" component={HomeScreen} />
         <HomeStack.Screen name="EditScreen" component={EditScreen} />
-        <HomeStack.Screen
-          name="TransactionsScreen"
-          component={TransactionsScreen}
-        />
       </HomeStack.Navigator>
     );
   }
@@ -70,11 +67,25 @@ export default function App() {
     );
   }
 
-  function StatsScreenStack() {
+  function TransactionsScreenStack() {
     return (
-      <StatsStack.Navigator screenOptions={{headerShown: false}}>
-        <StatsStack.Screen name="StatsScreen" component={StatsScreen} />
-      </StatsStack.Navigator>
+      <TransactionsStack.Navigator screenOptions={{headerShown: false}}>
+        <TransactionsStack.Screen
+          name="TransactionsScreen"
+          component={TransactionsScreen}
+        />
+      </TransactionsStack.Navigator>
+    );
+  }
+
+  function SubscriptionsScreenStack() {
+    return (
+      <SubscriptionsStack.Navigator screenOptions={{headerShown: false}}>
+        <SubscriptionsStack.Screen
+          name="SubscriptionsScreen"
+          component={SubscriptionsScreen}
+        />
+      </SubscriptionsStack.Navigator>
     );
   }
 
@@ -100,11 +111,28 @@ export default function App() {
           }}
         />
         <Tab.Screen
-          name="Stats"
-          component={StatsScreenStack}
+          name="Transactions"
+          component={TransactionsScreenStack}
           options={{
             tabBarIcon: ({color}) => (
-              <IonIcon name="md-analytics-outline" size={21} color={color} />
+              <MaterialCommunityIcon
+                name="chart-timeline-variant-shimmer"
+                size={21}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Subscriptions"
+          component={SubscriptionsScreenStack}
+          options={{
+            tabBarIcon: ({color}) => (
+              <MaterialCommunityIcon
+                name="repeat-variant"
+                size={21}
+                color={color}
+              />
             ),
           }}
         />

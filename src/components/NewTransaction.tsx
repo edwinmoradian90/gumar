@@ -33,23 +33,6 @@ export default function NewTransaction() {
     transactionTypes.Installment.SINGLE,
   );
 
-  function handleSnackbar(transactionId: string) {
-    const snackbarTitle = `Created transaction`;
-    const snackbarActionLabel = `View`;
-    const snackbarActionOnPress = () => {
-      snackbar.hide();
-      transactions.select(transactionId);
-      navigation.navigate('EditScreen');
-    };
-
-    const s = snackbar.create(
-      snackbarTitle,
-      snackbarActionLabel,
-      snackbarActionOnPress,
-    );
-    snackbar.show(s);
-  }
-
   function resetState() {
     setName('');
     setAmount('');
@@ -66,7 +49,7 @@ export default function NewTransaction() {
     );
 
     modal.hide();
-    handleSnackbar(transactionId);
+    snackbar.createAndShow('Transaction created');
     resetState();
   }
 

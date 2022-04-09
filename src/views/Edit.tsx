@@ -111,12 +111,12 @@ function Edit() {
   }
 
   function saveWithRef(data: any) {
-    const updatedTransaction = {...selected, [editTargetRef.current]: data};
+    const transaction = {...selected, [editTargetRef.current]: data};
 
     closeWithRef();
 
-    dispatch(actions.transaction.update(selected.id, updatedTransaction));
-    dispatch(actions.transaction.select(updatedTransaction));
+    dispatch(actions.transaction.update(selected.id, transaction));
+    dispatch(actions.transaction.select(transaction));
 
     clearContent();
   }
@@ -127,27 +127,30 @@ function Edit() {
         ? appTypes.EditTarget.DATE
         : editTarget;
 
-    let updatedTransaction = {...selected, [key]: data};
-    const isSubscription = _.transactions.isSubscription(updatedTransaction);
-    const hasSubscriptionId =
-      _.transactions.hasSubscriptionId(updatedTransaction);
+    let transaction = {...selected, [key]: data};
+
+    const isSubscription = _.transactions.isSubscription({
+      transaction,
+    });
+
+    const hasSubscriptionId = _.transactions.hasSubscriptionId(transaction);
 
     // refactor later
     if (isSubscription) {
       if (!hasSubscriptionId) {
         const subscriptionId = uuid.v4();
-        updatedTransaction = {...updatedTransaction, subscriptionId};
+        transaction = {...transaction, subscriptionId};
       }
     } else {
       if (hasSubscriptionId) {
-        updatedTransaction = {...updatedTransaction, subscriptionId: null};
+        transaction = {...transaction, subscriptionId: null};
       }
     }
 
     close();
 
-    dispatch(actions.transaction.update(selected.id, updatedTransaction));
-    dispatch(actions.transaction.select(updatedTransaction));
+    dispatch(actions.transaction.update(selected.id, transaction));
+    dispatch(actions.transaction.select(transaction));
 
     clearContent();
   }

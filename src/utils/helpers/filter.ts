@@ -1,6 +1,6 @@
 import moment from 'moment';
-import {transactionTypes} from '../types';
-import * as transactionHelpers from './helpers/transactions';
+import {transactionTypes} from '../../types';
+import * as transactionHelpers from './transactions';
 
 export function apply(filters: {(): boolean}[], opts?: any): boolean {
   const {operator} = opts || {};
@@ -100,7 +100,7 @@ function selected(
 function subscription(
   transaction: transactionTypes.Transaction,
 ): () => boolean {
-  return () => transactionHelpers.isSubscription({transaction});
+  return () => transactionHelpers.isSubscription(transaction);
 }
 
 export const conditions = {

@@ -65,7 +65,6 @@ export default function useSort() {
           : helpers.compare.aname;
         break;
       default:
-        console.log('DEFAULT');
         comparator = isDescending
           ? helpers.compare.ddate
           : helpers.compare.adate;

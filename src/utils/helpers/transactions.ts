@@ -72,8 +72,17 @@ export function shouldAutoPopulate(
   return result;
 }
 
-export function isSubscription(transaction: transactionTypes.Transaction) {
-  return transaction.installment !== transactionTypes.Installment.SINGLE;
+export function isSubscription({
+  transaction,
+  installment,
+}: {
+  transaction?: transactionTypes.Transaction;
+  installment?: transactionTypes.Installment;
+}) {
+  if (transaction)
+    return transaction.installment !== transactionTypes.Installment.SINGLE;
+  if (installment) return installment !== transactionTypes.Installment.SINGLE;
+  return false;
 }
 
 export function hasSubscriptionId(transaction: transactionTypes.Transaction) {
