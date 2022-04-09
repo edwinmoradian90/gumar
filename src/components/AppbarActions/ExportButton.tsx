@@ -4,7 +4,13 @@ import {useAlert, useExport, useSelect} from '../../hooks';
 import {selectTypes} from '../../types';
 import {colors} from '../../utils';
 
-export default function ExportButton() {
+export default function ExportButton({
+  isVisible,
+  setIsVisible,
+}: {
+  isVisible: boolean;
+  setIsVisible: (arg: boolean) => void;
+}) {
   const exp = useExport();
   const alert = useAlert();
   const {selectionObject} = useSelect();
@@ -22,7 +28,7 @@ export default function ExportButton() {
       'Cancel',
       () => {
         alert.hide();
-        exp.show();
+        setIsVisible(true);
       },
     );
 

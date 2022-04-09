@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import ReactNativeModal from 'react-native-modal';
 import {ScrollView, View, StyleSheet, Text, Pressable} from 'react-native';
-import {selectTypes, transactionTypes} from '../types';
+import {selectTypes, storeTypes, transactionTypes} from '../types';
 import {colors, helpers} from '../utils';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
@@ -14,15 +14,30 @@ import {
   Divider,
 } from 'react-native-paper';
 import {useFilter, useModal, useSnackbar} from '../hooks';
+import {useSelector} from 'react-redux';
 
-export default function Filter({data}: {data: any}) {
+export default function Filter({
+  isVisible,
+  setIsVisible,
+  data,
+}: {
+  isVisible: boolean;
+  setIsVisible: any;
+  data?: any;
+}) {
   const date = new Date();
 
   const filter = useFilter();
   const modal = useModal();
   const snackbar = useSnackbar();
 
-  const {min, max} = useMemo(() => helpers.findMinMax(data, 'amount'), [data]);
+  const {transactions} = useSelector(
+    (state: storeTypes.RootState) => state.transaction,
+  );
+
+  let d = data ? data : transactions;
+
+  const {min, max} = useMemo(() => helpers.findMinMax(d, 'amount'), [d]);
   const [amountRange, setAmountRange] = useState({
     from: min,
     to: max,

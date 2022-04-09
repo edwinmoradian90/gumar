@@ -8,6 +8,7 @@ import * as View from './src/views';
 import {colors} from './src/utils';
 import {appTypes} from './src/types';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import {NewTransaction} from './src/components';
 
 export default function App() {
   const [isSplash, setIsSplash] = useState(true);

@@ -8,13 +8,19 @@ import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
 import {style} from '../styles';
 import {appTypes, modalTypes, storeTypes, transactionTypes} from '../types';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {colors} from '../utils';
 import {Appbar} from 'react-native-paper';
 import newTransactionStyles from '../styles/newTransaction';
-import {useModal, useSnackbar, useTransactions} from '../hooks';
+import {useAppData, useModal, useSnackbar, useTransactions} from '../hooks';
 
-export default function NewTransaction() {
+export default function NewTransaction({
+  isVisible,
+  setIsVisible,
+}: {
+  isVisible: boolean;
+  setIsVisible: any;
+}) {
   const dispatch = useDispatch();
   const navigation = useNavigation<appTypes.Navigation>();
   const {modalVisible} = useSelector(
@@ -48,7 +54,7 @@ export default function NewTransaction() {
       installment,
     );
 
-    modal.hide();
+    setIsVisible(false);
     snackbar.createAndShow('Transaction created');
     resetState();
   }
@@ -56,16 +62,16 @@ export default function NewTransaction() {
   return (
     <ReactNativeModal
       style={style.newTransaction.modalContainer}
-      isVisible={modalVisible === modalTypes.ModalVisible.ADD}
+      isVisible={isVisible}
       swipeDirection={['down']}
-      onBackdropPress={() => dispatch(actions.modal.setNotVisible())}
-      onSwipeComplete={() => dispatch(actions.modal.setNotVisible())}>
+      onBackdropPress={() => setIsVisible(false)}
+      onSwipeComplete={() => setIsVisible(false)}>
       <View style={style.newTransaction.modalView}>
         <Appbar.Header
           style={{backgroundColor: colors.white, elevation: 0}}
           dark={false}>
           <Appbar.Content title="Create Transaction" />
-          <Component.AppbarActions.ModalCloseButton />
+          <Appbar.Action icon="close" onPress={() => setIsVisible(false)} />
         </Appbar.Header>
         <View style={style.newTransaction.container}>
           <Subheading>Transaction name</Subheading>

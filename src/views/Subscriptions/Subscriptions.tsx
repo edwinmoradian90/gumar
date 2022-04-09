@@ -1,12 +1,15 @@
 import React from 'react';
 import * as Component from '../../components';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {Appbar, Divider, Headline, Paragraph} from 'react-native-paper';
 import {colors} from '../../utils';
 import {ScrollView, View} from 'react-native';
 
 export default function Subscriptions() {
   const navigation = useNavigation();
+  const route = useRoute<any>();
+
+  console.log(route.name);
 
   return (
     <React.Fragment>

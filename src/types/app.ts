@@ -26,11 +26,12 @@ export enum Mode {
 }
 
 export enum Page {
-  HOME_SCREEN = 'HomeScreen',
-  EDIT_SCREEN = 'EditScreen',
-  SETTINGS_SCREEN = 'SettingsScreen',
-  SETTING_SCREEN = 'SettingScreen',
-  STATS_SCREEN = 'StatsScreen',
+  HOME = 'HomeScreen',
+  EDIT = 'EditScreen',
+  TRANSACTIONS = 'TransactionsScreen',
+  SUBSCRIPTIONS = 'SubscriptionsScreen',
+  SETTINGS = 'SettingsScreen',
+  SETTING = 'SettingScreen',
 }
 
 export enum NavigationInitiator {
@@ -41,6 +42,7 @@ export interface State {
   mode: Mode;
   editTarget: EditTarget;
   status: Status;
+  page: Page;
 }
 
 export type RootStackParamList = {

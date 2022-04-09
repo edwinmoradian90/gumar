@@ -13,7 +13,13 @@ import {
 import {appTypes, selectTypes, spreadSheetTypes, storeTypes} from '../types';
 import {colors} from '../utils';
 
-export default function SpreadSheet() {
+export default function SpreadSheet({
+  isVisible,
+  setIsVisible,
+}: {
+  isVisible?: boolean;
+  setIsVisible: (arg: boolean) => void;
+}) {
   const [submitted, setSubmitted] = useState(false);
   const [title, setTitle] = useState('');
   const {accessToken} = useSelector(
@@ -49,7 +55,7 @@ export default function SpreadSheet() {
 
   function onSuccess() {
     resetSelect();
-    modal.hide();
+    setIsVisible(false);
     handleSnackbar();
     setSubmitted(false);
   }

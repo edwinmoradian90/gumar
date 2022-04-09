@@ -1,33 +1,25 @@
 import moment from 'moment';
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, Text, View} from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import * as Component from '../components';
-import {actions} from '../redux';
 import homeStyles from '../styles/home';
-import {
-  appTypes,
-  transactionTypes,
-  storeTypes,
-  modalTypes,
-  snackbarTypes,
-  selectTypes,
-} from '../types';
-import {colors, helpers} from '../utils';
-import {Appbar, Button, Card, Colors, IconButton} from 'react-native-paper';
+import {appTypes, transactionTypes, storeTypes} from '../types';
+import {colors} from '../utils';
+import {Appbar, Button, Card, Colors} from 'react-native-paper';
 import useTotal from '../hooks/useTotal';
-import {useFilter, useMode, useSelect} from '../hooks';
 
 export default function Home() {
   const navigation = useNavigation<any>();
-  const dispatch = useDispatch();
   const [total, symbol] = useTotal();
   const [totalMonth] = useTotal({
     dateRangeFrom: moment().startOf('month').format('YYYY-MM-DD hh:mm'),
     dateRangeTo: moment().endOf('month').format('YYYY-MM-DD hh:mm'),
   });
+
+  const [showNewTransaction, setShowNewTransaction] = useState(false);
 
   const {transactions, status} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
@@ -59,9 +51,7 @@ export default function Home() {
         <Appbar.Content title="Overview" />
         <Appbar.Action
           icon="plus"
-          onPress={() =>
-            dispatch(actions.modal.setVisible(modalTypes.ModalVisible.ADD))
-          }
+          onPress={() => setShowNewTransaction(true)}
         />
       </Appbar.Header>
       <ScrollView
@@ -242,6 +232,10 @@ export default function Home() {
           )}
         </React.Fragment>
       </ScrollView>
+      <Component.NewTransaction
+        isVisible={showNewTransaction}
+        setIsVisible={setShowNewTransaction}
+      />
       <Component.Search containerBackgroundColor={colors.altBackground} />
     </React.Fragment>
   );

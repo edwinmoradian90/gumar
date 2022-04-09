@@ -1,16 +1,18 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native';
 import {Appbar, Colors, Divider} from 'react-native-paper';
 import * as Component from '../components';
-import {useModal} from '../hooks';
 import {appTypes, modalTypes} from '../types';
 import {colors, helpers} from '../utils';
 
 export default function Transactions() {
-  const route = useRoute<appTypes.TransactionsScreenProp>();
+  const route = useRoute<any>();
   const navigation = useNavigation();
-  const modal = useModal();
+
+  const [showNewTransaction, setShowNewTransaction] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
+  const [showExport, setShowExport] = useState(false);
 
   const category = route.params?.category;
   const isSearchResult =
@@ -18,10 +20,6 @@ export default function Transactions() {
 
   function handleBack() {
     navigation.goBack();
-  }
-
-  function handleAdd() {
-    modal.show(modalTypes.ModalVisible.ADD);
   }
 
   return (
@@ -40,12 +38,14 @@ export default function Transactions() {
           }}
           icon="plus"
           color={colors.iconButtonColor}
-          onPress={handleAdd}
+          onPress={() => setShowNewTransaction(true)}
         />
       </Appbar.Header>
       <Component.Toolbar
         startSpace={90}
         title={category && helpers.capitalize(category)}
+        isExportVisible={showExport}
+        setIsExportVisible={setShowExport}
       />
       <Divider />
       <ScrollView>
@@ -56,6 +56,12 @@ export default function Transactions() {
           hasSelectMode={true}
         />
       </ScrollView>
+      <Component.NewTransaction
+        isVisible={showNewTransaction}
+        setIsVisible={setShowNewTransaction}
+      />
+      <Component.Export isVisible={showExport} setIsVisible={setShowExport} />
+      <Component.Filter isVisible={showFilter} setIsVisible={setShowFilter} />
       <Component.Search
         containerBackgroundColor={colors.white}
         searchBackgroundColor={colors.altBackground}

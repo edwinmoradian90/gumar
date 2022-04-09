@@ -3,18 +3,28 @@ import * as Component from '../components';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 import {Snackbar} from 'react-native-paper';
 import {useSelector} from 'react-redux';
-import {storeTypes, transactionTypes} from '../types';
+import {storeTypes, subscriptionTypes, transactionTypes} from '../types';
 import {colors, _} from '../utils';
-import {useSnackbar, useTransactions, useTransactionsFilter} from '../hooks';
+import {
+  useAppData,
+  useSnackbar,
+  useSubscriptions,
+  useTransactions,
+  useTransactionsFilter,
+} from '../hooks';
+import {useRoute} from '@react-navigation/native';
 
 export default function Layout({
   children,
 }: {
   children: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
 }) {
-  const sb = useSnackbar();
   const snackbar = useSelector((state: storeTypes.RootState) => state.snackbar);
   const alert = useSelector((state: storeTypes.RootState) => state.alert);
+  const app = useAppData();
+
+  const sb = useSnackbar();
+  const subscriptions = useSubscriptions();
   const {createManualFilter} = useTransactionsFilter();
 
   const manualFilter = createManualFilter(
@@ -25,12 +35,13 @@ export default function Layout({
   const transactions = useTransactions({ignoreFilter: true, manualFilter});
 
   const recentSubscriptions = useMemo(() => {
-    const subscriptions = _.transactions.getSubscriptions(
+    const subscriptionTransactions = _.transactions.getSubscriptionTransactions(
       transactions.modified,
     );
-    if (subscriptions.length === 0) return {};
-    const recentSubscriptions =
-      _.transactions.recentSubscriptionMap(subscriptions);
+    if (subscriptionTransactions.length === 0) return {};
+    const recentSubscriptions = _.transactions.recentSubscriptionMap(
+      subscriptionTransactions,
+    );
 
     return recentSubscriptions;
   }, [transactions.modified]);
@@ -38,10 +49,18 @@ export default function Layout({
   useEffect(() => {
     const subCheck = setInterval(() => {
       let updateCount = 0;
+
       Object.values(recentSubscriptions).forEach(
         (subscription: transactionTypes.Transaction) => {
+          const {subscriptionId} = subscription;
           if (!_.transactions.shouldAutoPopulate(subscription)) return;
-          updateCount++;
+
+          const s = subscriptions.data.filter(
+            (s: subscriptionTypes.Subscription) => s.id === subscriptionId,
+          )[0];
+
+          if (s && s.frozen) return;
+          if (subscription) updateCount++;
           transactions.autoCreateSubscriptionTransaction(subscription);
         },
       );
@@ -56,16 +75,18 @@ export default function Layout({
       }
     }, 60 * 1000);
     return () => clearInterval(subCheck);
-  }, [transactions.modified]);
+  }, [
+    transactions.modified,
+    subscriptions.data,
+    subscriptions.dataWithTransactions,
+  ]);
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={colors.primary} barStyle="dark-content" />
       {children}
-      <Component.NewTransaction />
       <Component.Export />
       <Component.SortOptions />
-      {/* <Component.Filter data={transactions.all} /> */}
       <Snackbar
         duration={5000}
         visible={snackbar.visible}

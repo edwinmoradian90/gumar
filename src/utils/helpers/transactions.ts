@@ -115,7 +115,9 @@ export function recentSubscriptionMap(
   return grouped;
 }
 
-export function getSubscriptions(transactions: transactionTypes.Transaction[]) {
+export function getSubscriptionTransactions(
+  transactions: transactionTypes.Transaction[],
+) {
   if (transactions.length === 0) return [];
   return transactions.filter((transaction: transactionTypes.Transaction) =>
     isSubscription(transaction),

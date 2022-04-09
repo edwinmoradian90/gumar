@@ -1,5 +1,9 @@
 import {constants} from '..';
-import {appTypes, storeTypes} from '../../types';
+import {appTypes} from '../../types';
+
+export function setPage(page: appTypes.Page) {
+  return {type: constants.app.SET_PAGE, page};
+}
 
 export function setMode(mode: appTypes.Mode) {
   return {type: constants.app.SET_MODE, mode};

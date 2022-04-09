@@ -1,10 +1,10 @@
 import {useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
-import {modalTypes, storeTypes} from '../types';
+import {appTypes, modalTypes, storeTypes} from '../types';
 import {helpers} from '../utils';
 
-export default function useModal(): any {
+export default function useModal(page?: appTypes.Page): any {
   const dispatch = useDispatch();
   const modal = useSelector((state: storeTypes.RootState) => state.modal);
 

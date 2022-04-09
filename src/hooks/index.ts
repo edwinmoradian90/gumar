@@ -1,5 +1,6 @@
 import useAccount from './useAccount';
 import useAlert from './useAlert';
+import useAppData from './useAppData';
 import useExport from './useExport';
 import useFilter from './useFilter';
 import useHeaderActions from './useHeaderActions';
@@ -18,6 +19,7 @@ import useTransactionsFilter from './useTransactionsFilter';
 export {
   useAccount,
   useAlert,
+  useAppData,
   useExport,
   useFilter,
   useHeaderActions,

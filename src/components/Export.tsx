@@ -2,27 +2,32 @@ import React from 'react';
 import ReactNativeModal from 'react-native-modal';
 import {Text, ScrollView, StyleSheet, View} from 'react-native';
 import {colors} from '../utils';
-import {useAccount, useModal} from '../hooks';
+import {useAccount} from '../hooks';
 import {Appbar, Subheading} from 'react-native-paper';
 import * as Component from '../components';
 
-export default function Export() {
-  const modal = useModal();
+export default function Export({
+  isVisible,
+  setIsVisible,
+}: {
+  isVisible: boolean;
+  setIsVisible: (arg: boolean) => void;
+}) {
   const account = useAccount();
 
   return (
     <ReactNativeModal
       style={styles.modalContainer}
-      isVisible={modal.isExportModal}
+      isVisible={isVisible}
       swipeDirection={['down']}
-      onBackdropPress={modal.hide}
-      onSwipeComplete={modal.hide}>
+      onBackdropPress={() => setIsVisible(false)}
+      onSwipeComplete={() => setIsVisible(false)}>
       <ScrollView style={styles.modalView}>
         <Appbar.Header
           style={{backgroundColor: colors.background, elevation: 0}}
           dark={false}>
           <Appbar.Content title="Export" />
-          <Component.AppbarActions.ModalCloseButton />
+          <Appbar.Action icon="close" onPress={() => setIsVisible(false)} />
         </Appbar.Header>
         <View style={styles.modalContent}>
           {account.isLoggedIn ? (
@@ -30,7 +35,7 @@ export default function Export() {
               <Subheading style={{paddingVertical: 10}}>
                 Spread Sheet Information
               </Subheading>
-              <Component.SpreadSheet />
+              <Component.SpreadSheet setIsVisible={setIsVisible} />
             </React.Fragment>
           ) : (
             <React.Fragment>

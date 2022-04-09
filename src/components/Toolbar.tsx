@@ -17,15 +17,18 @@ import {colors} from '../utils';
 export default function Toolbar({
   title = 'All',
   startSpace = 0,
+  isExportVisible,
+  setIsExportVisible,
 }: {
   title?: string;
   startSpace?: number;
+  isExportVisible: boolean;
+  setIsExportVisible: (arg: boolean) => void;
 }) {
   const {setMode, isSelectMode} = useMode();
   const {selectionObject} = useSelect();
   const dispatch = useDispatch();
   const sort = useSort();
-  const filter = useFilter();
 
   const [allSelected, setAllSelected] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -156,7 +159,10 @@ export default function Toolbar({
         />
       </Menu>
       <Component.AppbarActions.FilterButton />
-      <Component.AppbarActions.ExportButton />
+      <Component.AppbarActions.ExportButton
+        isVisible={isExportVisible}
+        setIsVisible={setIsExportVisible}
+      />
       <Appbar.Action
         size={22}
         icon="trash-can-outline"
