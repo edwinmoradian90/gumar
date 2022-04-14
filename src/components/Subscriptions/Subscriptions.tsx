@@ -62,6 +62,28 @@ Freeze subscription?`,
       }
     }
 
+    function onPressRemove() {
+      setShowMenu({...showMenu, [subscriptionId]: false});
+
+      const onConfirm = () => {
+        const snackbarTitle = `Subscription "${subscription.name}" has been removed`;
+
+        alert.hide();
+        subscriptions.remove(subscriptionId);
+        snackbar.createAndShow(snackbarTitle);
+      };
+
+      alert.createAndShow(
+        'Are you sure?',
+        `Removing a subscription is irreversible, however, the transactions created by the subscription will not be affected.
+Remove subscription?
+        `,
+        'Remove',
+        'Cancel',
+        onConfirm,
+      );
+    }
+
     console.log('SUB ', subscription);
     return (
       <React.Fragment>
@@ -70,8 +92,12 @@ Freeze subscription?`,
           title={subscription.frozen ? 'Activate' : 'Freeze'}
           onPress={onPressFreeze}
         />
-        <Divider />
-        <Menu.Item icon="trash-can-outline" title="Remove" />
+        <Divider style={{marginHorizontal: 20}} />
+        <Menu.Item
+          icon="trash-can-outline"
+          title="Remove"
+          onPress={onPressRemove}
+        />
       </React.Fragment>
     );
   };

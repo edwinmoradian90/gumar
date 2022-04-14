@@ -21,12 +21,18 @@ export default function useSubscriptions() {
     return installment !== transactionTypes.Installment.SINGLE;
   }
 
-  function create(paymentInterval: transactionTypes.Installment) {
+  function create(
+    name: string,
+    amount: string,
+    paymentInterval: transactionTypes.Installment,
+  ) {
     const id = uuid.v4() as string;
     const date = new Date();
 
     const subscription: subscriptionTypes.Subscription = {
       id,
+      name,
+      amount,
       paymentInterval,
       frozen: false,
       recent: date,
@@ -56,6 +62,7 @@ export default function useSubscriptions() {
     const newSubscriptions = subscriptions.data.filter(
       (subscription: subscriptionTypes.Subscription) => subscription.id !== id,
     );
+
     dispatch(actions.subscriptions.remove(newSubscriptions));
   }
 

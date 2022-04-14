@@ -118,6 +118,18 @@ function adate(a: any, b: any): 1 | -1 | 0 {
   return 0;
 }
 
+function dupdated(a: any, b: any): 1 | -1 | 0 {
+  if (moment(a.date).isBefore(b.date)) return -1;
+  if (moment(b.date).isBefore(a.date)) return 1;
+  return 0;
+}
+
+function aupdated(a: any, b: any): 1 | -1 | 0 {
+  if (moment(a.udpatedAt).isAfter(b.updatedAt)) return -1;
+  if (moment(b.updatedAt).isAfter(a.updatedAt)) return 1;
+  return 0;
+}
+
 function aamount(a: any, b: any) {
   const intA = parseInt(a.amount);
   const intB = parseInt(b.amount);
@@ -149,6 +161,8 @@ function dname(a: any, b: any) {
 export const compare = {
   adate,
   ddate,
+  aupdated,
+  dupdated,
   aamount,
   damount,
   aname,

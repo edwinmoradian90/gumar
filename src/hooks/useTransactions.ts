@@ -1,11 +1,12 @@
 import uuid from 'react-native-uuid';
-import {SetStateAction, useMemo, useState} from 'react';
+import {useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {actions} from '../redux';
-import {storeTypes, transactionTypes} from '../types';
+import {storeTypes, subscriptionTypes, transactionTypes} from '../types';
 import {filter, helpers, _} from '../utils';
 import {useFilter, useSearch, useSort} from '.';
 import useSubscriptions from './useSubscriptions';
+import useSnackbar from './useSnackbar';
 
 // move to types
 
@@ -37,6 +38,7 @@ export default function useTransactions(props?: UseTransactionsProps) {
   const sort = useSort();
   const search = useSearch();
   const subscriptions = useSubscriptions();
+  const snackbar = useSnackbar();
 
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
@@ -121,7 +123,7 @@ export default function useTransactions(props?: UseTransactionsProps) {
     const updatedTransactions = transactions.map(
       (transaction: transactionTypes.Transaction) => {
         if (transaction.id !== transactionId) return transaction;
-        return {...transaction, subscriptionId: null};
+        return {...transaction, subscriptionId: null, updatedAt: new Date()};
       },
     );
 
@@ -139,7 +141,7 @@ export default function useTransactions(props?: UseTransactionsProps) {
     const date = new Date();
 
     if (_.transactions.isSubscription({installment})) {
-      const subscription = subscriptions.create(installment);
+      const subscription = subscriptions.create(name, amount, installment);
       subscriptionId = subscription.id;
     }
 
@@ -152,6 +154,8 @@ export default function useTransactions(props?: UseTransactionsProps) {
         subscriptionId,
         id,
         date,
+        createdAt: date,
+        updatedAt: date,
       }),
     );
 
@@ -189,7 +193,16 @@ export default function useTransactions(props?: UseTransactionsProps) {
   ) {
     const id = uuid.v4() as string;
     const date = _.transactions.getUpdatedSubscriptionDate(transaction);
-    const updated = {...transaction, id, date};
+    const subscription = subscriptions.data.filter(
+      (subscription: subscriptionTypes.Subscription) =>
+        subscription.id === transaction.subscriptionId,
+    );
+
+    if (subscription.length === 0) {
+      return snackbar.createAndShow('Could not automatically add transaction');
+    }
+
+    const updated = {...transaction, id, date, amount: subscription[0].amount};
 
     dispatch(actions.transaction.append(updated));
 

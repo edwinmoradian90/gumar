@@ -47,4 +47,6 @@ export interface Transaction {
   installment: Installment;
   subscriptionId: string | null;
   date: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

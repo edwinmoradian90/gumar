@@ -221,7 +221,7 @@ function Edit() {
         )}
         title="Date"
         description={() => (
-          <>
+          <React.Fragment>
             {editTarget === appTypes.EditTarget.DATE ? (
               <DatePicker
                 modal
@@ -235,7 +235,7 @@ function Edit() {
             ) : (
               <Text>{date}</Text>
             )}
-          </>
+          </React.Fragment>
         )}
         onPress={onPress(appTypes.EditTarget.DATE)}
       />
@@ -255,7 +255,7 @@ function Edit() {
         )}
         title="Time"
         description={() => (
-          <>
+          <React.Fragment>
             {editTarget === appTypes.EditTarget.TIME ? (
               <DatePicker
                 modal
@@ -271,7 +271,7 @@ function Edit() {
             ) : (
               <Text>{time}</Text>
             )}
-          </>
+          </React.Fragment>
         )}
         onPress={onPress(appTypes.EditTarget.TIME)}
       />

@@ -35,10 +35,10 @@ export default function Category({
   const {total, lastUpdated} = useMemo(() => {
     let total = 0;
     let lastUpdated = null;
-
+    console.log('last updated');
     transactions.modified.length > 0 &&
       transactions.modified
-        .sort(helpers.compare.adate)
+        .sort(helpers.compare.aupdated)
         .forEach(
           (transaction: transactionTypes.Transaction) =>
             (total += parseInt(transaction.amount)),
@@ -46,15 +46,15 @@ export default function Category({
 
     lastUpdated =
       transactions.modified.length > 0
-        ? transactions.modified[0].date
+        ? transactions.modified[0].updatedAt
         : lastUpdated;
 
     return {total, lastUpdated};
-  }, [transactions.modified]);
+  }, [transactions.all]);
 
   const description = useMemo(() => {
     return `Updated ${moment(lastUpdated).fromNow()}`;
-  }, [transactions.modified]);
+  }, [transactions.all]);
 
   function handleView() {
     setShowMenu(false);

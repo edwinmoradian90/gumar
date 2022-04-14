@@ -53,13 +53,13 @@ export default function Layout({
       Object.values(recentSubscriptions).forEach(
         (subscription: transactionTypes.Transaction) => {
           const {subscriptionId} = subscription;
+
           if (!_.transactions.shouldAutoPopulate(subscription)) return;
 
           const s = subscriptions.data.filter(
             (s: subscriptionTypes.Subscription) => s.id === subscriptionId,
           )[0];
-
-          if (s && s.frozen) return;
+          if (!s || (s && s.frozen)) return;
           if (subscription) updateCount++;
           transactions.autoCreateSubscriptionTransaction(subscription);
         },
@@ -85,7 +85,6 @@ export default function Layout({
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={colors.primary} barStyle="dark-content" />
       {children}
-      <Component.Export />
       <Component.SortOptions />
       <Snackbar
         duration={5000}

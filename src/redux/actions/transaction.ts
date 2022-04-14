@@ -66,7 +66,11 @@ export function update(
       const updatedTransactions = transactions.map(
         (transaction: transactionTypes.Transaction) => {
           if (transaction.id === id) {
-            return {...transaction, ...updatedTransaction};
+            return {
+              ...transaction,
+              ...updatedTransaction,
+              updatedAt: new Date(),
+            };
           }
 
           return transaction;
