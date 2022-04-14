@@ -29,18 +29,19 @@ const settingsData = [
     description: 'Connect to your google account',
     iconLeft: 'account-check-outline',
   },
-  {
-    id: 'privacy-security',
-    name: 'Privacy & Security',
-    description: 'Add and update app password',
-    iconLeft: 'hand-front-right-outline',
-  },
-  {
-    id: 'terms-of-use',
-    name: 'Terms of use',
-    description: 'Privacy policy and terms of service',
-    iconLeft: 'file-document-multiple-outline',
-  },
+  // include in future release
+  // {
+  //   id: 'privacy-security',
+  //   name: 'Privacy & Security',
+  //   description: 'Add and update app password',
+  //   iconLeft: 'hand-front-right-outline',
+  // },
+  // {
+  //   id: 'terms-of-use',
+  //   name: 'Terms of use',
+  //   description: 'Privacy policy and terms of service',
+  //   iconLeft: 'file-document-multiple-outline',
+  // },
 ];
 
 export default function Settings() {

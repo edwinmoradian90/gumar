@@ -24,6 +24,7 @@ export default function useSubscriptions() {
   function create(
     name: string,
     amount: string,
+    paymentMethod: transactionTypes.PaymentMethod,
     paymentInterval: transactionTypes.Installment,
   ) {
     const id = uuid.v4() as string;
@@ -33,6 +34,7 @@ export default function useSubscriptions() {
       id,
       name,
       amount,
+      paymentMethod,
       paymentInterval,
       frozen: false,
       recent: date,

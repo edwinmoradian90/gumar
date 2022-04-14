@@ -141,7 +141,12 @@ export default function useTransactions(props?: UseTransactionsProps) {
     const date = new Date();
 
     if (_.transactions.isSubscription({installment})) {
-      const subscription = subscriptions.create(name, amount, installment);
+      const subscription = subscriptions.create(
+        name,
+        amount,
+        paymentMethod,
+        installment,
+      );
       subscriptionId = subscription.id;
     }
 

@@ -18,6 +18,8 @@ export default function Account() {
   const navigation = useNavigation();
   const account = useAccount();
 
+  console.log(account.data, 'AC');
+
   return (
     <React.Fragment>
       <Appbar.Header style={styles.header} dark={false}>
@@ -31,24 +33,30 @@ export default function Account() {
           your google account.
         </Paragraph>
         <Divider style={{marginVertical: 30}} />
-        <View>
-          <List.Item
-            title="Name"
-            description={account.data.givenName}
-            left={() => <List.Icon icon="account-box-outline" />}
-          />
-          <List.Item
-            title="Email"
-            description={account.data.email}
-            left={() => <List.Icon icon="email-outline" />}
-          />
+        {account.data.email && account.data.givenName ? (
+          <View>
+            <List.Item
+              title="Name"
+              description={account.data.givenName}
+              left={() => <List.Icon icon="account-box-outline" />}
+            />
+            <List.Item
+              title="Email"
+              description={account.data.email}
+              left={() => <List.Icon icon="email-outline" />}
+            />
 
-          <List.Item
-            title="Status"
-            description={account.isLoggedIn ? 'Signed in' : 'Signed out'}
-            left={() => <List.Icon icon="check-network-outline" />}
-          />
-        </View>
+            <List.Item
+              title="Status"
+              description={account.isLoggedIn ? 'Signed in' : 'Signed out'}
+              left={() => <List.Icon icon="check-network-outline" />}
+            />
+          </View>
+        ) : (
+          <Subheading style={{textAlign: 'center'}}>
+            Looks like you haven't signed in before.
+          </Subheading>
+        )}
         <Component.Login />
       </View>
     </React.Fragment>

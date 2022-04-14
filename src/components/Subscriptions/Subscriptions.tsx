@@ -30,9 +30,9 @@ export default function Subscriptions() {
   const RightMenu = ({
     subscription,
   }: {
-    subscription: subscriptionTypes.Subscription & transactionTypes.Transaction;
+    subscription: subscriptionTypes.Subscription;
   }) => {
-    const subscriptionId = subscription.subscriptionId as string;
+    const subscriptionId = subscription.id as string;
 
     function onPressFreeze() {
       setShowMenu({...showMenu, [subscriptionId]: false});
@@ -105,7 +105,7 @@ Remove subscription?
   const Description = ({
     subscription,
   }: {
-    subscription: transactionTypes.Transaction & subscriptionTypes.Subscription;
+    subscription: subscriptionTypes.Subscription;
   }) => {
     return (
       <View>
@@ -168,13 +168,9 @@ Remove subscription?
 
   return (
     <List.Section>
-      {subscriptions.dataWithTransactions.map(
-        (
-          subscription: subscriptionTypes.Subscription &
-            transactionTypes.Transaction,
-          index: number,
-        ) => {
-          const subscriptionId = subscription.subscriptionId as string;
+      {subscriptions.data.map(
+        (subscription: subscriptionTypes.Subscription, index: number) => {
+          const subscriptionId = subscription.id as string;
 
           return (
             <React.Fragment key={subscription.id}>

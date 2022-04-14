@@ -6,6 +6,7 @@ export interface Subscription {
   amount: string;
   frozen: boolean;
   paymentInterval: transactionTypes.Installment;
+  paymentMethod: transactionTypes.PaymentMethod;
   recent: Date;
   createdAt: Date;
   updatedAt: Date;
