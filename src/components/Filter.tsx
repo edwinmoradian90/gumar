@@ -17,8 +17,6 @@ import {useFilter, useModal, useSnackbar} from '../hooks';
 import {useSelector} from 'react-redux';
 
 export default function Filter({
-  isVisible,
-  setIsVisible,
   data,
 }: {
   isVisible: boolean;
@@ -35,27 +33,40 @@ export default function Filter({
     (state: storeTypes.RootState) => state.transaction,
   );
 
+  const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
+
   let d = data ? data : transactions;
 
   const {min, max} = useMemo(() => helpers.findMinMax(d, 'amount'), [d]);
+
   const [amountRange, setAmountRange] = useState({
-    from: min,
-    to: max,
+    from: filter.data.amountRangeFrom,
+    to: filter.data.amountRangeTo,
   });
+
+  console.log(filter.data.amountRangeFrom);
+
   const [dateRange, setDateRange] = useState({
     from: filter.data.dateRangeFrom,
     to: filter.data.dateRangeTo,
   });
+
   const [toggleDateRange, setToggleDateRange] = useState({
     from: false,
     to: false,
   });
+
   const [name, setName] = useState('');
 
   function initialInstallmentState() {
     const installments: {[index: string]: selectTypes.Status} = {};
     const values = Object.values(transactionTypes.Installment);
     values.forEach((value: string) => {
+      if (
+        value === transactionTypes.Installment.NONE ||
+        value === transactionTypes.Installment.OTHER
+      )
+        return;
       installments[value] = selectTypes.Status.UNCHECKED;
     });
     return installments;
@@ -82,23 +93,18 @@ export default function Filter({
   );
 
   function handleResetFilter() {
-    const from = filter.data.rangeAmountFrom || min;
-    const to = filter.data.rangeAmountTo || max;
-
     filter.reset();
 
+    setInstallments(initialInstallmentState);
     setPaymentMethods(initialPaymentMethodState);
-    setAmountRange({from, to});
+    setAmountRange({from: '', to: ''});
     setDateRange({
       from: filter.data.dateRangeFrom,
       to: filter.data.dateRangeTo,
     });
     setName(filter.data.name);
-  }
 
-  function handleSnackbar() {
-    const sb = snackbar.create('Filter applied.');
-    snackbar.show(sb);
+    snackbar.createAndShow('Filter removed');
   }
 
   function handleSubmit() {
@@ -107,7 +113,7 @@ export default function Filter({
     );
 
     const selectedInstallments = Object.keys(installments).filter(
-      (key: string) => installments[key],
+      (key: string) => installments[key] === selectTypes.Status.CHECKED,
     );
 
     const amountRangeTo = amountRange.to || max;
@@ -124,13 +130,12 @@ export default function Filter({
     });
 
     modal.hide();
-
-    handleSnackbar();
+    snackbar.createAndShow('Filter applied');
   }
 
-  useEffect(() => {
-    if (!filter.isEnabled) handleResetFilter();
-  }, [filter.isEnabled, filter.data.paymentMethods]);
+  // useEffect(() => {
+  //   if (!filter.isEnabled) handleResetFilter();
+  // }, [filter.isEnabled, filter.data.paymentMethods]);
 
   const InstallmentOption = ({name, type}: {name: string; type: string}) => {
     return (
@@ -179,9 +184,11 @@ export default function Filter({
     );
   };
 
-  useEffect(() => {
-    setAmountRange({from: min, to: max});
-  }, [min, max]);
+  console.log(filter.data.amountRangeTo);
+
+  // useEffect(() => {
+  //   setAmountRange({from: min, to: max});
+  // }, [min, max]);
 
   return (
     <ReactNativeModal
@@ -229,8 +236,8 @@ export default function Filter({
                   style={{backgroundColor: colors.background}}
                   keyboardType="numeric"
                   activeUnderlineColor={colors.secondary}
-                  placeholder={amountRange.from}
-                  value={filter.data.amountRangeFrom}
+                  label={`Min ${symbol}${min}`}
+                  value={amountRange.from}
                   onChangeText={(newAmount: string) =>
                     setAmountRange({
                       ...amountRange,
@@ -245,8 +252,8 @@ export default function Filter({
                   style={{backgroundColor: colors.background}}
                   keyboardType="numeric"
                   activeUnderlineColor={colors.secondary}
-                  placeholder={amountRange.to}
-                  value={filter.data.amountRangeTo}
+                  label={`Max ${symbol}${max}`}
+                  value={amountRange.to}
                   onChangeText={(newAmount: string) =>
                     setAmountRange({...amountRange, to: newAmount})
                   }
@@ -339,6 +346,11 @@ export default function Filter({
           <View>
             <Subheading style={{paddingBottom: 10}}>Installment</Subheading>
             {Object.keys(installments).map((key: string, index: number) => {
+              if (
+                key === transactionTypes.Installment.NONE ||
+                key === transactionTypes.Installment.OTHER
+              )
+                return;
               const name = helpers.capitalize(key);
               return (
                 <InstallmentOption

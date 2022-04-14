@@ -18,6 +18,7 @@ interface UseTransactionsProps {
   manualFilter?: (transaction: transactionTypes.Transaction) => boolean;
   ignoreFilter?: boolean;
   category?: transactionTypes.PaymentMethod;
+  subscription?: subscriptionTypes.Subscription;
   selected?: string[];
 }
 
