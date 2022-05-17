@@ -66,13 +66,7 @@ export default function Home() {
                 Looks like you have no transactions...
               </Text>
               <Text style={homeStyles.p}>Go buy something!</Text>
-              <View style={homeStyles.bagIcon}>
-                <FontAwesome5Icon
-                  name="shopping-bag"
-                  size={50}
-                  color={colors.secondary}
-                />
-              </View>
+              <Text style={{fontSize: 40}}>🛍</Text>
             </View>
           ) : (
             <View style={{paddingTop: 100}}>

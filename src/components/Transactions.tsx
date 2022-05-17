@@ -192,7 +192,18 @@ function Transactions({
     };
   }, []);
 
-  if (transactions.length === 0) return <Text>Nothing here...</Text>;
+  if (transactions.length === 0)
+    return (
+      <React.Fragment>
+        <Text
+          style={{color: colors.mainText, textAlign: 'center', paddingTop: 10}}>
+          Nothing here...
+        </Text>
+        <Text style={{fontSize: 26, textAlign: 'center', paddingTop: 10}}>
+          🥺
+        </Text>
+      </React.Fragment>
+    );
 
   return (
     <View style={{paddingTop: startSpace}}>
