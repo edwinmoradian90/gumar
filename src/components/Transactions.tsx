@@ -50,6 +50,8 @@ function Transactions({
   const {transactions} = useSelector(
     (state: storeTypes.RootState) => state.transaction,
   );
+
+  console.log(transactions);
   const {symbol} = useSelector((state: storeTypes.RootState) => state.currency);
 
   const [showMore, setShowMore] = useState(false);

@@ -14,6 +14,7 @@ async function setSheetValues(
   spreadSheetId: string,
   transactions: transactionTypes.Transaction[],
 ) {
+  console.log(transactions);
   const batchUpdateUrl = `${config.sheets.url}/${spreadSheetId}/values:batchUpdate`;
   const range = `A1:D${transactions.length + 1}`;
   const categories = ['Name', 'Amount', 'Date', 'Time'];
@@ -56,7 +57,7 @@ export function create(
   return async (dispatch, getState) => {
     const {sheets: currentSheets} = getState().spreadSheets;
     const URL = 'https://sheets.googleapis.com/v4/spreadsheets';
-    console.log({spreadSheet});
+
     try {
       dispatch({type: SPREAD_SHEET});
       const body = {

@@ -40,7 +40,7 @@ export default function SpreadSheet({
 
   function handleCreate() {
     setSubmitted(true);
-    spreadsheets.create(accessToken, {title}, transactions);
+    spreadsheets.create(accessToken, {title}, transactions.modified);
   }
 
   function handleSnackbar() {
