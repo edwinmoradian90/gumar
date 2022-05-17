@@ -195,7 +195,7 @@ export default function Search({
         onSubmitEditing={onSubmitEditing}
         onIconPress={onSubmitEditing}
       />
-      {/* <Results filteredData={filteredData} /> */}
+      <Results filteredData={filteredData} />
     </View>
   );
 }

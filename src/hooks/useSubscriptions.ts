@@ -103,14 +103,14 @@ export default function useSubscriptions() {
       (subscription: subscriptionTypes.Subscription) => {
         const transactionIndex = transactionSubscriptions.findIndex(
           (t: transactionTypes.Transaction) => {
-            return t.subscriptionId === subscription.id;
+            return t.subscriptionId === subscription?.id;
           },
         );
 
         return {
           ...subscription,
           ...transactionSubscriptions[transactionIndex],
-          id: transactionSubscriptions[transactionIndex].id,
+          id: transactionSubscriptions[transactionIndex]?.id,
         };
       },
     );

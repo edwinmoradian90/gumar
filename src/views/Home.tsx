@@ -56,7 +56,7 @@ export default function Home() {
       </Appbar.Header>
       <ScrollView
         scrollEnabled={!search.isFocused}
-        style={{flex: 1, backgroundColor: Colors.grey100}}>
+        style={{backgroundColor: colors.primary}}>
         <React.Fragment>
           {status === appTypes.Status.SUCCESS &&
           transactions &&
@@ -236,7 +236,9 @@ export default function Home() {
         isVisible={showNewTransaction}
         setIsVisible={setShowNewTransaction}
       />
-      <Component.Search containerBackgroundColor={colors.altBackground} />
+      {transactions.length > 0 && (
+        <Component.Search containerBackgroundColor={colors.altBackground} />
+      )}
     </React.Fragment>
   );
 }

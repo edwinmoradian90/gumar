@@ -47,9 +47,11 @@ export default function NewTransaction({
   }
 
   function onSubmit() {
+    const decimalAmount = parseFloat(amount).toFixed(2);
+    console.log('decimal amount', decimalAmount);
     const {transactionId} = transactions.create(
       name,
-      amount,
+      decimalAmount,
       paymentMethod,
       installment,
     );

@@ -32,10 +32,11 @@ export default function useTotal(props?: UseTotalProps): string[] {
         ]),
       )
       .reduce(
-        (a: number, b: transactionTypes.Transaction) => a + parseInt(b.amount),
+        (a: number, b: transactionTypes.Transaction) =>
+          a + parseFloat(b.amount),
         0,
       );
   }, [transactions, dateRangeFrom, dateRangeTo, paymentMethod]);
 
-  return [total, symbol];
+  return [parseFloat(total).toFixed(2), symbol];
 }

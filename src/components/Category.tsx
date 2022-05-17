@@ -39,10 +39,10 @@ export default function Category({
     transactions.modified.length > 0 &&
       transactions.modified
         .sort(helpers.compare.aupdated)
-        .forEach(
-          (transaction: transactionTypes.Transaction) =>
-            (total += parseInt(transaction.amount)),
-        );
+        .forEach((transaction: transactionTypes.Transaction) => {
+          console.log(transaction.amount);
+          total += parseFloat(transaction.amount);
+        });
 
     lastUpdated =
       transactions.modified.length > 0
@@ -99,7 +99,7 @@ export default function Category({
               style={{
                 fontSize: 16,
                 fontWeight: '300',
-              }}>{`${symbol}${total}`}</Text>
+              }}>{`${symbol}${total.toFixed(2)}`}</Text>
             <Menu
               visible={showMenu}
               onDismiss={() => setShowMenu(false)}

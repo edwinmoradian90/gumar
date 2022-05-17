@@ -1,4 +1,5 @@
-import React, {useState, useLayoutEffect, useEffect, useMemo} from 'react';
+import React, {useState, useLayoutEffect} from 'react';
+import {LogBox} from 'react-native';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {NavigationContainer} from '@react-navigation/native';
@@ -6,11 +7,9 @@ import {createMaterialBottomTabNavigator} from '@react-navigation/material-botto
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as View from './src/views';
 import {colors} from './src/utils';
-import {appTypes} from './src/types';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import {NewTransaction} from './src/components';
 
 export default function App() {
+  LogBox.ignoreAllLogs();
   const [isSplash, setIsSplash] = useState(true);
 
   useLayoutEffect(() => {
